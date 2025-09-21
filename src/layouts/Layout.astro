@@ -1,22 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qatari Virtual Landing</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body>
+    <header class="bg-primary text-white p-4">
+      <nav class="container mx-auto flex justify-between">
+        <a href="/" class="text-lg font-bold">Qatari Virtual</a>
+        <ul class="flex gap-4">
+          <li><a href="/" class="hover:underline">Home</a></li>
+          <li><a href="/about" class="hover:underline">About Us</a></li>
+          <li><a href="/fleet" class="hover:underline">Fleet</a></li>
+          <li><a href="/ranks" class="hover:underline">Ranks</a></li>
+          <li><a href="/staff" class="hover:underline">Staff</a></li>
+          <li><a href="/apply" class="hover:underline">Apply</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main class="container mx-auto p-4">
+      <slot />
+    </main>
+    <footer class="bg-secondary text-white p-4 text-center">
+      &copy; 2025 Qatari Virtual Landing. All rights reserved.
+    </footer>
+  </body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
