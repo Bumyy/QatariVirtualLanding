@@ -1,10 +1,33 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import FeatureCard from '../components/FeatureCard.astro';
 ---
 
 <Layout>
-  <h1 class="text-3xl font-bold text-center">Welcome to Qatari Virtual Landing</h1>
-  <p class="mt-4 text-center">
-    Experience the best virtual aviation with our dedicated team and fleet.
-  </p>
+  <div class="p-8 max-w-7xl mx-auto">
+    <h1 class="text-4xl font-bold text-center mb-12 text-primary">Our Fleet Features</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- Card 1: Standard component, no extra classes -->
+      <FeatureCard title="State-of-the-Art Avionics">
+        Our fleet is equipped with the latest technology for a realistic and safe virtual flying experience.
+      </FeatureCard>
+
+      <!-- Card 2: Customized with extra Tailwind classes -->
+      <!-- We make this one stand out with a border and a stronger hover effect -->
+      <FeatureCard 
+        title="Luxury Virtual Cabins"
+        class="border-2 border-accent hover:scale-105 hover:shadow-2xl"
+      >
+        Experience unparalleled comfort in our meticulously recreated first-class and business cabins.
+      </FeatureCard>
+
+      <!-- Card 3: Another standard card -->
+      <FeatureCard title="Global Route Network">
+        Fly to hundreds of destinations worldwide with our extensive and regularly updated route network.
+      </FeatureCard>
+
+    </div>
+  </div>
 </Layout>
