@@ -1,0 +1,96 @@
+---
+import type { StaffMember, RoleLevel } from '../data/staff';
+
+export interface Props {
+    member: StaffMember;
+}
+
+const { member } = Astro.props;
+
+// --- Helper Functions/Data ---
+
+// Function to map role level to a DaisyUI badge color/style
+const getRoleStyle = (level: RoleLevel) => {
+    switch (level) {
+        case 'Executive':
+            return 'badge-secondary'; // e.g., Purple/High-level
+        case 'Manager':
+            return 'badge-primary';   // e.g., Blue/Mid-level
+        case 'Staff':
+            return 'badge-info';      // e.g., Cyan/Entry-level
+        default:
+            return 'badge-neutral';
+    }
+};
+
+const roleStyle = getRoleStyle(member.role_level);
+const joinedDate = new Date(member.joined).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+});
+---
+
+<!-- DaisyUI Card Structure -->
+<div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+    
+    <!-- Header with Avatar and Role Badges -->
+    <div class="card-body p-6 pb-4">
+        
+        <div class="flex items-center gap-4 mb-4">
+            <!-- Avatar Section -->
+            <div class="avatar">
+                <div class="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <img 
+                        src={member.avatar_url} 
+                        alt={`Avatar for ${member.name}`} 
+                        loading="lazy"
+                        
+                        class="opacity-0 transition-opacity duration-500"
+                        
+                        onload="this.classList.remove('opacity-0'); this.classList.add('opacity-100');"
+                    />             
+                </div>
+            </div>
+
+            <!-- Name and Main Role -->
+            <div>
+                <h2 class="card-title text-primary text-2xl">
+                    {member.name}
+                </h2>
+                <p class="text-lg font-semibold text-base-content/90">
+                    {member.role}
+                </p>
+            </div>
+        </div>
+
+        <!-- Details and Badges -->
+        <div class="flex flex-col gap-2 pt-2 border-t border-base-200">
+            
+            <!-- Callsign and Level -->
+            <div class="flex justify-between items-center text-sm">
+                <p class="text-base-content/70">
+                    Callsign: <span class="font-mono text-secondary-focus font-bold">{member.callsign}</span>
+                </p>
+                <div class:list={["badge", roleStyle]}>
+                    {member.role_level}
+                </div>
+            </div>
+
+            <!-- Joined Date and IFC Link -->
+            <div class="flex justify-between items-center text-sm mt-2">
+                 <p class="text-base-content/60">
+                    Joined: {joinedDate}
+                </p>
+                <a 
+                    href={member.ifc} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="btn btn-outline btn-xs btn-primary"
+                >
+                    IFC Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

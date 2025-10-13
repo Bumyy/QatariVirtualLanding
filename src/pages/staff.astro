@@ -1,10 +1,84 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import StaffCard from '../components/StaffCard.astro';
+import { getStaffRoster, type StaffMember, type RoleLevel } from '../data/staff';
+
+let staffMembers: StaffMember[] = [];
+let error: string | null = null;
+
+try {
+    staffMembers = await getStaffRoster();
+} catch (e) {
+    console.error("Critical error during staff data fetch:", e);
+    // Cast error to displayable message
+    error = e instanceof Error ? e.message : "An unknown error occurred during data fetch.";
+    // If the data fetch fails, staffMembers remains []
+}
+
+// --- Sorting Logic ---
+// 1. Define the order of roles
+const roleOrder: Record<RoleLevel, number> = {
+    'Executive': 1,
+    'Manager': 2,
+    'Staff': 3,
+};
+
+const isValidRoleLevel = (member: StaffMember): boolean => {
+    // Check if the property exists AND if its value is one of the valid keys
+    return member.role_level && roleOrder.hasOwnProperty(member.role_level);
+};
+
+
+// 2. Sort: Adaptively sort by role level (if available) OR by callsign.
+staffMembers.sort((a, b) => {
+    const aHasRole = isValidRoleLevel(a);
+    const bHasRole = isValidRoleLevel(b);
+
+    // --- CASE 1: Both members have a valid role level (The Future State) ---
+    if (aHasRole && bHasRole) {
+        // Primary sort: Role Level
+        const levelDiff = roleOrder[a.role_level] - roleOrder[b.role_level];
+        if (levelDiff !== 0) return levelDiff;
+        
+        // Secondary sort: Callsign
+        return a.callsign.localeCompare(b.callsign);
+    } 
+    
+    // --- CASE 2: No valid role data (The Current State / Fallback) ---
+    // If roles are missing or invalid, we default entirely to sorting by callsign.
+    return a.callsign.localeCompare(b.callsign);
+});
 ---
 
-<Layout>
-  <h1 class="text-3xl font-bold text-center">Staff</h1>
-  <p class="mt-4 text-center">
-    Meet the dedicated staff members who make Qatari Virtual Landing possible.
-  </p>
+<Layout title="Qatari Virtual Staff Roster">
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-5xl font-extrabold text-center text-primary mb-4">Staff Roster</h1>
+    <p class="mt-4 text-center text-lg text-base-content/80 max-w-2xl mx-auto">
+      Meet the dedicated staff members who make Qatari Virtual possible.
+    </p>
+
+    <!-- Error Handling -->
+    {error && (
+        <div role="alert" class="alert alert-error my-8 max-w-xl mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Error fetching staff data during build: {error}</span>
+        </div>
+    )}
+
+    <!-- Staff Grid -->
+    {staffMembers.length > 0 && (
+        <section class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {staffMembers.map((member) => (
+                <StaffCard member={member} />
+            ))}
+        </section>
+    )}
+
+    {staffMembers.length === 0 && !error && (
+        <p class="text-center text-xl text-base-content/60 mt-12">
+            No staff members found.
+        </p>
+    )}
+  </main>
 </Layout>
+
