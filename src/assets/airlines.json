@@ -1,0 +1,28 @@
+{
+  "airlines": [
+    {
+      "name": "Qatar Airways",
+      "prefix": "QR",
+      "hubs": ["OTHH"],
+      "color": "#8B1538"
+    },
+    {
+      "name": "British Airways",
+      "prefix": "BA",
+      "hubs": ["EGLL", "EGSS"],
+      "color": "#075AAA"
+    },
+    {
+      "name": "American Airlines",
+      "prefix": "AA",
+      "hubs": ["KJFK", "KMIA"],
+      "color": "#C8102E"
+    },
+    {
+      "name": "Air India",
+      "prefix": "AI",
+      "hubs": ["VABB", "VIDP"],
+      "color": "#FF6600"
+    }
+  ]
+}
