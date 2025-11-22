@@ -7,22 +7,96 @@
       "color": "#8B1538"
     },
     {
-      "name": "British Airways",
-      "prefix": "BA",
-      "hubs": ["EGLL", "EGSS"],
-      "color": "#075AAA"
+      "name": "Aer Lingus",
+      "prefix": "EI",
+      "hubs": ["EIDW", "EGAC", "EICK", "EIKN", "EINN"],
+      "color": "#008374"
     },
     {
-      "name": "American Airlines",
-      "prefix": "AA",
-      "hubs": ["KJFK", "KMIA"],
-      "color": "#C8102E"
+      "name": "Aeromexico",
+      "prefix": "AMX",
+      "hubs": ["MMMX"],
+      "color": "#035CF7"
+    },
+    {
+      "name": "Air Botswana",
+      "prefix": "BP",
+      "hubs": ["FBSK"],
+      "color": "#14B4E4"
     },
     {
       "name": "Air India",
       "prefix": "AI",
       "hubs": ["VABB", "VIDP"],
       "color": "#FF6600"
+    },
+    {
+      "name": "Air Link",
+      "prefix": "4Z",
+      "hubs": ["FAOR", "FACT"],
+      "color": "#0C6433"
+    },
+    {
+      "name": "Air Malta",
+      "prefix": "KM",
+      "hubs": ["LMML"],
+      "color": "#DC0434"
+    },
+    {
+      "name": "Air Serbia",
+      "prefix": "JU",
+      "hubs": ["LYBE"],
+      "color": "#002E5D"
+    },
+    {
+      "name": "Air Seychelles",
+      "prefix": "HM",
+      "hubs": ["FSIA"],
+      "color": "#A6CE42"
+    },
+    {
+      "name": "Air Transat",
+      "prefix": "TS",
+      "hubs": ["CYYZ", "CYUL", "CYHZ", "CYQB"],
+      "color": "#3CBCEC"
+    },
+{
+      "name": "Alaska Airlines",
+      "prefix": "AS",
+      "hubs": ["PANC", "KSEA", "KLAX", "KPDX", "KSAN", "KSFO", "KPAE", "KBOI"],
+      "color": "#0C446B"
+    },
+     {
+      "name": "American Airlines",
+      "prefix": "AA",
+      "hubs": ["KJFK", "KMIA", "KDFW", "KLAX", "KORD", "KPHL", "KAUS", "KBOS", "KCLT", "KPHX", "KDCA"],
+      "color": "#C8102E"
+    },
+     {
+      "name": "Asiana Airlines",
+      "prefix": "OZ",
+      "hubs": ["RKSI"],
+      "color": "#C21E3F"
+    },
+     {
+      "name": "Azerbaijan Airlines",
+      "prefix": "J2",
+      "hubs": ["UBBB"],
+      "color": "#043464"
+    },
+     {
+      "name": "Bangkok Airways",
+      "prefix": "PG",
+      "hubs": ["VTBS", "VTSM", "VTCC", "VTSP"],
+      "color": "#0C149C"
+    },
+    {
+      "name": "British Airways",
+      "prefix": "BA",
+      "hubs": ["EGLL", "EGKK"],
+      "color": "#075AAA"
     }
+
+  
   ]
 }
