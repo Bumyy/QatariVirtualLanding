@@ -66,3 +66,53 @@ export async function getRoutes(): Promise<Route[]> {
   // Return the result directly as it matches our interface
   return rawData.result;
 }
+
+/**
+ * Filters routes to only include those with "QR" in the flight number
+ */
+export async function getQRRoutes(): Promise<Route[]> {
+  const allRoutes = await getRoutes();
+  return allRoutes.filter(route => route.fltnum.includes('QR'));
+}
+
+/**
+ * Optimized function: fetches QR routes first, then only parses needed airports
+ */
+export async function getQRRoutesWithAirports(csvData: string): Promise<{
+  routes: Route[];
+  airports: Record<string, { name: string; icao: string; lat: number; lng: number }>;
+}> {
+  // Get QR routes first
+  const routes = await getQRRoutes();
+  
+  // Get unique airport codes from routes
+  const neededAirports = new Set<string>();
+  routes.forEach(route => {
+    neededAirports.add(route.dep);
+    neededAirports.add(route.arr);
+  });
+  
+  // Parse only needed airports from CSV
+  const airports: Record<string, { name: string; icao: string; lat: number; lng: number }> = {};
+  const lines = csvData.split('\n');
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',');
+    if (values.length >= 5 && values[0]) {
+      const icao = values[0].trim();
+      
+      // Only parse if this airport is needed
+      if (neededAirports.has(icao) && values[3] && values[4]) {
+        const name = values[2] ? values[2].trim().replace(/"/g, '') : '';
+        const lat = parseFloat(values[3]);
+        const lng = parseFloat(values[4]);
+        
+        if (!isNaN(lat) && !isNaN(lng)) {
+          airports[icao] = { name, icao, lat, lng };
+        }
+      }
+    }
+  }
+  
+  return { routes, airports };
+}

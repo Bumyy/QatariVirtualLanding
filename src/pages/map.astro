@@ -1,0 +1,295 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getQRRoutesWithAirports } from '../data/route.ts';
+
+let airports = {};
+let routes = [];
+
+try {
+  const airportData = await import('../assets/airport_database_processed.csv?raw');
+  const data = await getQRRoutesWithAirports(airportData.default);
+  airports = data.airports;
+  routes = data.routes;
+} catch (error) {
+  airports = {
+    OTHH: { name: "Doha Hamad Intl", icao: "OTHH", lat: 25.2731, lng: 51.6081 }
+  };
+  routes = [];
+}
+---
+
+<Layout>
+  <h1 class="text-3xl font-bold text-center">Interactive Route Map</h1>
+  <p class="mt-2 text-center">
+    Take a look at the routes you could fly!
+  </p>
+
+  <!-- Search bar -->
+  <div class="flex justify-center mt-4">
+    <input
+      id="airportSearch"
+      type="text"
+      placeholder="Search airport by name, IATA, ICAO, or city..."
+      class="border border-gray-300 px-4 py-2 rounded w-80 shadow-sm"
+    />
+  </div>
+
+  <style>
+    #map {
+      height: 70vh;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .leaflet-popup-content {
+      font-size: 14px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .leaflet-popup-content strong {
+      font-weight: bold;
+    }
+    
+    .leaflet-popup {
+      max-width: 350px;
+    }
+  </style>
+
+  <div id="map"></div>
+
+  <!-- Leaflet + plugin -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    client:load
+  ></script>
+  <script
+    src="https://unpkg.com/leaflet-arc/bin/leaflet-arc.min.js"
+    client:load
+  ></script>
+
+  <!-- Map + search logic -->
+  <script define:vars={{ airports, routes }}>
+    window.onload = function() {
+      if (Object.keys(airports).length === 0) return;
+      
+      // --- MAP SETUP ---
+      const map = L.map("map").setView([20, 10], 2);
+
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution: "&copy; OpenStreetMap & CARTO",
+          subdomains: "abcd",
+        }
+      ).addTo(map);
+      
+      // Build connection map with route details
+      const connections = {};
+      const routeDetails = {};
+      Object.keys(airports).forEach((code) => (connections[code] = new Set()));
+
+      routes.forEach((route) => {
+        const { dep, arr } = route;
+        if (airports[dep] && airports[arr]) {
+          connections[dep].add(arr);
+          connections[arr].add(dep);
+          
+          // Store route details for both directions
+          const routeKey = `${dep}-${arr}`;
+          const reverseKey = `${arr}-${dep}`;
+          routeDetails[routeKey] = route;
+          routeDetails[reverseKey] = route;
+        }
+      });
+      
+
+
+      let drawn = [];
+
+      function clearRoutes() {
+        drawn.forEach((l) => map.removeLayer(l));
+        drawn = [];
+      }
+
+      function drawArc(fromCode, toCode) {
+        const A = airports[fromCode];
+        const B = airports[toCode];
+        if (!A || !B) return;
+
+        const routeKey = `${fromCode}-${toCode}`;
+        const route = routeDetails[routeKey];
+
+        let arc;
+        try {
+          arc = new L.Polyline.Arc(
+            [A.lat, A.lng],
+            [B.lat, B.lng],
+            {
+              color: "#8B1538",
+              weight: 2,
+              opacity: 1,
+              vertices: 200,
+            }
+          );
+        } catch (e) {
+          arc = L.polyline(
+            [
+              [A.lat, A.lng],
+              [B.lat, B.lng],
+            ],
+            { color: "#8B1538", weight: 2, opacity: 1 }
+          );
+        }
+
+        if (route) {
+          const duration = Math.floor(route.duration / 60); // Convert to minutes
+          const hours = Math.floor(duration / 60);
+          const minutes = duration % 60;
+          const flightTime = `${hours}h ${minutes}m`;
+          
+          const aircraftList = route.aircraft.map(ac => 
+            `${ac.name} (${ac.liveryname})`
+          ).join('<br>');
+          
+          const popupContent = `
+            <div style="min-width: 200px;">
+              <strong>${route.fltnum}</strong><br>
+              <strong>${A.name} → ${B.name}</strong><br>
+              <strong>Flight Time:</strong> ${flightTime}<br>
+              <strong>Distance Multiplier:</strong> ${route.multiplier}x<br>
+              <strong>Times Flown:</strong> ${route.flown}<br>
+              ${route.featured ? '<span style="color: #8B1538;"><strong>★ Featured Route</strong></span><br>' : ''}
+              <strong>Aircraft:</strong><br>
+              <div style="font-size: 12px; margin-top: 5px;">${aircraftList}</div>
+              ${route.notes ? `<br><em>${route.notes}</em>` : ''}
+            </div>
+          `;
+          
+          arc.bindPopup(popupContent);
+        }
+
+        arc.addTo(map);
+        drawn.push(arc);
+      }
+
+      const markers = {};
+
+      function highlightAirport(code) {
+        if (!airports[code]) return;
+
+        clearRoutes();
+
+        const connectedSet = connections[code] || new Set();
+
+        // Fade / highlight markers
+        Object.entries(markers).forEach(([otherCode, marker]) => {
+          if (otherCode === code) {
+            marker.setStyle({ fillOpacity: 1, opacity: 1, radius: 7 });
+            marker.bringToFront();
+          } else if (connectedSet.has(otherCode)) {
+            marker.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 });
+          } else {
+            marker.setStyle({ fillOpacity: 0.2, opacity: 0.3, radius: 5 });
+          }
+        });
+
+        // Draw routes from this airport
+        connectedSet.forEach((dest) => drawArc(code, dest));
+
+        const ap = airports[code];
+        map.flyTo([ap.lat, ap.lng], 4, { duration: 0.7 });
+        markers[code].openPopup();
+      }
+
+      // Create markers
+      Object.entries(airports).forEach(([code, ap]) => {
+        const isHub = code === 'OTHH';
+        
+        const marker = L.circleMarker([ap.lat, ap.lng], {
+          radius: isHub ? 8 : 6,
+          fillColor: isHub ? "#8B1538" : "#007bff",
+          color: "#ffffff",
+          weight: 2,
+          fillOpacity: 0.9,
+        }).addTo(map);
+
+        // Get all aircraft available at this airport
+        const connectedRoutes = routes.filter(route => 
+          route.dep === code || route.arr === code
+        );
+        
+        const aircraftSet = new Set();
+        connectedRoutes.forEach(route => {
+          route.aircraft.forEach(ac => {
+            aircraftSet.add(ac.name);
+          });
+        });
+        
+        let aircraftList = '';
+        if (aircraftSet.size > 0) {
+          aircraftList = '<br><strong>Aircraft:</strong><br>';
+          Array.from(aircraftSet).forEach(aircraft => {
+            aircraftList += `<div style="font-size: 12px; margin: 1px 0;">Qatar Airways ${aircraft}</div>`;
+          });
+        }
+        
+        marker.bindPopup(
+          `<div style="min-width: 180px;"><strong>${ap.name}</strong><br>${ap.icao}${isHub ? '<br><em>Qatar Airways Hub</em>' : ''}${aircraftList}</div>`
+        );
+
+        markers[code] = marker;
+
+        marker.on("click", () => {
+          highlightAirport(code);
+        });
+      });
+      // Fit all airports initially
+      map.fitBounds(
+        Object.values(airports).map((a) => [a.lat, a.lng]),
+        {
+          padding: [40, 40],
+          maxZoom: 3,
+        }
+      );
+
+
+      // --- SEARCH FUNCTIONALITY ---
+      const searchInput = document.getElementById("airportSearch");
+
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          const q = searchInput.value.trim().toLowerCase();
+
+          // Empty search: reset styles & clear routes
+          if (!q) {
+            clearRoutes();
+            Object.values(markers).forEach((m) =>
+              m.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 })
+            );
+            return;
+          }
+
+          // Find first match by IATA, ICAO, name
+          const found = Object.entries(airports).find(([code, ap]) => {
+            return (
+              code.toLowerCase().includes(q) ||
+              (ap.iata && ap.iata.toLowerCase().includes(q)) ||
+              (ap.icao && ap.icao.toLowerCase().includes(q)) ||
+              (ap.name && ap.name.toLowerCase().includes(q))
+            );
+          });
+
+          if (found) {
+            const [code] = found;
+            highlightAirport(code);
+          }
+        });
+      }
+    };
+  </script>
+</Layout>
