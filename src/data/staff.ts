@@ -1,5 +1,3 @@
-// src/data/staff.ts (Updated for Avatar Fetching)
-
 import { fetchApiData } from "../utils/api";
 
 // -------------------------------------------------------------
@@ -15,14 +13,12 @@ export interface StaffMember {
   joined: string;
   role: string;
   role_level: RoleLevel;
-
-  // NEW: Property to hold the generated avatar URL
   avatar_url: string;
 }
 
 interface StaffApiResponseWrapper {
   status: number;
-  result: Omit<StaffMember, "avatar_url">[]; // API returns members WITHOUT avatar_url
+  result: Omit<StaffMember, "avatar_url">[];
 }
 
 // -------------------------------------------------------------
@@ -58,7 +54,7 @@ function extractUsernameFromIfcUrl(ifcUrl: string): string | null {
  */
 function generateAvatarUrl(username: string | null): string {
   const IFC_DOMAIN = "community.infiniteflight.com";
-  const DEFAULT_AVATAR = "/default-avatar.png"; // Placeholder for a local default image
+  const DEFAULT_AVATAR = "/default-avatar.png";
 
   if (!username) {
     return DEFAULT_AVATAR;
@@ -69,7 +65,7 @@ function generateAvatarUrl(username: string | null): string {
 }
 
 // -------------------------------------------------------------
-// DEDICATED FETCH FUNCTION (Updated)
+// DEDICATED FETCH FUNCTION
 // -------------------------------------------------------------
 
 export async function getStaffRoster(): Promise<StaffMember[]> {
@@ -81,7 +77,6 @@ export async function getStaffRoster(): Promise<StaffMember[]> {
     );
   }
 
-  // Map the raw results to the final StaffMember interface, adding the avatar_url
   const processedStaff: StaffMember[] = rawData.result.map((rawMember) => {
     const username = extractUsernameFromIfcUrl(rawMember.ifc);
     const avatarUrl = generateAvatarUrl(username);
