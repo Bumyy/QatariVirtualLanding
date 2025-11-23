@@ -95,8 +95,43 @@
       "prefix": "BA",
       "hubs": ["EGLL", "EGKK"],
       "color": "#075AAA"
+    },
+ {
+      "name": "Bulgaria Air",
+      "prefix": "FB",
+      "hubs": ["LBSF"],
+      "color": "#C03B35"
+    },
+     {
+      "name": "Caribbean Airlines",
+      "prefix": "BW",
+      "hubs": ["TBPB", "TTPP", "TUPJ", "MKJP", "TTCP", "SYCJ"],
+      "color": "CB5BA4"
+    },
+     {
+      "name": "Cathay Pacific",
+      "prefix": "CX",
+      "hubs": ["VHHH"],
+      "color": "#005D63"
+    },
+     {
+      "name": "Condor",
+      "prefix": "DE",
+      "hubs": ["EDDP", "EDDF", "EDDM", "EDDH", "EDDB", "EDDL", "EDNY"],
+      "color": "#FFA200"
+    },
+     {
+      "name": "Copa Airlines",
+      "prefix": "CM",
+      "hubs": ["MPTO"],
+      "color": "#0060A9"
+    },
+    {
+      "name": "Fiji Airways",
+      "prefix": "FJ",
+      "hubs": ["NFFN"],
+      "color": "#2C1C14"
     }
 
-  
   ]
 }
