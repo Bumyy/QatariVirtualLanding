@@ -80,61 +80,7 @@ export async function getQRRoutes(): Promise<Route[]> {
  */
 export async function getAirlineRoutes(prefix: string): Promise<Route[]> {
   const allRoutes = await getRoutes();
-  return allRoutes.filter(route => route.fltnum.includes(prefix));
+  return allRoutes.filter(route => route.fltnum.startsWith(prefix));
 }
 
-/**
- * Optimized function: fetches airline routes first, then only parses needed airports
- */
-export async function getAirlineRoutesWithAirports(prefix: string, csvData: string): Promise<{
-  routes: Route[];
-  airports: Record<string, { name: string; icao: string; lat: number; lng: number }>;
-}> {
-  const routes = await getAirlineRoutes(prefix);
-  
-  const neededAirports = new Set<string>();
-  routes.forEach(route => {
-    neededAirports.add(route.dep);
-    neededAirports.add(route.arr);
-  });
-  
-  const airports: Record<string, { name: string; icao: string; lat: number; lng: number }> = {};
-  const lines = csvData.split('\n');
-  
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',');
-    if (values.length >= 5 && values[0]) {
-      const icao = values[0].trim();
-      
-      if (neededAirports.has(icao) && values[3] && values[4]) {
-        const name = values[2] ? values[2].trim().replace(/"/g, '') : '';
-        const lat = parseFloat(values[3]);
-        const lng = parseFloat(values[4]);
-        
-        if (!isNaN(lat) && !isNaN(lng)) {
-          airports[icao] = { name, icao, lat, lng };
-        }
-      }
-    }
-  }
-  
-  return { routes, airports };
-}
 
-/**
- * Client-side function to get airline data
- */
-export async function getAirlineDataForClient(prefix: string): Promise<{
-  routes: Route[];
-  airports: Record<string, { name: string; icao: string; lat: number; lng: number }>;
-}> {
-  try {
-    const routes = await getAirlineRoutes(prefix);
-    
-    // For client-side, we'll need to pass CSV data differently
-    // This is a simplified version - in production you'd handle CSV loading properly
-    return { routes, airports: {} };
-  } catch {
-    return { routes: [], airports: {} };
-  }
-}

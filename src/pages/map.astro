@@ -1,46 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getAirlineRoutesWithAirports } from '../data/route.ts';
+import { getRoutes } from '../data/route';
+import airlinesData from '../assets/airlines.json';
+import csvText from '../assets/airport_database_processed.csv?raw';
 
-const airlinesData = await import('../assets/airlines.json');
 const airlines = airlinesData.airlines;
-
-// Load all routes and airports for client-side filtering
-let airports = {};
 let allRoutes = [];
 
 try {
-  const airportData = await import('../assets/airport_database_processed.csv?raw');
-  
-  const allAirlineRoutes = [];
-  for (const airline of airlines) {
-    const data = await getAirlineRoutesWithAirports(airline.prefix, airportData.default);
-    allAirlineRoutes.push(...data.routes);
-    Object.assign(airports, data.airports);
-  }
-  
-  allRoutes = allAirlineRoutes;
-  
-  const qrRoutes = allRoutes.filter(route => route.fltnum.includes('QR'));
-  const usedAirports = new Set();
-  qrRoutes.forEach(route => {
-    usedAirports.add(route.dep);
-    usedAirports.add(route.arr);
-  });
-  
-  const filteredAirports = {};
-  Object.entries(airports).forEach(([code, airport]) => {
-    if (usedAirports.has(code)) {
-      filteredAirports[code] = airport;
-    }
-  });
-  
-  airports = filteredAirports;
+  allRoutes = await getRoutes();
 } catch (error) {
-  airports = {
-    OTHH: { name: "Doha Hamad Intl", icao: "OTHH", lat: 25.2731, lng: 51.6081 }
-  };
-  allRoutes = [];
+  console.error('Failed to load routes:', error);
+  // Fallback to empty array - map will show message to select airline
 }
 ---
 
@@ -50,18 +21,18 @@ try {
     Take a look at the routes you could fly!
   </p>
 
-  <!-- Airline selector and search -->
+  <!-- Controls -->
   <div class="flex justify-center items-center gap-4 mt-4">
     <select
       id="airlineSelect"
       class="border border-gray-300 px-4 py-2 rounded shadow-sm"
     >
+      <option value="">Select Airline...</option>
       {airlines.map(airline => (
-        <option value={airline.prefix} selected={airline.prefix === 'QR'}>
-          {airline.name}
-        </option>
+        <option value={airline.prefix} data-color={airline.color}>{airline.name}</option>
       ))}
     </select>
+    
     <input
       id="airportSearch"
       type="text"
@@ -69,6 +40,8 @@ try {
       class="border border-gray-300 px-4 py-2 rounded w-60 shadow-sm"
     />
   </div>
+  
+  <div id="routeInfo" class="text-center mt-2 text-sm text-gray-600"></div>
 
   <style>
     #map {
@@ -79,22 +52,22 @@ try {
 
     .leaflet-popup-content {
       font-size: 14px;
-      max-height: 300px;
-      overflow-y: auto;
     }
 
     .leaflet-popup-content strong {
       font-weight: bold;
     }
-    
-    .leaflet-popup {
-      max-width: 350px;
+    .aircraft-icon {
+      background: none;
+      border: none;
+      font-size: 14px;
+      text-align: center;
     }
   </style>
 
   <div id="map"></div>
 
-  <!-- Leaflet + plugin -->
+  <!-- Leaflet + Arc plugin -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -108,265 +81,195 @@ try {
     client:load
   ></script>
 
-  <!-- Map + search logic -->
-  <script define:vars={{ airports, allRoutes, airlines }}>
-    if (typeof airports === 'undefined') airports = {};
-    if (typeof allRoutes === 'undefined') allRoutes = [];
-    if (typeof airlines === 'undefined') airlines = [];
-    let currentAirline = airlines.find(a => a.prefix === 'QR');
-    let map, markers = {}, drawn = [], connections = {}, routeDetails = {};
-    
-    function initMap() {
-      map = L.map("map").setView([20, 10], 2);
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        {
-          attribution: "&copy; OpenStreetMap & CARTO",
-          subdomains: "abcd",
+  <script client:load define:vars={{ allRoutes, csvText }}>
+    const map = L.map("map").setView([20, 10], 2);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: "&copy; OpenStreetMap & CARTO",
+      subdomains: "abcd",
+    }).addTo(map);
+
+    let currentColor = "#ff0000";
+    let airportData = {};
+    let currentRoutes = [];
+    let connections = {};
+    let markers = {};
+    let drawn = [];
+
+    const airlineSelect = document.getElementById('airlineSelect');
+    const routeInfo = document.getElementById('routeInfo');
+    const searchInput = document.getElementById('airportSearch');
+
+    function parseCSV(csvText) {
+      const airports = {};
+      const lines = csvText.split('\n');
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        if (parts.length >= 5) {
+          const icao = parts[0].trim();
+          const name = parts[2] ? parts[2].replace(/"/g, '') : icao;
+          const lat = parseFloat(parts[3]);
+          const lng = parseFloat(parts[4]);
+          if (icao && !isNaN(lat) && !isNaN(lng)) {
+            airports[icao] = { name, icao, lat, lng };
+          }
         }
-      ).addTo(map);
+      }
+      return airports;
     }
-    
-    window.onload = function() {
-      if (Object.keys(airports).length === 0) {
-        airports = {
-          OTHH: { name: "Doha Hamad Intl", icao: "OTHH", lat: 25.2731, lng: 51.6081 }
-        };
-        allRoutes = [];
-      }
-      
-      initMap();
-      
-      const qrRoutes = allRoutes.filter(route => route.fltnum.includes('QR'));
-      
-      updateMap(airports, qrRoutes, currentAirline);
-      
-      // Airline selector
-      document.getElementById('airlineSelect').addEventListener('change', (e) => {
-        const prefix = e.target.value;
-        currentAirline = airlines.find(a => a.prefix === prefix);
-        
-        // Filter routes for selected airline
-        const filteredRoutes = allRoutes.filter(route => route.fltnum.includes(prefix));
-        const usedAirports = new Set();
-        filteredRoutes.forEach(route => {
-          usedAirports.add(route.dep);
-          usedAirports.add(route.arr);
-        });
-        
-        // Get all airports (already loaded)
-        const allAirportsData = {};
-        const neededAirports = new Set();
-        allRoutes.forEach(route => {
-          neededAirports.add(route.dep);
-          neededAirports.add(route.arr);
-        });
-        
-        // Use all available airports, filter by used ones
-        const filteredAirports = {};
-        Object.keys(airports).forEach(code => {
-          if (usedAirports.has(code)) {
-            filteredAirports[code] = airports[code];
-          }
-        });
-        
-        // Add any missing airports from the full dataset if needed
-        usedAirports.forEach(code => {
-          if (!filteredAirports[code] && airports[code]) {
-            filteredAirports[code] = airports[code];
-          }
-        });
-        
-        updateMap(filteredAirports, filteredRoutes, currentAirline);
-      });
-    };
-    
-    function updateMap(airportData, routeData, airline) {
-      
-      // Clear existing data
-      Object.values(markers).forEach(m => map.removeLayer(m));
+
+    function clearRoutes() {
       drawn.forEach(l => map.removeLayer(l));
-      markers = {};
       drawn = [];
-      connections = {};
-      routeDetails = {};
-      
-      // Build connection map
-      Object.keys(airportData).forEach((code) => (connections[code] = new Set()));
+    }
 
-      routeData.forEach((route) => {
-        const { dep, arr } = route;
-        if (airportData[dep] && airportData[arr]) {
-          connections[dep].add(arr);
-          connections[arr].add(dep);
-          
-          const routeKey = `${dep}-${arr}`;
-          const reverseKey = `${arr}-${dep}`;
-          routeDetails[routeKey] = route;
-          routeDetails[reverseKey] = route;
+    function drawArc(fromCode, toCode) {
+      const A = airportData[fromCode];
+      const B = airportData[toCode];
+      if (!A || !B) return;
+
+      const route = currentRoutes.find(r => 
+        (r.dep === fromCode && r.arr === toCode) || 
+        (r.dep === toCode && r.arr === fromCode)
+      );
+
+      let arc;
+      try {
+        arc = new L.Polyline.Arc([A.lat, A.lng], [B.lat, B.lng], {
+          color: currentColor,
+          weight: 2,
+          opacity: 1,
+          vertices: 200,
+        });
+      } catch (e) {
+        arc = L.polyline([[A.lat, A.lng], [B.lat, B.lng]], {
+          color: currentColor, weight: 2, opacity: 1
+        });
+      }
+
+      if (route) {
+        const aircraftList = route.aircraft.length > 0 ? 
+          '<ul>' + route.aircraft.map(a => `<li>${a.liveryname} ${a.name}</li>`).join('') + '</ul>' : 'No aircraft assigned';
+        arc.bindPopup(`<strong>${route.fltnum}</strong><br>${route.dep} → ${route.arr}<br><strong>Aircraft:</strong><br>${aircraftList}`);
+      }
+      
+      arc.addTo(map);
+      drawn.push(arc);
+    }
+
+    function highlightAirport(code) {
+      if (!airportData[code]) return;
+
+      clearRoutes();
+      const connectedSet = connections[code] || new Set();
+
+      Object.entries(markers).forEach(([otherCode, marker]) => {
+        if (otherCode === code) {
+          marker.setStyle({ fillOpacity: 1, opacity: 1, radius: 7 });
+          marker.bringToFront();
+        } else if (connectedSet.has(otherCode)) {
+          marker.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 });
+        } else {
+          marker.setStyle({ fillOpacity: 0.2, opacity: 0.3, radius: 5 });
         }
       });
 
-      function clearRoutes() {
-        drawn.forEach((l) => map.removeLayer(l));
-        drawn = [];
-      }
+      connectedSet.forEach(dest => drawArc(code, dest));
+      const ap = airportData[code];
+      map.flyTo([ap.lat, ap.lng], 4, { duration: 0.7 });
+      markers[code].openPopup();
+    }
 
-      function drawArc(fromCode, toCode) {
-        const A = airportData[fromCode];
-        const B = airportData[toCode];
-        if (!A || !B) return;
+    function displayRoutesForAirline(prefix) {
+      clearRoutes();
+      Object.values(markers).forEach(m => map.removeLayer(m));
+      markers = {};
+      connections = {};
 
-        const routeKey = `${fromCode}-${toCode}`;
-        const route = routeDetails[routeKey];
+      if (!prefix) return;
 
-        let arc;
-        try {
-          arc = new L.Polyline.Arc(
-            [A.lat, A.lng],
-            [B.lat, B.lng],
-            {
-              color: airline.color,
-              weight: 2,
-              opacity: 1,
-              vertices: 200,
-            }
-          );
-        } catch (e) {
-          arc = L.polyline(
-            [
-              [A.lat, A.lng],
-              [B.lat, B.lng],
-            ],
-            { color: airline.color, weight: 2, opacity: 1 }
-          );
+      currentRoutes = allRoutes.filter(route => route.fltnum.startsWith(prefix));
+      const neededICAOs = new Set();
+      currentRoutes.forEach(route => {
+        neededICAOs.add(route.dep);
+        neededICAOs.add(route.arr);
+      });
+
+      const routeAirports = {};
+      neededICAOs.forEach(icao => {
+        if (airportData[icao]) {
+          routeAirports[icao] = airportData[icao];
+          connections[icao] = new Set();
         }
+      });
 
-        if (route) {
-          const duration = Math.floor(route.duration / 60);
-          const hours = Math.floor(duration / 60);
-          const minutes = duration % 60;
-          const flightTime = `${hours}h ${minutes}m`;
-          
-          const aircraftList = route.aircraft.map(ac => 
-            `${ac.name} (${ac.liveryname})`
-          ).join('<br>');
-          
-          const popupContent = `
-            <div style="min-width: 200px;">
-              <strong>${route.fltnum}</strong><br>
-              <strong>${A.name} → ${B.name}</strong><br>
-              <strong>Flight Time:</strong> ${flightTime}<br>
-              <strong>Aircraft:</strong><br>
-              <div style="font-size: 12px; margin-top: 5px;">${aircraftList}</div>
-            </div>
-          `;
-          
-          arc.bindPopup(popupContent);
+      currentRoutes.forEach(route => {
+        if (routeAirports[route.dep] && routeAirports[route.arr]) {
+          connections[route.dep].add(route.arr);
+          connections[route.arr].add(route.dep);
         }
+      });
 
-        arc.addTo(map);
-        drawn.push(arc);
-      }
-
-      function highlightAirport(code) {
-        if (!airportData[code]) return;
-
-        clearRoutes();
-
-        const connectedSet = connections[code] || new Set();
-
-        Object.entries(markers).forEach(([otherCode, marker]) => {
-          if (otherCode === code) {
-            marker.setStyle({ fillOpacity: 1, opacity: 1, radius: 7 });
-            marker.bringToFront();
-          } else if (connectedSet.has(otherCode)) {
-            marker.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 });
-          } else {
-            marker.setStyle({ fillOpacity: 0.2, opacity: 0.3, radius: 5 });
-          }
-        });
-
-        connectedSet.forEach((dest) => drawArc(code, dest));
-
-        const ap = airportData[code];
-        map.flyTo([ap.lat, ap.lng], 4, { duration: 0.7 });
-        markers[code].openPopup();
-      }
-
-      // Create markers
-      Object.entries(airportData).forEach(([code, ap]) => {
-        const isHub = airline.hubs.includes(code);
-        
-        const marker = L.circleMarker([ap.lat, ap.lng], {
-          radius: isHub ? 8 : 6,
-          fillColor: isHub ? airline.color : "#007bff",
+      Object.entries(routeAirports).forEach(([code, airport]) => {
+        const marker = L.circleMarker([airport.lat, airport.lng], {
+          radius: 6,
+          fillColor: currentColor,
           color: "#ffffff",
           weight: 2,
           fillOpacity: 0.9,
         }).addTo(map);
 
-        const connectedRoutes = routeData.filter(route => 
-          route.dep === code || route.arr === code
-        );
-        
+        const airportRoutes = currentRoutes.filter(r => r.dep === code || r.arr === code);
         const aircraftSet = new Set();
-        connectedRoutes.forEach(route => {
-          route.aircraft.forEach(ac => {
-            aircraftSet.add(ac.name);
-          });
+        airportRoutes.forEach(route => {
+          route.aircraft.forEach(aircraft => aircraftSet.add(`${aircraft.liveryname} ${aircraft.name}`));
         });
+        const aircraftList = aircraftSet.size > 0 ? 
+          '<ul>' + Array.from(aircraftSet).map(a => `<li>${a}</li>`).join('') + '</ul>' : 'No aircraft';
         
-        let aircraftList = '';
-        if (aircraftSet.size > 0) {
-          aircraftList = '<br><strong>Aircraft:</strong><br>';
-          Array.from(aircraftSet).forEach(aircraft => {
-            aircraftList += `<div style="font-size: 12px; margin: 1px 0;">${airline.name} ${aircraft}</div>`;
-          });
-        }
-        
-        marker.bindPopup(
-          `<div style="min-width: 180px;"><strong>${ap.name}</strong><br>${ap.icao}${isHub ? `<br><em>${airline.name} Hub</em>` : ''}${aircraftList}</div>`
-        );
-
+        marker.bindPopup(`<strong>${airport.name}</strong><br>${airport.icao}<br><strong>Aircraft:</strong><br>${aircraftList}`);
         markers[code] = marker;
-
-        marker.on("click", () => {
-          highlightAirport(code);
-        });
+        marker.on("click", () => highlightAirport(code));
       });
+
+      routeInfo.textContent = `${currentRoutes.length} routes, ${Object.keys(routeAirports).length} airports`;
       
-      if (Object.keys(airportData).length > 0) {
-        map.fitBounds(
-          Object.values(airportData).map((a) => [a.lat, a.lng]),
-          {
-            padding: [40, 40],
-            maxZoom: 3,
-          }
-        );
+      if (Object.keys(routeAirports).length > 0) {
+        const bounds = Object.values(routeAirports).map(a => [a.lat, a.lng]);
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 3 });
       }
     }
 
-    // Search functionality
-    const searchInput = document.getElementById("airportSearch");
-    if (searchInput) {
-      searchInput.addEventListener("input", () => {
-        const q = searchInput.value.trim().toLowerCase();
-        if (!q) {
-          Object.values(markers).forEach((m) =>
-            m.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 })
-          );
-          return;
-        }
-        
-        const found = Object.keys(markers).find(code => 
-          code.toLowerCase().includes(q)
+    airlineSelect.addEventListener('change', (e) => {
+      currentColor = e.target.selectedOptions[0]?.dataset.color || '#ff0000';
+      displayRoutesForAirline(e.target.value);
+    });
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      
+      if (!q) {
+        clearRoutes();
+        Object.values(markers).forEach(m => 
+          m.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 })
         );
-        
-        if (found && markers[found]) {
-          markers[found].fire('click');
-        }
+        return;
+      }
+
+      const found = Object.entries(airportData).find(([code, ap]) => {
+        return (
+          code.toLowerCase().includes(q) ||
+          ap.name.toLowerCase().includes(q) ||
+          ap.icao.toLowerCase().includes(q)
+        );
       });
-    }
+
+      if (found && markers[found[0]]) {
+        highlightAirport(found[0]);
+      }
+    });
+
+    // Initialize
+    airportData = parseCSV(csvText);
+    routeInfo.textContent = 'Select an airline to view routes.';
   </script>
 </Layout>
