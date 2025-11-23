@@ -60,31 +60,43 @@
       "hubs": ["CYYZ", "CYUL", "CYHZ", "CYQB"],
       "color": "#3CBCEC"
     },
-{
+    {
       "name": "Alaska Airlines",
       "prefix": "AS",
       "hubs": ["PANC", "KSEA", "KLAX", "KPDX", "KSAN", "KSFO", "KPAE", "KBOI"],
       "color": "#0C446B"
     },
-     {
+    {
       "name": "American Airlines",
       "prefix": "AA",
-      "hubs": ["KJFK", "KMIA", "KDFW", "KLAX", "KORD", "KPHL", "KAUS", "KBOS", "KCLT", "KPHX", "KDCA"],
+      "hubs": [
+        "KJFK",
+        "KMIA",
+        "KDFW",
+        "KLAX",
+        "KORD",
+        "KPHL",
+        "KAUS",
+        "KBOS",
+        "KCLT",
+        "KPHX",
+        "KDCA"
+      ],
       "color": "#C8102E"
     },
-     {
+    {
       "name": "Asiana Airlines",
       "prefix": "OZ",
       "hubs": ["RKSI"],
       "color": "#C21E3F"
     },
-     {
+    {
       "name": "Azerbaijan Airlines",
       "prefix": "J2",
       "hubs": ["UBBB"],
       "color": "#043464"
     },
-     {
+    {
       "name": "Bangkok Airways",
       "prefix": "PG",
       "hubs": ["VTBS", "VTSM", "VTCC", "VTSP"],
@@ -96,31 +108,31 @@
       "hubs": ["EGLL", "EGKK"],
       "color": "#075AAA"
     },
- {
+    {
       "name": "Bulgaria Air",
       "prefix": "FB",
       "hubs": ["LBSF"],
       "color": "#C03B35"
     },
-     {
+    {
       "name": "Caribbean Airlines",
       "prefix": "BW",
       "hubs": ["TBPB", "TTPP", "TUPJ", "MKJP", "TTCP", "SYCJ"],
       "color": "CB5BA4"
     },
-     {
+    {
       "name": "Cathay Pacific",
       "prefix": "CX",
       "hubs": ["VHHH"],
       "color": "#005D63"
     },
-     {
+    {
       "name": "Condor",
       "prefix": "DE",
       "hubs": ["EDDP", "EDDF", "EDDM", "EDDH", "EDDB", "EDDL", "EDNY"],
       "color": "#FFA200"
     },
-     {
+    {
       "name": "Copa Airlines",
       "prefix": "CM",
       "hubs": ["MPTO"],
@@ -132,6 +144,5 @@
       "hubs": ["NFFN"],
       "color": "#2C1C14"
     }
-
   ]
 }

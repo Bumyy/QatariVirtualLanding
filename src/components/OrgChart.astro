@@ -1,0 +1,228 @@
+---
+import type { StaffMember } from '../data/staff';
+import OrgNode from './OrgNode.astro';
+
+interface Props {
+  members: StaffMember[];
+}
+
+const { members } = Astro.props;
+
+// --- Helper Functions ---
+const findRole = (roleName: string) => members.find(m => m.role.toLowerCase() === roleName.toLowerCase());
+const findGroup = (roleName: string) => members.filter(m => m.role.toLowerCase().includes(roleName.toLowerCase()));
+
+// --- Data Mapping ---
+const ceo = findRole('Chief Executive Officer');
+const chro = findRole('Chief Human Resources Officer');
+const cmo = findRole('Chief Marketing Officer');
+const coo = findRole('Chief Operating Officer');
+const trainingMgr = findRole('Training Manager');
+const marketingMgr = findRole('Marketing Manager');
+
+const instructors = findGroup('Flight Instructor');
+const recruiters = findGroup('Recruiter');
+const routeCoords = findGroup('Route Coordinator');
+const eventCoords = findGroup('Event Coordinator');
+const socialCoords = findGroup('Social Media');
+---
+
+<div class="w-full flex flex-col items-center pt-8 pb-20 px-4">
+    
+    <!-- LEVEL 1: CEO -->
+    <!-- z-50 ensures CEO is above everything -->
+    <div class="relative z-50 mb-8">
+        <OrgNode member={ceo} type="boss" />
+        <div class="hidden lg:block absolute left-1/2 -translate-x-1/2 top-full h-12 w-0.5 bg-gray-300 -z-10"></div>
+    </div>
+
+    <!-- LEVEL 2: TEAMS GRID -->
+    <div class="relative w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8">
+        
+        <!-- Desktop Connector Lines -->
+        <div class="hidden lg:block absolute top-0 left-0 w-full h-8 pointer-events-none z-0">
+            <div class="absolute top-0 left-[16.66%] right-[16.66%] h-0.5 bg-gray-300"></div>
+            <div class="absolute top-0 left-[16.66%] h-8 w-0.5 bg-gray-300"></div>
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 h-8 w-0.5 bg-gray-300"></div>
+            <div class="absolute top-0 right-[16.66%] h-8 w-0.5 bg-gray-300"></div>
+        </div>
+
+        <!-- === TEAM 1: TRAINING TEAM (Pink) === -->
+        <div class="team-column">
+            <div class="team-card bg-pink-50/50 border-2 border-gray-300">
+                <h3 class="team-title text-pink-900">Training Team</h3>
+                
+                <!-- Executive (z-40: High priority) -->
+                <div class="flex justify-center mb-8 relative z-40">
+                    <OrgNode member={chro} type="exec" />
+                    <div class="absolute top-full h-8 w-0.5 bg-gray-200 -z-10"></div>
+                </div>
+
+                <!-- Manager (z-30: Medium priority) -->
+                <div class="flex justify-center mb-8 relative z-30">
+                    <OrgNode member={trainingMgr} type="manager" />
+                    <div class="absolute top-full h-8 w-0.5 bg-gray-200 -z-10"></div>
+                </div>
+
+                <!-- Staff (z-20: Lower priority) -->
+                <div class="flex flex-col items-center gap-8 w-full relative z-20">
+                    
+                    {/* Instructors */}
+                    <div class="w-full flex flex-col items-center relative">
+                        <div class="staff-category-label">Instructors</div>
+                        <div class="flex flex-col gap-4 items-center w-full">
+                            {instructors.length > 0 ? instructors.map((m, index) => (
+                                /* Decreasing Z-index for vertical stacks so top covers bottom */
+                                <div class="relative" style={`z-index: ${20 - index + 10}`}>
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 h-4 w-0.5 bg-gray-200 -z-10"></div>
+                                    <OrgNode member={m} type="staff" />
+                                </div>
+                            )) : <div class="text-xs opacity-40 italic py-2">No instructors</div>}
+                        </div>
+                    </div>
+
+                    {/* Recruiters */}
+                    <div class="w-full flex flex-col items-center relative">
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 h-8 w-0.5 bg-gray-200"></div>
+                        <div class="staff-category-label">Recruiters</div>
+                        <div class="flex flex-col gap-4 items-center w-full">
+                            {recruiters.length > 0 ? recruiters.map((m, index) => (
+                                <div class="relative" style={`z-index: ${20 - index}`}>
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 h-4 w-0.5 bg-gray-200 -z-10"></div>
+                                    <OrgNode member={m} type="staff" />
+                                </div>
+                            )) : <div class="text-xs opacity-40 italic py-2">No recruiters</div>}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- === TEAM 2: OPERATIONAL TEAM (Blue) === -->
+        <div class="team-column">
+            <div class="team-card bg-pink-50/50 border-2 border-gray-300">
+                <h3 class="team-title text-pink-900">Operational Team</h3>
+                
+                <!-- Executive (z-40) -->
+                <div class="flex justify-center mb-8 relative z-40">
+                    <OrgNode member={coo} type="exec" />
+                    <div class="absolute top-full h-8 w-0.5 bg-gray-200 -z-10"></div>
+                </div>
+
+                <!-- Staff (z-20) -->
+                <div class="flex flex-col items-center gap-8 w-full relative z-20">
+                    <div class="w-full flex flex-col items-center relative">
+                        <div class="staff-category-label">Route Team</div>
+                        <div class="flex flex-col gap-4 items-center w-full">
+                            {routeCoords.length > 0 ? routeCoords.map((m, index) => (
+                                <div class="relative" style={`z-index: ${20 - index}`}>
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 h-4 w-0.5 bg-gray-200 -z-10"></div>
+                                    <OrgNode member={m} type="staff" />
+                                </div>
+                            )) : <div class="text-xs opacity-40 italic py-2">No route coords</div>}
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- === TEAM 3: MARKETING TEAM (Purple) === -->
+        <div class="team-column">
+            <div class="team-card bg-pink-50/50 border-2 border-gray-300">
+                <h3 class="team-title text-pink-900">Marketing Team</h3>
+
+                <!-- Executive (z-40) -->
+                <div class="flex justify-center mb-8 relative z-40">
+                    <OrgNode member={cmo} type="exec" />
+                    <div class="absolute top-full h-8 w-0.5 bg-gray-200 -z-10"></div>
+                </div>
+
+                <!-- Manager (z-30) -->
+                <div class="flex justify-center mb-8 relative z-30">
+                    <OrgNode member={marketingMgr} type="manager" />
+                    <div class="absolute top-full h-8 w-0.5 bg-gray-200 -z-10"></div>
+                </div>
+
+                <!-- Staff (z-20) -->
+                <div class="flex flex-col items-center gap-8 w-full relative z-20">
+                    
+                    {/* Events */}
+                    <div class="w-full flex flex-col items-center relative">
+                        <div class="staff-category-label">Events Team</div>
+                        <div class="flex flex-col gap-4 items-center w-full">
+                            {eventCoords.length > 0 ? eventCoords.map((m, index) => (
+                                <div class="relative" style={`z-index: ${20 - index + 10}`}>
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 h-4 w-0.5 bg-gray-200 -z-10"></div>
+                                    <OrgNode member={m} type="staff" />
+                                </div>
+                            )) : <div class="text-xs opacity-40 italic py-2">No event coords</div>}
+                        </div>
+                    </div>
+
+                    {/* Socials */}
+                    <div class="w-full flex flex-col items-center relative">
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 h-8 w-0.5 bg-gray-200"></div>
+                        <div class="staff-category-label">Social Media</div>
+                        <div class="flex flex-col gap-4 items-center w-full">
+                            {socialCoords.length > 0 ? socialCoords.map((m, index) => (
+                                <div class="relative" style={`z-index: ${20 - index}`}>
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 h-4 w-0.5 bg-gray-200 -z-10"></div>
+                                    <OrgNode member={m} type="staff" />
+                                </div>
+                            )) : <div class="text-xs opacity-40 italic py-2">No social media</div>}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+  .team-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      @media (min-width: 1024px) {
+          margin-top: 32px; 
+      }
+  }
+
+  .team-card {
+      width: 100%;
+      border-radius: 2rem;
+      padding: 24px 16px 40px 16px; /* Added padding top for title */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+      position: relative;
+  }
+
+  .team-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      text-align: center;
+  }
+
+  .staff-category-label {
+      background: oklch(var(--b1));
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: oklch(var(--bc) / 0.4);
+      border: 1px solid oklch(var(--bc) / 0.1);
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 5;
+  }
+</style>
