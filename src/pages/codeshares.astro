@@ -1,386 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import airlinesData from '../assets/airlines.json';
 
-const codeshares = [
-     {
-    name: 'Aegean',
-    code: 'AEE/A3',
-    image: 'https://1000logos.net/wp-content/uploads/2021/04/Aegean-Airlines-logo.png',
-    href: '#',
-  },
-  {
-    name: 'Aer Lingus',
-    code: 'EIN/EI',
-    image: 'https://images.vasystem.org/myOTQH6eMtJOAxJIb0-9UFeGNLx-hbewbT-1JouJY6E/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsLzRmLzJmLzRmMmYyM2JjMTE4NGE0MWQ1YTA0YzNiZDJiNWIwZWQyM2I5ZTExMGQ',
-    href: '#',
-  },
-  {
-    name: 'Aeroflot',
-    code: 'AFL/SU',
-    image: 'https://logos-world.net/wp-content/uploads/2023/01/Aeroflot-Logo-2003.png',
-    href: '#',
-  },
-  {
-    name: 'Aermexico',
-    code: 'AMX/AM',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Aeromexico.png/1280px-Aeromexico.png',
-    href: '#',
-  },
-  {
-    name: 'Air Algerie',
-    code: 'DAH/AH',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Logo_Air_Alg%C3%A9rie.svg/3840px-Logo_Air_Alg%C3%A9rie.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Air Botswana',
-    code: 'BOT/BP',
-    image: 'https://upload.wikimedia.org/wikipedia/en/e/e5/Air_Botswana_logo.svg',
-    href: '#',
-  },
-  {
-    name: 'Air India',
-    code: 'AIC/AI',
-    image: 'https://1000logos.net/wp-content/uploads/2020/09/Air-India-Logo.png',
-    href: '#',
-  },
-  {
-    name: 'AirLink',
-    code: 'LNK/4Z',
-    image: 'https://images.vasystem.org/P7HLQsARSt89-8xAvKRwFPVrZo9140NZdPyMyrAiUCI/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL0xKL2VIL0xKZUhrc1NFUXZwT2hDQ1NkS0FvbEtJQUlZSERvUW5xSkVhRWFxdVFJeFZPdHVlSmxSYXFhY2RpRUZrVFhKT3UucG5n',
-    href: '#',
-  },
-  {
-    name: 'Air Malta',
-    code: 'AMC/KM',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Logo_airmalta.svg',
-    href: '#',
-  },
-  {
-    name: 'Air Serbia',
-    code: 'ASL/JU',
-    image: 'https://i.logos-download.com/11849/2898-og-122d3fe989062348bd026cbaa5faaced.png/Air_Serbia_logo_logotype_og.png',
-    href: '#',
-  },
-  {
-    name: 'Air Seychelles',
-    code: 'SEY/HM',
-    image: 'https://logos-world.net/wp-content/uploads/2023/01/Air-Seychelles-Logo.png',
-    href: '#',
-  },
-  {
-    name: 'Air Transat',
-    code: 'TSC/TS',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Air_Transat_logo.svg/960px-Air_Transat_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Alaska Airlines',
-    code: 'ASA/AS',
-    image: 'https://images.vasystem.org/7CN_n9_yf-Iuqy4tQtowbYKmkM2msAPIvHxtlPaTakM/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL2dmL3NiL2dmc2J0Wm1Va0RFTW9lWW1nc2RYZndVbXFqTnhyTWZrWlNudVlxa1dGeU51QVFqWWFVSExLQ0Jmc0tZRENreEYucG5n',
-    href: '#',
-  },
-  {
-    name: 'American Airlines',
-    code: 'AAL/AA',
-    image: 'https://images.vasystem.org/CgZRp3AadHW3PThZkxELQBCn595G3amdATVVrWB3LbE/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL2Q5L2Q3L2Q5ZDdlMmFjYjdkMjI3OWZmNDczYzVkNjI1MGEyZWEwMDk0ZDQ0Yjc',
-    href: '#',
-  },
-   {
-    name: 'Asiana Airlines',
-    code: 'AAR/OZ',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Asiana_Airlines-Logo_New.svg/1280px-Asiana_Airlines-Logo_New.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Azerbaijan Airlines',
-    code: 'AHY/J2',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/Azerbaijan_Airlines_logo.svg/1280px-Azerbaijan_Airlines_logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Bangkok Airways',
-    code: 'BKP/PG',
-    image: 'https://upload.wikimedia.org/wikipedia/en/0/01/Bangkok_Airways_logo.svg',
-    href: '#',
-  },
-  {
-    name: 'British Airways',
-    code: 'BAW/BA',
-    image: 'https://images.vasystem.org/H5rGKLb9w0Iu3Km4RSfhcyDQABeQrJYDGP0iZcajqDY/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsLzgwLzY5LzgwNjkzNTkxNjMyNDU2ZTk0ZTNjZGM1ZjIzYWM4NmQ4MzkyMzFhMjk',
-    href: '#',
-  },
-   {
-    name: 'Bulgaria Air',
-    code: 'LZB/FB',
-    image: 'https://air.bg/media/logo/bg-air-light-en.svg',
-    href: '#',
-  },
-   {
-    name: 'Caribbean Airlines',
-    code: 'BWA/BW',
-    image: 'https://assets.planespotters.net/files/airlines/5/caribbean-airlines_f8f9b9_opr.png',
-    href: '#',
-  },
-  {
-    name: 'Cathay Pacific',
-    code: 'CPA/CX',
-    image: 'https://images.vasystem.org/KfXpOAsuWJ80Wvp36WAILqoUdXjloF5_hipCHAyblm0/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsLzJhL2MyLzJhYzI4ZjkzOTdkZDBiODgxNmIzZTI4MGUwYTliMjJjMGNkNTlkMmU',
-    href: '#',
-  },
-  {
-    name: 'China Southern',
-    code: 'CSN/CZ',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/China_Southern_Airlines_logo.svg/500px-China_Southern_Airlines_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Condor',
-    code: 'CFG/DE',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Condor_logo_2022.svg/500px-Condor_logo_2022.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Copa Airlines',
-    code: 'CMP/CM',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Copa_airlines_logo.svg/500px-Copa_airlines_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Fiji Airways',
-    code: 'FJI/FJ',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/Fiji_Airways_logo.svg/960px-Fiji_Airways_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Finnair',
-    code: 'FIN/AY',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Finnair_Logo.svg/500px-Finnair_Logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Garuda Indonesia',
-    code: 'GIA/GA',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/Garuda_Indonesia_Logo.svg/960px-Garuda_Indonesia_Logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'GOL',
-    code: 'GLO/G3',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Gol_airlines_logo.png',
-    href: '#',
-  },
-   {
-    name: 'Gulf Air',
-    code: 'GFA/GF',
-    image: 'https://logos-world.net/wp-content/uploads/2023/01/Gulf-Air-Logo.png',
-    href: '#',
-  },
-   {
-    name: 'Hainan Airlines',
-    code: 'CHH/HU',
-    image: 'https://upload.wikimedia.org/wikipedia/de/thumb/c/cd/Hainan_Airlines_Logo.svg/960px-Hainan_Airlines_Logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Hawaiian',
-    code: 'HAL/HA',
-    image: 'https://www.flysfo.com/sites/default/files/styles/original_image_webp/public/2024-12/Hawaiian%20Logo.png.webp?itok=2B-Eip_8',
-    href: '#',
-  },
-   {
-    name: 'Iberia',
-    code: 'IBE/IB',
-    image: 'https://logos-world.net/wp-content/uploads/2020/12/Iberia-Logo.png',
-    href: '#',
-  },
-   {
-    name: 'IndiGo',
-    code: 'IGO/6E',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/69/IndiGo.svg/500px-IndiGo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Japan Airlines',
-    code: 'JAL/JL',
-    image: 'https://logodownload.org/wp-content/uploads/2020/03/japan-airlines-logo-1.png',
-    href: '#',
-  },
-   {
-    name: 'Jet2',
-    code: 'EXS/LS',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Jet2Logo.svg/3840px-Jet2Logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'jetBlue',
-    code: 'JBU/B6',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/JetBlue_Airways_Logo.svg/1280px-JetBlue_Airways_Logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Kenya Airways',
-    code: 'KQA/KQ',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Kenya_Airways_Logo.svg/3840px-Kenya_Airways_Logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'LATAM',
-    code: 'TAM/LA',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Latam-logo_-v_%28Indigo%29.svg',
-    href: '#',
-  },
-   {
-    name: 'Malaysia Airlines',
-    code: 'MAS/MH',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Malaysia_Airlines_Logo.svg/500px-Malaysia_Airlines_Logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Maldivian',
-    code: 'DQA/Q2',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/8/84/Maldivian_%28airline%29_logo.svg/3840px-Maldivian_%28airline%29_logo.svg.png',
-    href: '#',
-  },
-   {
-    name: 'Middle East Airlines',
-    code: 'MEA/ME',
-    image: 'https://vectorseek.com/wp-content/uploads/2023/09/MEA-Middle-East-Airlines-Logo-Vector.svg-.png',
-    href: '#',
-  },
-  {
-    name: 'Norwegian',
-    code: 'NOS/DY',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png?_=20241221162114',
-    href: '#',
-  },
-  {
-    name: 'Oman Air',
-    code: 'OMA/WY',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/Oman_Air_logo.svg/500px-Oman_Air_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Philippine Airlines',
-    code: 'PAL/PR',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d2/Philippine_Airlines_logo.svg/1920px-Philippine_Airlines_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Pakistan International Airlines',
-    code: 'PIA/PK',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Pakistan_International_Airlines_Logo.svg/1280px-Pakistan_International_Airlines_Logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Qantas',
-    code: 'QFA/QF',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/02/Qantas_Airways_logo_2016.svg/500px-Qantas_Airways_logo_2016.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Royal Air Maroc',
-    code: 'RAM/AT',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Logo_Royal_Air_Maroc.svg/1280px-Logo_Royal_Air_Maroc.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Royal Jordanian',
-    code: 'RJA/RJ',
-    image: 'https://upload.wikimedia.org/wikipedia/it/6/6e/Royal_Jordanian_Logo.png',
-    href: '#',
-  },
-  {
-    name: 'Rwandair',
-    code: 'RWD/WB',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/5/50/RwandAir_Logotype.png',
-    href: '#',
-  },
-  {
-    name: 'Ryanair',
-    code: 'RYR/FR',
-    image: 'https://logos-world.net/wp-content/uploads/2020/06/Ryanair-Logo.png',
-    href: '#',
-  },
-  {
-    name: 'SkyAlps',
-    code: 'SKP/BQ',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/SkyAlps_Logo.svg/1280px-SkyAlps_Logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'South African Airways',
-    code: 'SAA/SA',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/SAA_logo_%282019%29.svg/330px-SAA_logo_%282019%29.svg.png',
-    href: '#',
-  },
-  {
-    name: 'SriLankan',
-    code: 'ALK/UL',
-    image: 'https://images.vasystem.org/QVaPkuwnm9LGiWw5nr0fSIGpcwk-RqSVFxnaEeSfbgY/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL2JhL2I3L2JhYjc3YTk3YmVjY2NjNzEzNWI1NWZmYWQwZTdhMWEyNWM2ODEyODE',
-    href: '#',
-  },
-  {
-    name: 'Starlux',
-    code: 'SJX/JX',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/93/STARLUX_Airlines_logo.svg/500px-STARLUX_Airlines_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'VARIG',
-    code: 'VRG/RG',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Varig_logo_%282007%29.svg',
-    href: '#',
-  },
-  {
-    name: 'Vietnam Airlines',
-    code: 'HVN/VN',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/Vietnam_Airlines_logo_2015.svg/960px-Vietnam_Airlines_logo_2015.svg.png?_=20230121032939',
-    href: '#',
-  },
-  {
-    name: 'Virgin Australia',
-    code: 'VOZ/VA',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/06/Virgin_Australia_Logo_2022.svg/960px-Virgin_Australia_Logo_2022.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Volotea',
-    code: 'VOE/V7',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Volotea.svg/1280px-Volotea.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Vueling',
-    code: 'VLG/VY',
-    image: 'https://1000logos.net/wp-content/uploads/2021/04/Vueling-Airlines-logo.png',
-    href: '#',
-  },
-  {
-    name: 'Webjet',
-    code: 'WEB/WH',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/WebJet_Linhas_A%C3%A9reas_logo.svg/3840px-WebJet_Linhas_A%C3%A9reas_logo.svg.png',
-    href: '#',
-  },
-  {
-    name: 'WestJet',
-    code: 'WJA/WS',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/WestJetLogo2018.svg/960px-WestJetLogo2018.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Widerøe',
-    code: 'WIF/WF',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Wideroe_logo_2002.svg/3840px-Wideroe_logo_2002.svg.png',
-    href: '#',
-  },
-  {
-    name: 'Xiamen Airlines',
-    code: 'CXA/MF',
-    image: 'https://images.vasystem.org/SFkZof9RsfpBZ0VNID4C3CknV5CMjXkzbX5fwQLuABo/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvc2t5dGVhbXZpcnR1YWwvMTAvZjgvMTBmOGU0NjE4MDA3ZTQ2ZmE3MDdlNTFhZGU4N2Y1YWE3ZjViMWZjMy5wbmc',
-    href: '#',
-  },
-];
+// We filter out Qatar Airways since this is specifically a codeshare partners page
+const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'QR');
 ---
 
 <Layout>
@@ -400,13 +23,22 @@ const codeshares = [
       </p>
     </div>
 
+    <div class="mb-8 flex justify-end">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search airlines or codes..."
+        class="border border-gray-300 px-4 py-2 rounded-md w-full sm:w-72 shadow-sm focus:outline-none focus:border-[#8B1538] focus:ring-1 focus:ring-[#8B1538] transition"
+      />
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {codeshares.map((airline) => (
-        <div class="bg-white rounded-lg border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200">
+        <div class="airline-card bg-white rounded-lg border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200" data-search={`${airline.name.toLowerCase()} ${airline.codeshare_code.toLowerCase()}`}>
           <div class="h-[250px] flex items-center justify-center p-6">
-            {airline.image ? (
+            {airline.logo ? (
               <img
-                src={airline.image}
+                src={airline.logo}
                 alt={airline.name}
                 class="max-h-[120px] object-contain"
               />
@@ -417,13 +49,40 @@ const codeshares = [
             )}
           </div>
 
-          <div class="border-t bg-[#faf7f8] px-4 py-3">
-            <a href={airline.href} class="text-[#8B1538] font-semibold text-sm hover:underline">
-              {airline.name} ({airline.code})
+          <div class="border-t bg-[#faf7f8] px-4 py-3 flex justify-between items-center">
+            <span class="text-[#8B1538] font-semibold text-sm">
+              {airline.name} ({airline.codeshare_code})
+            </span>
+            <a href={`/map?airline=${airline.prefix}`} class="text-sm text-gray-500 hover:text-[#8B1538] hover:underline flex items-center gap-1" title={`View ${airline.name} Route Map`}>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              Map
             </a>
           </div>
         </div>
       ))}
     </div>
   </section>
+
+  <script>
+    // Client-side script to handle the filtering
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.airline-card');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        cards.forEach((card) => {
+          const searchData = card.getAttribute('data-search') || '';
+          if (searchData.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+  </script>
 </Layout>

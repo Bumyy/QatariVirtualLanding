@@ -38,7 +38,12 @@ try {
     >
       <option value="">Select Airline...</option>
       {airlines.map(airline => (
-        <option value={airline.prefix} data-color={airline.color}>{airline.name}</option>
+        <>
+          <option value={airline.prefix} data-color={airline.color}>{airline.name}</option>
+          {(airline.prefix === 'QR' || airline.name === 'Qatar Airways') && (
+            <option value="ALL" data-color="#8B1538">All Routes</option>
+          )}
+        </>
       ))}
     </select>
     
@@ -90,8 +95,8 @@ try {
     client:load
   ></script>
 
-  <script client:load define:vars={{ allRoutes, csvText }}>
-    const map = L.map("map").setView([20, 10], 2);
+  <script client:load define:vars={{ allRoutes, csvText, airlines }}>
+    const map = L.map("map", { worldCopyJump: true }).setView([20, 10], 2);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       attribution: "&copy; OpenStreetMap & CARTO",
       subdomains: "abcd",
@@ -103,6 +108,7 @@ try {
     let connections = {};
     let markers = {};
     let drawn = [];
+    let currentPrefix = '';
 
     const airlineSelect = document.getElementById('airlineSelect');
     const routeInfo = document.getElementById('routeInfo');
@@ -141,17 +147,38 @@ try {
         (r.dep === toCode && r.arr === fromCode)
       );
 
+      let routeColor = currentColor;
+      if (currentPrefix === 'ALL' && route) {
+        const airline = airlines.find(a => route.fltnum.startsWith(a.prefix));
+        if (airline) routeColor = airline.color;
+      }
+
+      const weight = currentPrefix === 'ALL' ? 1 : 2;
+      const opacity = currentPrefix === 'ALL' ? 0.5 : 1;
+
+      // Handle crossing the Pacific (Antimeridian) by taking the shortest path
+      let lngA = A.lng;
+      let lngB = B.lng;
+      
+      if (Math.abs(lngA - lngB) > 180) {
+        if (lngA > lngB) {
+          lngB += 360;
+        } else {
+          lngB -= 360;
+        }
+      }
+
       let arc;
       try {
-        arc = new L.Polyline.Arc([A.lat, A.lng], [B.lat, B.lng], {
-          color: currentColor,
-          weight: 2,
-          opacity: 1,
+        arc = new L.Polyline.Arc([A.lat, lngA], [B.lat, lngB], {
+          color: routeColor,
+          weight: weight,
+          opacity: opacity,
           vertices: 200,
         });
       } catch (e) {
-        arc = L.polyline([[A.lat, A.lng], [B.lat, B.lng]], {
-          color: currentColor, weight: 2, opacity: 1
+        arc = L.polyline([[A.lat, lngA], [B.lat, lngB]], {
+          color: routeColor, weight: weight, opacity: opacity
         });
       }
 
@@ -173,12 +200,12 @@ try {
 
       Object.entries(markers).forEach(([otherCode, marker]) => {
         if (otherCode === code) {
-          marker.setStyle({ fillOpacity: 1, opacity: 1, radius: 7 });
+          marker.setStyle({ fillOpacity: 1, opacity: 1, radius: 10 });
           marker.bringToFront();
         } else if (connectedSet.has(otherCode)) {
-          marker.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 });
+          marker.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 8 });
         } else {
-          marker.setStyle({ fillOpacity: 0.2, opacity: 0.3, radius: 5 });
+          marker.setStyle({ fillOpacity: 0.2, opacity: 0.3, radius: 6 });
         }
       });
 
@@ -189,6 +216,7 @@ try {
     }
 
     function displayRoutesForAirline(prefix) {
+      currentPrefix = prefix;
       clearRoutes();
       Object.values(markers).forEach(m => map.removeLayer(m));
       markers = {};
@@ -196,7 +224,12 @@ try {
 
       if (!prefix) return;
 
-      currentRoutes = allRoutes.filter(route => route.fltnum.startsWith(prefix));
+      if (prefix === 'ALL') {
+        currentRoutes = allRoutes;
+      } else {
+        currentRoutes = allRoutes.filter(route => route.fltnum.startsWith(prefix));
+      }
+      
       const neededICAOs = new Set();
       currentRoutes.forEach(route => {
         neededICAOs.add(route.dep);
@@ -220,17 +253,18 @@ try {
 
       Object.entries(routeAirports).forEach(([code, airport]) => {
         const marker = L.circleMarker([airport.lat, airport.lng], {
-          radius: 6,
+          radius: currentPrefix === 'ALL' ? 6 : 8,
           fillColor: currentColor,
           color: "#ffffff",
-          weight: 2,
+          weight: currentPrefix === 'ALL' ? 1 : 2,
           fillOpacity: 0.9,
         }).addTo(map);
 
         const airportRoutes = currentRoutes.filter(r => r.dep === code || r.arr === code);
         const aircraftSet = new Set();
         airportRoutes.forEach(route => {
-          route.aircraft.forEach(aircraft => aircraftSet.add(`${aircraft.liveryname} ${aircraft.name}`));
+          const otherIcao = route.dep === code ? route.arr : route.dep;
+          route.aircraft.forEach(aircraft => aircraftSet.add(`${aircraft.liveryname} ${aircraft.name} - <strong>${otherIcao}</strong>`));
         });
         const aircraftList = aircraftSet.size > 0 ? 
           '<ul>' + Array.from(aircraftSet).map(a => `<li>${a}</li>`).join('') + '</ul>' : 'No aircraft';
@@ -242,6 +276,18 @@ try {
 
       routeInfo.textContent = `${currentRoutes.length} routes, ${Object.keys(routeAirports).length} airports`;
       
+      // Draw the beautiful "web" of all routes immediately
+      if (currentPrefix === 'ALL') {
+        const drawnPairs = new Set();
+        currentRoutes.forEach(route => {
+          const pair = [route.dep, route.arr].sort().join('-');
+          if (!drawnPairs.has(pair)) {
+            drawArc(route.dep, route.arr);
+            drawnPairs.add(pair);
+          }
+        });
+      }
+
       if (Object.keys(routeAirports).length > 0) {
         const bounds = Object.values(routeAirports).map(a => [a.lat, a.lng]);
         map.fitBounds(bounds, { padding: [40, 40], maxZoom: 3 });
@@ -257,10 +303,14 @@ try {
       const q = searchInput.value.trim().toLowerCase();
       
       if (!q) {
-        clearRoutes();
-        Object.values(markers).forEach(m => 
-          m.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 6 })
-        );
+        if (currentPrefix === 'ALL') {
+          displayRoutesForAirline('ALL');
+        } else {
+          clearRoutes();
+          Object.values(markers).forEach(m => 
+            m.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 8 })
+          );
+        }
         return;
       }
 
@@ -280,5 +330,17 @@ try {
     // Initialize
     airportData = parseCSV(csvText);
     routeInfo.textContent = 'Select an airline to view routes.';
+
+    // Check for URL parameter to pre-select airline
+    const urlParams = new URLSearchParams(window.location.search);
+    const airlineParam = urlParams.get('airline');
+    if (airlineParam) {
+      airlineSelect.value = airlineParam;
+      const selectedOption = airlineSelect.querySelector(`option[value="${airlineParam}"]`);
+      if (selectedOption) {
+        currentColor = selectedOption.dataset.color || '#ff0000';
+        displayRoutesForAirline(airlineParam);
+      }
+    }
   </script>
 </Layout>
