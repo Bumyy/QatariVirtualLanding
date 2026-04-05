@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @plugin "daisyui" {
   themes: light --default;
 }
@@ -14,8 +15,9 @@
   --color-base-300: oklch(92% 0.01 240);
   --color-base-content: oklch(25% 0.02 250);
 
-  --color-primary: oklch(40.5% 0.15 351);
-  --color-primary-content: oklch(99% 0.002 240);
+  /* ✅ YOUR BRAND COLOR */
+  --color-primary: #8B1538;
+  --color-primary-content: #ffffff;
 
   --color-secondary: oklch(75% 0.01 250);
   --color-secondary-content: oklch(25% 0.02 250);
