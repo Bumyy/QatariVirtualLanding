@@ -7,16 +7,34 @@
       "color": "#8B1538"
     },
     {
+      "name": "Aegean",
+      "prefix": "A3",
+      "hubs": ["LGAV"],
+      "color": "#4E6E81"
+    },
+    {
       "name": "Aer Lingus",
       "prefix": "EI",
-      "hubs": ["EIDW", "EGAC", "EICK", "EIKN", "EINN"],
+      "hubs": ["EIDW"],
       "color": "#008374"
+    },
+    {
+      "name": "Aeroflot",
+      "prefix": "SU",
+      "hubs": ["UUEE"],
+      "color": "#043484"
     },
     {
       "name": "Aeromexico",
       "prefix": "AMX",
       "hubs": ["MMMX"],
       "color": "#035CF7"
+    },
+    {
+      "name": "Air Algerie",
+      "prefix": "AH",
+      "hubs": ["DAAG"],
+      "color": "#ED1B24"
     },
     {
       "name": "Air Botswana",
@@ -27,13 +45,13 @@
     {
       "name": "Air India",
       "prefix": "AI",
-      "hubs": ["VABB", "VIDP"],
+      "hubs": ["VIDP"],
       "color": "#FF6600"
     },
     {
       "name": "Air Link",
       "prefix": "4Z",
-      "hubs": ["FAOR", "FACT"],
+      "hubs": ["FAOR"],
       "color": "#0C6433"
     },
     {
@@ -57,31 +75,19 @@
     {
       "name": "Air Transat",
       "prefix": "TS",
-      "hubs": ["CYYZ", "CYUL", "CYHZ", "CYQB"],
+      "hubs": ["CYYZ"],
       "color": "#3CBCEC"
     },
     {
       "name": "Alaska Airlines",
       "prefix": "AS",
-      "hubs": ["PANC", "KSEA", "KLAX", "KPDX", "KSAN", "KSFO", "KPAE", "KBOI"],
+      "hubs": ["KSEA"],
       "color": "#0C446B"
     },
     {
       "name": "American Airlines",
       "prefix": "AA",
-      "hubs": [
-        "KJFK",
-        "KMIA",
-        "KDFW",
-        "KLAX",
-        "KORD",
-        "KPHL",
-        "KAUS",
-        "KBOS",
-        "KCLT",
-        "KPHX",
-        "KDCA"
-      ],
+      "hubs": ["KJFK"],
       "color": "#C8102E"
     },
     {
@@ -99,13 +105,13 @@
     {
       "name": "Bangkok Airways",
       "prefix": "PG",
-      "hubs": ["VTBS", "VTSM", "VTCC", "VTSP"],
+      "hubs": ["VTBS"],
       "color": "#0C149C"
     },
     {
       "name": "British Airways",
       "prefix": "BA",
-      "hubs": ["EGLL", "EGKK"],
+      "hubs": ["EGLL"],
       "color": "#075AAA"
     },
     {
@@ -117,7 +123,7 @@
     {
       "name": "Caribbean Airlines",
       "prefix": "BW",
-      "hubs": ["TBPB", "TTPP", "TUPJ", "MKJP", "TTCP", "SYCJ"],
+      "hubs": ["TTPP"],
       "color": "CB5BA4"
     },
     {
@@ -127,9 +133,15 @@
       "color": "#005D63"
     },
     {
+      "name": "China Southern",
+      "prefix": "CZ",
+      "hubs": ["ZGGG"],
+      "color": "#0093D0"
+    },
+    {
       "name": "Condor",
       "prefix": "DE",
-      "hubs": ["EDDP", "EDDF", "EDDM", "EDDH", "EDDB", "EDDL", "EDNY"],
+      "hubs": ["EDDF"],
       "color": "#FFA200"
     },
     {
@@ -211,10 +223,160 @@
       "color": "#003876"
     },
     {
+      "name": "Kenya Airways",
+      "prefix": "KQ",
+      "hubs": ["HKJK"],
+      "color": "#EC2227"
+    },
+    {
       "name": "LATAM",
       "prefix": "LA",
       "hubs": ["SBGR"],
       "color": "#2A0087"
+    },
+    {
+      "name": "Malaysia Airlines",
+      "prefix": "MH",
+      "hubs": ["WMKK"],
+      "color": "#002B5C"
+    },
+    {
+      "name": "Maldivian",
+      "prefix": "Q2",
+      "hubs": ["VRMM"],
+      "color": "#E0163B"
+    },
+    {
+      "name": "MEA",
+      "prefix": "ME",
+      "hubs": ["OLBA"],
+      "color": "#007B5E"
+    },
+    {
+      "name": "Norwegian",
+      "prefix": "NOS",
+      "hubs": ["ENGM"],
+      "color": "#BA0C2F"
+    },
+    {
+      "name": "Oman Air",
+      "prefix": "WY",
+      "hubs": ["OOMS"],
+      "color": "#B5985A"
+    },
+    {
+      "name": "Philippine Airlines",
+      "prefix": "PR",
+      "hubs": ["RPLL"],
+      "color": "#FDCB0A"
+    },
+    {
+      "name": "PIA",
+      "prefix": "PK",
+      "hubs": ["OPIS"],
+      "color": "#004F30"
+    },
+    {
+      "name": "Qantas",
+      "prefix": "QF",
+      "hubs": ["YSSY"],
+      "color": "#E40000"
+    },
+    {
+      "name": "Royal Air Maroc",
+      "prefix": "AT",
+      "hubs": ["GMMN"],
+      "color": "#C40434"
+    },
+    {
+      "name": "Royal Jordanian",
+      "prefix": "RJ",
+      "hubs": ["OJAI"],
+      "color": "#A8854A"
+    },
+    {
+      "name": "Rwandair",
+      "prefix": "WB",
+      "hubs": ["HRYR"],
+      "color": "#1CA3DB"
+    },
+    {
+      "name": "Ryanair",
+      "prefix": "FR",
+      "hubs": ["EIDW"],
+      "color": "#073590"
+    },
+    {
+      "name": "SkyAlps",
+      "prefix": "BQ",
+      "hubs": ["LIPB"],
+      "color": "#043C2C"
+    },
+    {
+      "name": "SriLankan",
+      "prefix": "UL",
+      "hubs": ["VCBI"],
+      "color": "#01742F"
+    },
+    {
+      "name": "Starlux",
+      "prefix": "JX",
+      "hubs": ["RCTP"],
+      "color": "#9C6C4C"
+    },
+    {
+      "name": "VARIG",
+      "prefix": "VRG",
+      "hubs": ["SBGR"],
+      "color": "#000080"
+    },
+    {
+      "name": "Vietnam Airlines",
+      "prefix": "VN",
+      "hubs": ["VVTS"],
+      "color": "#0090BC"
+    },
+    {
+      "name": "Virgin Australia",
+      "prefix": "VA",
+      "hubs": ["VA"],
+      "color": "#D6083B"
+    },
+    {
+      "name": "Volotea",
+      "prefix": "V7",
+      "hubs": ["LFML"],
+      "color": "#ED164A"
+    },
+    {
+      "name": "Vueling",
+      "prefix": "VY",
+      "hubs": ["LEBL"],
+      "color": "#FFCC00"
+    },
+    {
+      "name": "Webjet",
+      "prefix": "WEB",
+      "hubs": ["SBRJ"],
+      "color": "#90C833"
+    },
+    {
+      "name": "WestJet",
+      "prefix": "WS",
+      "hubs": ["CYYC"],
+      "color": "#00AAA6"
+    },
+    {
+      "name": "Widerøe",
+      "prefix": "WIF",
+      "hubs": ["ENBR"],
+      "color": "#4EA322"
+    },
+    {
+      "name": "Xiamen Airlines",
+      "prefix": "MF",
+      "hubs": ["ZSAM"],
+      "color": "#008CD5"
     }
   ]
 }
