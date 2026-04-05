@@ -173,6 +173,48 @@
       "prefix": "HU",
       "hubs": ["ZJHK"],
       "color": "#E60012"
+    },
+    {
+      "name": "Hawaiian",
+      "prefix": "HA",
+      "hubs": ["PHNL"],
+      "color": "#D2058A"
+    },
+    {
+      "name": "Iberia",
+      "prefix": "IB",
+      "hubs": ["LEMD"],
+      "color": "#D7192D"
+    },
+    {
+      "name": "IndiGo",
+      "prefix": "6E",
+      "hubs": ["VABB"],
+      "color": "#4B0082"
+    },
+    {
+      "name": "Japan Airlines",
+      "prefix": "JL",
+      "hubs": ["RJTT"],
+      "color": "#C90000"
+    },
+    {
+      "name": "Jet2",
+      "prefix": "LS",
+      "hubs": ["EGCC"],
+      "color": "#EE3123"
+    },
+    {
+      "name": "jetBlue",
+      "prefix": "JB",
+      "hubs": ["KJFK"],
+      "color": "#003876"
+    },
+    {
+      "name": "LATAM",
+      "prefix": "LA",
+      "hubs": ["SBGR"],
+      "color": "#2A0087"
     }
   ]
 }
