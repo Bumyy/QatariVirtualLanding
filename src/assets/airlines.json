@@ -143,6 +143,36 @@
       "prefix": "FJ",
       "hubs": ["NFFN"],
       "color": "#2C1C14"
+    },
+    {
+      "name": "Finnair",
+      "prefix": "AY",
+      "hubs": ["EFHK"],
+      "color": "#003580"
+    },
+    {
+      "name": "Garuda Indonesia",
+      "prefix": "GA",
+      "hubs": ["WIII"],
+      "color": "#2F6F7E"
+    },
+    {
+      "name": "GOL Linhas Aéreas",
+      "prefix": "G3",
+      "hubs": ["SBSP"],
+      "color": "#FF6F1F"
+    },
+    {
+      "name": "Gulf Air",
+      "prefix": "GF",
+      "hubs": ["OBBI"],
+      "color": "#A29061"
+    },
+    {
+      "name": "Hainan Airlines",
+      "prefix": "HU",
+      "hubs": ["ZJHK"],
+      "color": "#E60012"
     }
   ]
 }
