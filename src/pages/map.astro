@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getRoutes } from '../data/route';
 import airlinesData from '../assets/airlines.json';
-import csvText from '../assets/airport_database_processed.csv?raw';
+import csvText from '../assets/airports.csv?raw';
 
 const airlines = airlinesData.airlines;
 let allRoutes = [];
@@ -46,6 +46,19 @@ try {
         </>
       ))}
     </select>
+
+    <select
+      id="regionSelect"
+      class="border border-gray-300 px-4 py-2 rounded shadow-sm"
+    >
+      <option value="ALL">All Regions</option>
+      <option value="AF">Africa</option>
+      <option value="AS">Asia & Middle East</option>
+      <option value="EU">Europe</option>
+      <option value="NA">North America</option>
+      <option value="OC">Oceania</option>
+      <option value="SA">South America</option>
+    </select>
     
     <input
       id="airportSearch"
@@ -53,6 +66,11 @@ try {
       placeholder="Search airport..."
       class="border border-gray-300 px-4 py-2 rounded w-60 shadow-sm"
     />
+
+    <label class="flex items-center gap-2 cursor-pointer text-gray-700 font-medium">
+      <input type="checkbox" id="showLinesToggle" class="w-4 h-4 accent-[#8B1538] cursor-pointer" />
+      Show Lines
+    </label>
   </div>
   
   <div id="routeInfo" class="text-center mt-2 text-sm text-gray-600"></div>
@@ -109,8 +127,11 @@ try {
     let markers = {};
     let drawn = [];
     let currentPrefix = '';
+    let currentRegion = 'ALL';
 
     const airlineSelect = document.getElementById('airlineSelect');
+    const regionSelect = document.getElementById('regionSelect');
+    const showLinesToggle = document.getElementById('showLinesToggle');
     const routeInfo = document.getElementById('routeInfo');
     const searchInput = document.getElementById('airportSearch');
 
@@ -118,14 +139,30 @@ try {
       const airports = {};
       const lines = csvText.split('\n');
       for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',');
-        if (parts.length >= 5) {
-          const icao = parts[0].trim();
-          const name = parts[2] ? parts[2].replace(/"/g, '') : icao;
-          const lat = parseFloat(parts[3]);
-          const lng = parseFloat(parts[4]);
+        const line = lines[i];
+        if (!line) continue;
+        
+        // Smart CSV parser to handle commas inside quotes (e.g. "City, Country")
+        let parts = [];
+        let current = '';
+        let inQuotes = false;
+        for (let c of line) {
+          if (c === '"') inQuotes = !inQuotes;
+          else if (c === ',' && !inQuotes) { parts.push(current); current = ''; }
+          else current += c;
+        }
+        parts.push(current);
+
+        // airports.csv columns: 0:id, 1:ident, 2:type, 3:name, 4:lat, 5:lng, 6:elev, 7:continent
+        if (parts.length >= 8) {
+          const icao = parts[1]?.trim();
+          const name = parts[3]?.trim();
+          const lat = parseFloat(parts[4]);
+          const lng = parseFloat(parts[5]);
+          const continent = parts[7]?.trim() || 'NA'; // Missing continent usually implies NA
+          
           if (icao && !isNaN(lat) && !isNaN(lng)) {
-            airports[icao] = { name, icao, lat, lng };
+            airports[icao] = { name, icao, lat, lng, continent };
           }
         }
       }
@@ -230,6 +267,17 @@ try {
         currentRoutes = allRoutes.filter(route => route.fltnum.startsWith(prefix));
       }
       
+      // Apply Region Filter (Inclusive: shows if either Dep or Arr is in Region)
+      if (currentRegion !== 'ALL') {
+        currentRoutes = currentRoutes.filter(route => {
+          const depAp = airportData[route.dep];
+          const arrAp = airportData[route.arr];
+          const depRegion = depAp ? depAp.continent : 'OTHER';
+          const arrRegion = arrAp ? arrAp.continent : 'OTHER';
+          return depRegion === currentRegion || arrRegion === currentRegion;
+        });
+      }
+
       const neededICAOs = new Set();
       currentRoutes.forEach(route => {
         neededICAOs.add(route.dep);
@@ -276,8 +324,8 @@ try {
 
       routeInfo.textContent = `${currentRoutes.length} routes, ${Object.keys(routeAirports).length} airports`;
       
-      // Draw the beautiful "web" of all routes immediately
-      if (currentPrefix === 'ALL') {
+      // Draw the beautiful "web" of all routes immediately if checked
+      if (showLinesToggle.checked) {
         const drawnPairs = new Set();
         currentRoutes.forEach(route => {
           const pair = [route.dep, route.arr].sort().join('-');
@@ -299,18 +347,20 @@ try {
       displayRoutesForAirline(e.target.value);
     });
 
+    regionSelect.addEventListener('change', (e) => {
+      currentRegion = e.target.value;
+      displayRoutesForAirline(currentPrefix);
+    });
+
+    showLinesToggle.addEventListener('change', () => {
+      displayRoutesForAirline(currentPrefix);
+    });
+
     searchInput.addEventListener('input', () => {
       const q = searchInput.value.trim().toLowerCase();
       
       if (!q) {
-        if (currentPrefix === 'ALL') {
-          displayRoutesForAirline('ALL');
-        } else {
-          clearRoutes();
-          Object.values(markers).forEach(m => 
-            m.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 8 })
-          );
-        }
+        displayRoutesForAirline(currentPrefix);
         return;
       }
 
