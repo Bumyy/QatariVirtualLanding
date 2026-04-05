@@ -15,10 +15,18 @@ try {
 ---
 
 <Layout title="Staff">
-    <h1 class="text-3xl font-bold text-center">Our Staff</h1>
-    <p class="mt-2 text-center">
-        They keep the show running!
-    </p>
+<section class="px-6 py-8 min-h-screen">
+    <div class="mb-8">
+      <div class="flex justify-between items-start gap-4 mb-3">
+        <h1 class="text-5xl font-bold text-[#8B1538]">Our Staff</h1>
+        <p class="text-sm text-gray-500 pt-2">
+          <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Staff
+        </p>
+      </div>
+      <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+        A team of passionate aviation enthusiasts committed to maintaining high standards and delivering an exceptional virtual airline experience.
+      </p>
+    </div>
 
     {error && <div class="alert alert-error max-w-lg mb-8">{error}</div>}
 

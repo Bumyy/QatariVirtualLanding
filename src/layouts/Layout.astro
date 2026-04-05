@@ -7,20 +7,199 @@ import '../styles/global.css';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Qatari Virtual Landing</title>
+
+    <style>
+      .header-shell {
+        background: #6e0038;
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .brand-wrap {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .brand-logo {
+        height: 46px;
+        width: auto;
+        display: block;
+      }
+
+      .brand-tagline {
+        color: white;
+        font-size: 1.15rem;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+        opacity: 0.9;
+      }
+
+      .main-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-left: auto;
+      }
+
+      .nav-item {
+        position: relative;
+        list-style: none;
+      }
+
+      .nav-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-weight: 700;
+        font-size: 1rem;
+        color: white;
+        text-decoration: none;
+        padding: 0.35rem 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .nav-link:hover {
+        opacity: 0.85;
+      }
+
+      .dropdown-arrow {
+        width: 0.9rem;
+        height: 0.9rem;
+        transition: transform 0.22s ease;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        min-width: 220px;
+        background: white;
+        border: 1px solid rgba(110, 0, 56, 0.08);
+        border-radius: 14px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+        padding: 0.55rem;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+        z-index: 1000;
+      }
+
+      .dropdown-menu a {
+        display: block;
+        padding: 0.8rem 0.95rem;
+        border-radius: 10px;
+        color: #2f2f2f;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      }
+
+      .dropdown-menu a:hover {
+        background: #f8f1f4;
+        color: #6e0038;
+        transform: translateX(2px);
+      }
+
+      .nav-item:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .nav-item:hover .dropdown-arrow {
+        transform: rotate(180deg);
+      }
+
+      @media (max-width: 1100px) {
+        .brand-tagline {
+          font-size: 1rem;
+        }
+
+        .main-nav {
+          gap: 1rem;
+        }
+
+        .nav-link {
+          font-size: 0.95rem;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .brand-tagline {
+          display: none;
+        }
+
+        .main-nav {
+          gap: 0.85rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        .dropdown-menu {
+          min-width: 190px;
+        }
+      }
+    </style>
   </head>
+
   <body>
-    <header class="bg-primary text-white p-4">
-      <nav class="container mx-auto flex justify-between">
-        <a href="/" class="text-lg font-bold">Qatari Virtual</a>
-        <ul class="flex gap-4">
-          <li><a href="/" class="hover:underline">Home</a></li>
-          <li><a href="/about" class="hover:underline">About Us</a></li>
-          <li><a href="/fleet" class="hover:underline">Fleet</a></li>
-          <li><a href="/codeshares" class="hover:underline">Codeshares</a></li>
-          <li><a href="/map" class="hover:underline">Route Map</a></li>
-          <li><a href="/ranks" class="hover:underline">Ranks</a></li>
-          <li><a href="/staff" class="hover:underline">Staff</a></li>
-          <li><a href="/apply" class="hover:underline">Apply</a></li>
+    <header class="header-shell px-8 py-3">
+      <nav class="flex w-full items-center justify-between">
+        <div class="brand-wrap">
+          <a href="/">
+            <img
+              src="https://cdn.discordapp.com/attachments/1462850221867401258/1490418219335553173/Qatari_Virtual_Logo_White.png?ex=69d3fba2&is=69d2aa22&hm=7e5a1e6a819c65e94de5bd4416212d22f63744946d4086aa5c6ba044ae884a88"
+              alt="Qatari Virtual"
+              class="brand-logo"
+            />
+          </a>
+          <span class="brand-tagline">The Home Of Excellence</span>
+        </div>
+
+        <ul class="main-nav">
+          <li class="nav-item">
+            <a href="/" class="nav-link">Home</a>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              About
+              <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+              </svg>
+            </a>
+            <div class="dropdown-menu">
+              <a href="/about">About Us</a>
+              <a href="/staff">Staff</a>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              Operations
+              <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+              </svg>
+            </a>
+            <div class="dropdown-menu">
+              <a href="/fleet">Fleet</a>
+              <a href="/codeshares">Codeshares</a>
+              <a href="/map">Route Map</a>
+              <a href="/ranks">Ranks</a>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a href="/crew-center" class="nav-link">Crew Center</a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/apply" class="nav-link">Apply</a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -29,7 +208,7 @@ import '../styles/global.css';
       <slot />
     </main>
 
-    <footer class="bg-secondary text-white p-4 text-center">
+    <footer class="bg-secondary p-4 text-center text-white">
       &copy; 2025 Qatari Virtual Landing. All rights reserved.
     </footer>
   </body>
