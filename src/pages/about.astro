@@ -1,20 +1,373 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const timelineItems = [
+  {
+    date: 'May 2023',
+    title: 'Qatari Virtual Takes Off',
+    description:
+      'Qatari Virtual was approved by the IFVARB in May 2023. In the same month, we also hosted our first internal event.',
+  },
+  {
+    date: 'June 2023',
+    title: 'Our First Codeshare',
+    description:
+      'In June, Qatari Virtual agreed their very first codeshare with Finnair Virtual.',
+  },
+  {
+    date: 'August 2023',
+    title: 'First IFC Event and Cargo Mode',
+    description:
+      'In August 2023, Qatari Virtual hosted their first IFC event: Destination Doha. This event is known to have been the rise of Qatari Virtual, and to have broken Infinite Flight Records. In the same month Qatari Virtual also released their Cargo Mode System. This is a state-of-the-art exclusive system for our pilots, coded into our crew centre, to give our pilots an immersive and realistic cargo experience.',
+  },
+  {
+    date: 'December 2023',
+    title: 'IFC Awards',
+    description:
+      'At the end of our first year of operations, we were nominated for Best Virtual Airline in the IFC awards, finishing runner up.',
+  },
+  {
+    date: 'January 2024',
+    title: 'An African Adventure',
+    description:
+      'In January, Qatari Virtual hosted our first continental tour: Tour D’Afrique. An event consisting of 18 legs, flown across 10 weeks, discovering the beauty of Africa.',
+  },
+  {
+    date: 'February 2024',
+    title: 'F1 Cargo Event',
+    description:
+      'Qatari Virtual launched F1 Cargo Events, transporting F1 race equipment from each Grand Prix each week.',
+  },
+  {
+    date: 'April 2024',
+    title: 'One Year in Numbers',
+    description:
+      'Qatari Virtual hit one year of operations. Our pilots filed 7804 PIREPs, we had 417 new pilots join us, flew a total of 83,493 hours and hosted 205 events.',
+  },
+  {
+    date: 'June 2024',
+    title: 'Worldwide Summer',
+    description:
+      'To kickoff the summer, Qatari Virtual hosted a summer event scheme, lasting 10 weeks, visiting 10 regions, and hosting a massive 50 events!',
+  },
+  {
+    date: 'October 2024',
+    title: '100,000 Flight Hours Milestone',
+    description:
+      'Qatari Virtual surpassed 100,000 flight hours! This achievement was a huge testament to the commitment, enthusiasm and professionalism of our pilots and staff team. In other words, we flew around the Earth almost 2300 times.',
+  },
+  {
+    date: 'November 2024',
+    title: 'The Great Asian Expedition',
+    description:
+      "Having conquered the landscapes of Africa on our Tour D'Afrique and braved the frozen expanses of Antarctica, Qatari Virtual proudly presents our next great journey - The Great Asian Expedition! Our pilots embarked on an adventure through the largest continent on Earth. During this tour, our pilots learned about the rich diversity of 12 countries, visited 14 remarkable cities, and had fun piloting 15 flights across Asia.",
+  },
+  {
+    date: 'April 2025',
+    title: '2 Years In Numbers',
+    description:
+      'In our second year of operations, we reached 13,303 hours of flight time, 526 new recruits, a total of 172,136 hours flown and hosted 446 events.',
+  },
+  {
+    date: 'May 2025',
+    title: "Tour D'Europe",
+    description:
+      'Our pilots embarked on a tour of the continent steeped in history and rich culture! Exploring 12 countries, 12 magnificent cities and 14 flights flying on 8 different airlines!',
+  },
+  {
+    date: 'November 2025',
+    title: 'Missions',
+    description:
+      'We reinstated our popular Missions mode, offering up Halloween Missions to spooky destinations, with prizes, as well as the U17 World Cup, which was being hosted in Doha. This gave our pilots the opportunity to fly special charter flights to far flung destinations like Fiji, or Santiago de Chile!',
+  },
+  {
+    date: 'January 2026',
+    title: 'IFC Best Virtual Airline 2025',
+    description:
+      'After falling short in 2023 and 2024, we finished first in the IFC Best Virtual Airline Award 2025! This win belongs to every one of our community. Every pilot, every flight, every shared event, and every moment of support contributed to this achievement. QRV is not just a virtual airline, it is a family built on trust, respect, and a shared love for flying.',
+  },
+  {
+    date: 'March 2026',
+    title: 'War in the Middle East',
+    description:
+      'At the start of March, as conflict arose in the Middle East, we at Qatari Virtual made the difficult decision to suspend our operations in solidarity with the people of the region and Qatar Airways. As operations gradually resumed, we followed in those footsteps and our pilots brought the skies of Doha back to life. We ended the month on 1200 PIREPs, one of our most active months to date!',
+  },
+];
+
+const testimonials = [
+  {
+    quote:
+      'I believe that Qatar Airways Virtual Airline is one of the best, if not the best, virtual airlines out there in Infinite Flight. My reasons for this are because, personally, since joining, my experience in the game has leveled up to a new kind of realism—going through the highly immersive and in-depth training to become a pilot for the airline, along with the very active group of people that are a part of this airline. Not to forget the immense number of events that are happening all the time, giving you the chance to not only rank up quickly and fly new, bigger, and more challenging planes but also to enjoy flying alongside other people with the same interest in aviation as you! Personally, I would really rate this VA an 11/10, and that’s not being biased by being a part of it—I truly mean it!',
+    author: 'Daniel',
+    callsign: 'QRV012',
+  },
+  {
+    quote:
+      'Qatari Virtual is one of the very best virtual organizations in the Infinite Flight skies. Collaboration and professionalism are embedded into the culture of the airline which is shaped by both incredible members and staff. Frequent internal and external events, different flight modes, a diverse fleet, and an expansive route network thanks to the airline’s many destinations and codeshare partnerships give pilots the flexibility and opportunity to explore the world on their own terms.',
+    author: 'Genav',
+    callsign: 'QRV016',
+  },
+  {
+    quote:
+      'The VA I started with and the VA I’ll end with once I retire. It’s the VA where I improved my aviation knowledge. It’s the VA where I met my friends. It’s the VA that led me to co-found another VA with them.',
+    author: 'Hilo',
+    callsign: 'QRV229',
+  },
+  {
+    quote:
+      'Joining Qatari Virtual has been nothing short of life-changing. From the moment I signed up, I felt welcomed into a community that quickly became like a second family. Not long after joining, I was thrilled to take on the role of recruiter, which allowed me to connect with even more passionate aviators and help grow this incredible VA. The friendships I’ve built here are priceless—I’ve met some of the most amazing people who share the same love for aviation. Together, we’ve created countless unforgettable memories, from group flights and exciting events to late-night chats filled with laughter and camaraderie. Being part of Qatari Virtual isn’t just about flying; it’s about belonging to something bigger, something truly special. This VA is more than a community—it’s a home, and I’m proud to call it mine.',
+    author: 'Avboy_Mohammed6',
+    callsign: 'QRV060',
+  },
+];
 ---
 
 <Layout>
-<section class="px-6 py-8 min-h-screen">
- <div class="mb-8">
-      <div class="flex justify-between items-start gap-4 mb-3">
-        <h1 class="text-5xl font-bold text-[#8B1538]">About Us</h1>
-        <p class="text-sm text-gray-500 pt-2">
-          <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / About Us
+  <section class="px-6 py-8 min-h-screen">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-8">
+        <div class="flex justify-between items-start gap-4 mb-3">
+          <h1 class="text-5xl font-bold text-[#8B1538]">About Us</h1>
+          <p class="text-sm text-gray-500 pt-2">
+            <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / About Us
+          </p>
+        </div>
+
+        <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+          Qatari Virtual is a welcoming community of aviation enthusiasts united by a passion for flying. We focus on creating engaging events, building meaningful connections, and providing a supportive environment for pilots of all experience levels.
+          <br /><br />
+          Below you will find
+          <a href="#testimonials" class="font-bold text-[#8B1538] hover:underline"> testimonials</a>,
+          a
+          <a href="#ceo" class="font-bold text-[#8B1538] hover:underline"> CEO message</a>,
+          and a
+          <a href="#timeline" class="font-bold text-[#8B1538] hover:underline"> timeline</a>
+          of events at Qatari Virtual.
         </p>
       </div>
 
-      <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
-       Qatari Virtual is a welcoming community of aviation enthusiasts united by a passion for flying. We focus on creating engaging events, building meaningful connections, and providing a supportive environment for pilots of all experience levels.
-      </p>
-    </div>
+      <div id="testimonials" class="mt-16 md:mt-20">
+        <div class="mb-10">
+          <h2 class="text-4xl font-bold text-[#8B1538] mb-3">Testimonials</h2>
+          <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+            Don’t just take our word for it — hear what our pilots have to say.
+          </p>
+        </div>
 
+        <div class="grid grid-cols-1 gap-6">
+          {testimonials.map((testimonial, index) => {
+            const animationClass = index % 2 === 0 ? 'slide-left' : 'slide-right';
+
+            return (
+              <article class={`testimonial-card reveal-card relative rounded-2xl border border-[#ead9df] bg-white/95 backdrop-blur-sm px-6 py-6 md:px-8 md:py-8 ${animationClass}`}>
+                <div class="testimonial-accent"></div>
+
+                <div class="relative">
+                  <div class="text-5xl leading-none text-[#8B1538]/12 font-serif mb-3">“</div>
+
+                  <p class="text-base md:text-lg leading-8 text-gray-600 italic mb-6">
+                    {testimonial.quote}
+                  </p>
+
+                  <div class="flex flex-wrap items-center gap-2 text-[#8B1538] font-bold text-xl">
+                    <span>{testimonial.author}</span>
+                    <span class="text-gray-400 font-normal">|</span>
+                    <span>{testimonial.callsign}</span>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      <div id="ceo" class="mt-16 md:mt-20">
+        <div class="mb-10">
+          <h2 class="text-4xl font-bold text-[#8B1538] mb-3">The Vision of our Chief Executive Officer</h2>
+          <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+            A message that reflects the values, direction, and spirit of Qatari Virtual.
+          </p>
+        </div>
+
+        <article class="ceo-card reveal-card rounded-2xl border border-[#ead9df] bg-gradient-to-br from-[#f8f1f3] to-white px-6 py-8 md:px-10 md:py-10 relative overflow-hidden">
+          <div class="ceo-accent"></div>
+
+          <div class="relative text-center">
+            <p class="text-xl md:text-2xl font-semibold text-[#8B1538] mb-6">
+              The Vision of our Chief Executive Officer:
+            </p>
+
+            <p class="text-lg md:text-xl italic leading-9 text-gray-700 max-w-4xl mx-auto">
+              As the CEO of Qatari Virtual, I aim to create a close-knit community, organize captivating events, share the love for Qatar Airways, and forge partnerships with other virtual airlines. Together, we will soar to new heights, embracing the spirit of aviation and building a vibrant and inclusive virtual airline experience for all pilots.
+            </p>
+
+            <p class="mt-6 text-[#8B1538] font-bold text-xl">
+              @bumy
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div id="timeline" class="mt-16 md:mt-20">
+        <div class="mb-10">
+          <h2 class="text-4xl font-bold text-[#8B1538] mb-3">Our Story</h2>
+          <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+            Follow the journey of Qatari Virtual through the milestones, events, achievements, and defining moments that shaped our community.
+          </p>
+        </div>
+
+        <div class="timeline-shell relative pl-8 md:pl-12">
+          <div class="timeline-line"></div>
+
+          <div class="space-y-6 md:space-y-8">
+            {timelineItems.map((item, index) => {
+              const animationClass = index % 2 === 0 ? 'slide-left' : 'slide-right';
+
+              return (
+                <article class={`timeline-card reveal-card relative rounded-2xl border border-[#ead9df] bg-white/95 backdrop-blur-sm px-6 py-5 md:px-8 md:py-6 ${animationClass}`}>
+                  <div class="timeline-dot"></div>
+
+                  <time class="block text-sm font-semibold uppercase tracking-[0.12em] text-[#8B1538]/80 mb-2">
+                    {item.date}
+                  </time>
+
+                  <h2 class="text-2xl font-bold text-gray-800 mb-3">
+                    {item.title}
+                  </h2>
+
+                  <p class="text-base leading-7 text-gray-600">
+                    {item.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .timeline-shell {
+      position: relative;
+    }
+
+    .timeline-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0.7rem;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, #8B1538 0%, #b04a69 50%, #8B1538 100%);
+      opacity: 0.95;
+    }
+
+    .timeline-card,
+    .testimonial-card,
+    .ceo-card {
+      opacity: 0;
+      transform: translateY(28px);
+      transition:
+        opacity 0.7s ease,
+        transform 0.7s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+      box-shadow: 0 10px 30px rgba(139, 21, 56, 0.08);
+    }
+
+    .timeline-card:hover,
+    .testimonial-card:hover,
+    .ceo-card:hover {
+      border-color: rgba(139, 21, 56, 0.28);
+      box-shadow: 0 18px 40px rgba(139, 21, 56, 0.12);
+    }
+
+    .timeline-card.is-visible,
+    .testimonial-card.is-visible,
+    .ceo-card.is-visible {
+      opacity: 1;
+      transform: translateY(0) translateX(0);
+    }
+
+    .slide-left {
+      transform: translateY(28px) translateX(-26px);
+    }
+
+    .slide-right {
+      transform: translateY(28px) translateX(26px);
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2.18rem;
+      top: 1.8rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #8B1538;
+      border: 4px solid #ffffff;
+      box-shadow: 0 0 0 6px #f5ecef;
+    }
+
+    .testimonial-card,
+    .ceo-card {
+      overflow: hidden;
+    }
+
+    .testimonial-accent,
+    .ceo-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background: linear-gradient(to bottom, #8B1538 0%, #b04a69 50%, #8B1538 100%);
+    }
+
+    @media (min-width: 768px) {
+      .timeline-line {
+        left: 0.95rem;
+      }
+
+      .timeline-dot {
+        left: -2.45rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .timeline-card,
+      .timeline-card.is-visible,
+      .testimonial-card,
+      .testimonial-card.is-visible,
+      .ceo-card,
+      .ceo-card.is-visible,
+      .slide-left,
+      .slide-right {
+        transition: none;
+        transform: none;
+        opacity: 1;
+      }
+    }
+  </style>
+
+  <script>
+    const cards = document.querySelectorAll('.reveal-card');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.15,
+      }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+  </script>
 </Layout>
