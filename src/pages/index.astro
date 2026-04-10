@@ -1,15 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// We store the images and their specific alignments here
+const slides = [
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/7/5/9/75988cc057301e7359b670f978f21e1db9a810e9.jpeg', position: 'center' },
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/2/5/f/25fb40344fa01bea40c2c549b6a512f173434c5a.jpeg', position: 'center' },
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/5/0/c/50ca75810f42fc8ae4ffd46caf5f68255e75de69.jpeg', position: 'center top' },
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/e/3/c/e3ccffd6e4772e82b0a2dafd0b539ad0f0a5610d.jpeg', position: 'center' }
+];
 ---
 
 <Layout>
 
-<section class="hero">
+<section class="hero" id="hero-banner">
+  {slides.map((slide, index) => (
+    <div 
+      class={`slide-layer ${index === 0 ? 'active' : ''}`} 
+      style={`background-image: url('${slide.url}'); background-position: ${slide.position};`}
+    ></div>
+  ))}
+
   <div class="overlay"></div>
 
   <div class="content">
     <p class="small-text">Welcome to Qatari Virtual</p>
     <h1 class="title">YOUR JOURNEY STARTS HERE</h1>
+    <br /><br />
+    <p class="small-text">Voted Best Virtual Airline 2025</p>
   </div>
 </section>
 
@@ -19,14 +36,28 @@ import Layout from '../layouts/Layout.astro';
     width: 100%;
     height: 50vh; 
     min-height: 500px; /* fallback for small screens */
-    background-image: url(https://global.discourse-cdn.com/infiniteflight/optimized/4X/8/d/6/8d64e734fbf27009765643e8d1d19329f4f4a54a_2_1230x858.jpeg);
-    background-size: cover;
-    background-position: center;
     border-bottom: 7px solid #6e0038;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    background-color: #000; /* Fallback color during load */
+  }
+
+  /* The stacked background images */
+  .slide-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out; /* Smooth cross-fade */
+    z-index: 0;
+  }
+
+  /* Only the active slide is visible */
+  .slide-layer.active {
+    opacity: 1;
   }
 
   /* White tint */
@@ -34,6 +65,7 @@ import Layout from '../layouts/Layout.astro';
     position: absolute;
     inset: 0;
     background: rgba(255, 255, 255, 0.5);
+    z-index: 1;
   }
 
   .content {
@@ -69,5 +101,25 @@ import Layout from '../layouts/Layout.astro';
     }
   }
 </style>
+
+<script>
+  // Grab all the generated slide elements
+  const slides = document.querySelectorAll('.slide-layer');
+  let currentIndex = 0;
+
+  if (slides.length > 0) {
+    // Cross-fade the images every 5 seconds
+    setInterval(() => {
+      // Fade out current slide
+      slides[currentIndex].classList.remove('active');
+      
+      // Move to next slide (looping back to 0 at the end)
+      currentIndex = (currentIndex + 1) % slides.length;
+      
+      // Fade in new slide
+      slides[currentIndex].classList.add('active');
+    }, 5000); 
+  }
+</script>
 
 </Layout>
