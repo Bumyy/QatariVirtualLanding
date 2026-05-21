@@ -36,6 +36,8 @@ const slides = [
     width: 100%;
     height: 50vh; 
     min-height: 500px; /* fallback for small screens */
+    margin-top: -84px;
+    padding-top: 84px;
     border-bottom: 7px solid #6e0038;
     display: flex;
     justify-content: center;
@@ -64,7 +66,7 @@ const slides = [
   .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.5);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.35) 35%, rgba(255, 255, 255, 0.55) 100%);
     z-index: 1;
   }
 
@@ -73,6 +75,7 @@ const slides = [
     text-align: center;
     z-index: 2;
     padding: 0 20px;
+    margin-top: -80px;
   }
 
   .small-text {
@@ -98,6 +101,15 @@ const slides = [
 
     .small-text {
       font-size: 1.2rem;
+    }
+
+    .hero {
+      margin-top: -68px;
+      padding-top: 68px;
+    }
+
+    .content {
+      margin-top: -50px;
     }
   }
 </style>
