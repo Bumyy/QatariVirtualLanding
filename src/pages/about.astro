@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Stats from '../components/Stats.astro';
 
 const timelineItems = [
   {
@@ -128,7 +129,7 @@ const testimonials = [
       <div class="mb-8">
         <div class="flex justify-between items-start gap-4 mb-3">
           <h1 class="text-5xl font-bold text-[#8B1538]">About Us</h1>
-          <p class="text-sm text-gray-500 pt-2">
+          <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
             <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / About Us
           </p>
         </div>
@@ -144,6 +145,11 @@ const testimonials = [
           <a href="#timeline" class="font-bold text-[#8B1538] hover:underline"> timeline</a>
           of events at Qatari Virtual.
         </p>
+      </div>
+
+      <div class="mt-10">
+        <h2 class="text-3xl font-bold text-[#8B1538] mb-6">Our Numbers</h2>
+        <Stats />
       </div>
 
       <div id="testimonials" class="mt-16 md:mt-20">

@@ -1,27 +1,40 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Stats from '../components/Stats.astro';
+import CTA from '../components/CTA.astro';
+import airlinesData from '../assets/airlines.json';
 
-// We store the images and their specific alignments here
 const slides = [
   { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/7/5/9/75988cc057301e7359b670f978f21e1db9a810e9.jpeg', position: 'center' },
   { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/2/5/f/25fb40344fa01bea40c2c549b6a512f173434c5a.jpeg', position: 'center' },
   { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/5/0/c/50ca75810f42fc8ae4ffd46caf5f68255e75de69.jpeg', position: 'center top' },
   { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/e/3/c/e3ccffd6e4772e82b0a2dafd0b539ad0f0a5610d.jpeg', position: 'center' }
 ];
+
+const rankSteps = [
+  { name: 'Cadet', range: '0–10h', color: '#ad596f', craft: 'A320 Family, 737 Family' },
+  { name: 'Captain', range: '100–250h', color: '#b03958', craft: '777 Family, B77F Cargo' },
+  { name: 'Oryx', range: '5,000h', color: '#b0802d', craft: 'Executive Jets, full access' },
+];
+
+const testimonials = [
+  { quote: 'I believe that Qatar Airways Virtual Airline is one of the best, if not the best, virtual airlines out there in Infinite Flight. The immersive training, active community, and endless events make every flight meaningful.', author: 'Daniel', callsign: 'QRV012' },
+  { quote: 'Qatari Virtual is one of the very best virtual organizations in the Infinite Flight skies. Collaboration and professionalism are embedded into the culture.', author: 'Genav', callsign: 'QRV016' },
+  { quote: 'Joining Qatari Virtual has been nothing short of life-changing. From the moment I signed up, I felt welcomed into a community that quickly became like a second family.', author: 'Mohammed', callsign: 'QRV060' },
+];
+
+const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').slice(0, 18);
 ---
 
 <Layout>
-
 <section class="hero" id="hero-banner">
   {slides.map((slide, index) => (
-    <div 
-      class={`slide-layer ${index === 0 ? 'active' : ''}`} 
+    <div
+      class={`slide-layer ${index === 0 ? 'active' : ''}`}
       style={`background-image: url('${slide.url}'); background-position: ${slide.position};`}
     ></div>
   ))}
-
   <div class="overlay"></div>
-
   <div class="content">
     <p class="small-text">Welcome to Qatari Virtual</p>
     <h1 class="title">YOUR JOURNEY STARTS HERE</h1>
@@ -30,43 +43,108 @@ const slides = [
   </div>
 </section>
 
-<style>
-  .hero {
-    position: relative;
-    width: 100%;
-    height: 50vh; 
-    min-height: 500px; /* fallback for small screens */
-    margin-top: -84px;
-    padding-top: 84px;
-    border-bottom: 7px solid #6e0038;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-color: #000; /* Fallback color during load */
-  }
+<!-- Stats -->
+<section class="px-6 py-12">
+  <div class="max-w-6xl mx-auto">
+    <Stats />
+  </div>
+</section>
 
-  /* The stacked background images */
+<!-- Rank Progression -->
+<section class="px-6 py-12">
+  <div class="max-w-6xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Climb the Ranks</h2>
+    <p class="text-gray-500 mb-8 max-w-xl mx-auto">Every hour unlocks new aircraft and opportunities.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {rankSteps.map((rank, i) => (
+        <div class="rank-step-card rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <div class="py-4 text-white font-bold text-lg" style={`background: linear-gradient(135deg, ${rank.color}, ${rank.color}dd)`}>
+            {rank.name}
+            <div class="text-sm font-normal opacity-80 mt-0.5">{rank.range}</div>
+          </div>
+          <div class="bg-white px-4 py-5">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Aircraft unlocked</p>
+            <p class="text-sm text-gray-700 font-medium leading-relaxed">{rank.craft}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+    <a href="/ranks" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
+      View full rank structure &rarr;
+    </a>
+  </div>
+</section>
+
+<!-- Partners -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-6xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Our Codeshare Partners</h2>
+    <p class="text-gray-500 mb-8 max-w-xl mx-auto">Fly realistic routes with 20+ partner airlines across the globe.</p>
+    <div class="partner-grid">
+      {partners.map((partner) => (
+        <div class="partner-item flex items-center justify-center p-3 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+          <img
+            src={partner.logo}
+            alt={partner.name}
+            class="partner-logo"
+            loading="lazy"
+            onerror="this.style.display='none'"
+          />
+        </div>
+      ))}
+    </div>
+    <a href="/codeshares" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
+      View all partners &rarr;
+    </a>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="px-6 py-12">
+  <div class="max-w-4xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-2">What Our Pilots Say</h2>
+    <p class="text-gray-500 mb-8">Hear from the community that makes Qatari Virtual special.</p>
+    <div class="testimonial-grid grid grid-cols-1 md:grid-cols-3 gap-5">
+      {testimonials.map((t) => (
+        <div class="testimonial-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300 text-left flex flex-col">
+          <div class="text-4xl text-[#8B1538]/20 font-serif leading-none mb-2">&ldquo;</div>
+          <p class="text-sm text-gray-600 leading-relaxed flex-1 mb-4 italic">{t.quote}</p>
+          <div class="text-[#8B1538] font-bold text-sm">{t.author} <span class="text-gray-400 font-normal ml-1">{t.callsign}</span></div>
+        </div>
+      ))}
+    </div>
+    <a href="/about" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
+      Read more about us &rarr;
+    </a>
+  </div>
+</section>
+
+<CTA
+  title="Ready to fly with the best?"
+  description="Join Qatari Virtual and be part of an award-winning community of pilots."
+/>
+
+<style>
+    .hero {
+      min-height: calc(100vh - 68px);
+    }
+
   .slide-layer {
     position: absolute;
     inset: 0;
     background-size: cover;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 1.5s ease-in-out; /* Smooth cross-fade */
+    transition: opacity 1.5s ease-in-out;
     z-index: 0;
   }
 
-  /* Only the active slide is visible */
-  .slide-layer.active {
-    opacity: 1;
-  }
+  .slide-layer.active { opacity: 1; }
 
-  /* White tint */
   .overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.35) 35%, rgba(255, 255, 255, 0.55) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.35) 35%, rgba(255,255,255,0.55) 100%);
     z-index: 1;
   }
 
@@ -75,7 +153,6 @@ const slides = [
     text-align: center;
     z-index: 2;
     padding: 0 20px;
-    margin-top: -80px;
   }
 
   .small-text {
@@ -93,44 +170,46 @@ const slides = [
     letter-spacing: 2px;
   }
 
-  /* 📱 Responsive tweak */
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .partner-logo {
+    max-height: 36px;
+    max-width: 100%;
+    object-fit: contain;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .partner-item:hover .partner-logo { opacity: 1; }
+
   @media (max-width: 768px) {
-    .title {
-      font-size: 2.5rem;
+    .title { font-size: 2.5rem; }
+    .small-text { font-size: 1.2rem; }
+    .hero { margin-top: -68px; padding-top: 68px; }
+    .content { margin-top: -50px; }
+
+    .partner-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
     }
 
-    .small-text {
-      font-size: 1.2rem;
-    }
-
-    .hero {
-      margin-top: -68px;
-      padding-top: 68px;
-    }
-
-    .content {
-      margin-top: -50px;
-    }
+    .partner-logo { max-height: 28px; }
   }
 </style>
 
 <script>
-  // Grab all the generated slide elements
   const slides = document.querySelectorAll('.slide-layer');
   let currentIndex = 0;
-
   if (slides.length > 0) {
-    // Cross-fade the images every 5 seconds
     setInterval(() => {
-      // Fade out current slide
       slides[currentIndex].classList.remove('active');
-      
-      // Move to next slide (looping back to 0 at the end)
       currentIndex = (currentIndex + 1) % slides.length;
-      
-      // Fade in new slide
       slides[currentIndex].classList.add('active');
-    }, 5000); 
+    }, 5000);
   }
 </script>
 

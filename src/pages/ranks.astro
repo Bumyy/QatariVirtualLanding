@@ -1,11 +1,185 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import CTA from '../components/CTA.astro';
+
+const allRanks = [
+  { name: 'Cadet', hours: '0h', min: 0, color: '#ad596f' },
+  { name: 'Second Officer', hours: '10h', min: 10, color: '#b04460' },
+  { name: 'First Officer', hours: '25h', min: 25, color: '#b03958' },
+  { name: 'Captain', hours: '100h', min: 100, color: '#b03958' },
+  { name: 'Senior Captain', hours: '250h', min: 250, color: '#b4294d' },
+  { name: 'Ruby', hours: '500h', min: 500, color: '#9624ab' },
+  { name: 'Sapphire', hours: '1,000h', min: 1000, color: '#196292' },
+  { name: 'Emerald', hours: '2,500h', min: 2500, color: '#209320' },
+  { name: 'OneWorld Discover', hours: '3,000h', min: 3000, color: '#5250a4' },
+  { name: 'Oryx', hours: '5,000h', min: 5000, color: '#b0802d' },
+];
+
+const ranks = [
+  { name: 'Cadet', hours: '0h', color: '#ad596f', aircraft: ['Airbus A319', 'Airbus A320', 'Airbus A321', 'Boeing 737-700/800/900', 'Boeing 737 MAX 8', 'CRJ Family', 'Dash 8-Q400', 'ERJ Family'], range: '0–10' },
+  { name: 'Second Officer', hours: '10h', color: '#b04460', aircraft: ['Airbus A220', 'Airbus A330', 'Boeing 787 Dreamliner Family'], range: '10–25' },
+  { name: 'First Officer', hours: '25h', color: '#b03958', aircraft: ['Airbus A350', 'Boeing 767'], range: '25–100' },
+  { name: 'Captain', hours: '100h', color: '#b03958', aircraft: ['Boeing 777-200LR/ER', 'Boeing 777-300ER', 'B77F (Codeshares)'], range: '100–250', extra: 'Apply to Qatari Cargo!' },
+  { name: 'Senior Captain', hours: '250h', color: '#b4294d', aircraft: ['Airbus A340', 'Airbus A380', 'Boeing 747-400/8'], range: '250–500' },
+];
+
+const awards = [
+  { name: 'Ruby Award', hours: '500h', color: '#9624ab', bonuses: ['Qatar Amiri A319', 'Callsign change (unlocks 40–100 range)', 'Access to the Qatari Staff Discord server'] },
+  { name: 'Sapphire Award', hours: '1,000h', color: '#196292', bonuses: ['Qatari Amiri B747, A340', 'Callsign change (unlocks 30–40 range)'] },
+  { name: 'Emerald Award', hours: '2,500h', color: '#209320', bonuses: ['Qatari Classic Route Database (WIP)'] },
+  { name: 'OneWorld Discover', hours: '3,000h', color: '#5250a4', bonuses: ['Access to all oneworld airline routes, approximately 5,000 new routes'] },
+  { name: 'The Oryx Award', hours: '5,000h', color: '#b0802d', bonuses: ['Qatari Executive C350, A318, B737'] },
+];
 ---
 
-<Layout>
+<Layout title="Ranks and Progression">
 <section class="px-6 py-8 min-h-screen">
-  <h1 class="text-3xl font-bold text-center">Ranks</h1>
-  <p class="mt-4 text-center">
-    Explore the ranking system at Qatari Virtual Landing and how you can progress.
-  </p>
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-start gap-4 mb-3">
+      <h1 class="text-5xl font-bold text-[#8B1538]">Ranks &amp; Progression</h1>
+      <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
+        <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Ranks
+      </p>
+    </div>
+    <p class="max-w-3xl text-lg text-gray-600 leading-relaxed mb-10">
+      Climb the ranks with Qatari Virtual. Every rank unlocks new aircraft, codeshare routes, and exclusive perks as you log more hours.
+    </p>
+
+    <!-- Rank Overview Table -->
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-4">Rank Overview</h2>
+    <div class="overflow-x-auto mb-12 rounded-2xl border border-[#ead9df] shadow-sm">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-gradient-to-r from-[#8B1538] to-[#b04a69] text-white">
+            <th class="py-3.5 px-5 font-bold">Name</th>
+            <th class="py-3.5 px-5 font-bold">Hours</th>
+            <th class="py-3.5 px-5 font-bold hidden sm:table-cell">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allRanks.map((rank, i) => (
+            <tr class={`border-t border-[#ead9df] ${i % 2 === 0 ? 'bg-white' : 'bg-[#fcfafb]'}`}>
+              <td class="py-3 px-5 font-semibold text-[#2f2f2f]">
+                <span class="inline-block w-3 h-3 rounded-full mr-2 align-middle" style={`background: ${rank.color}`}></span>
+                {rank.name}
+              </td>
+              <td class="py-3 px-5 font-medium text-gray-600">{rank.hours}</td>
+              <td class="py-3 px-5 hidden sm:table-cell">
+                <a href={rank.min >= 500 ? '#awards' : '#rank-structure'} class="text-[#8B1538] font-semibold text-sm hover:underline">
+                  {rank.min >= 500 ? 'Award' : 'Details'} &rarr;
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Rank Structure -->
+    <h2 id="rank-structure" class="text-3xl font-bold text-[#8B1538] mb-2">Rank Structure</h2>
+    <p class="text-gray-500 text-sm mb-6">(Codeshare aircraft unlocked as well)</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-14">
+      {ranks.map((rank) => (
+        <div class="rank-card rounded-2xl border border-[#ead9df] bg-white shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+          <div class="px-5 py-3 text-white font-bold text-lg flex items-center justify-between" style={`background: linear-gradient(135deg, ${rank.color}, ${rank.color}dd)`}>
+            <span>{rank.name}</span>
+            <span class="text-sm font-medium opacity-90">{rank.range} hrs</span>
+          </div>
+          <div class="px-5 pt-4 pb-5">
+            {rank.extra && (
+              <p class="text-sm font-semibold text-[#8B1538] mb-3">{rank.extra}</p>
+            )}
+            <ul class="space-y-1.5">
+              {rank.aircraft.map((ac) => (
+                <li class="flex items-center gap-2 text-sm text-gray-700">
+                  <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style={`background: ${rank.color}`}></span>
+                  {ac}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Cargo Captain Banner -->
+    <div class="cargo-banner rounded-2xl border border-[#ead9df] bg-gradient-to-br from-[#c87d06] to-[#9a6004] text-white p-6 md:p-8 mb-14 shadow-md">
+      <h3 class="text-2xl font-bold mb-1">Qatari Cargo Captain</h3>
+      <p class="text-white/80 mb-4 max-w-2xl leading-relaxed">
+        A separate training track leading into a full cargo program with a collaborative community mode — pilots work together to deliver cargo around the world.
+      </p>
+      <a href="/apply" class="inline-flex items-center gap-1.5 bg-white text-[#c87d06] font-bold px-5 py-2.5 rounded-full text-sm hover:bg-[#fef9f0] transition">
+        Apply to Qatari Cargo <span>&rarr;</span>
+      </a>
+    </div>
+
+    <!-- Awards -->
+    <h2 id="awards" class="text-3xl font-bold text-[#8B1538] mb-6">Awards</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-14">
+      {awards.map((award) => (
+        <div class="award-card rounded-2xl border border-[#ead9df] bg-white shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+          <div class="px-5 py-3 text-white font-bold text-lg flex items-center justify-between" style={`background: linear-gradient(135deg, ${award.color}, ${award.color}dd)`}>
+            <span>{award.name}</span>
+            <span class="text-sm font-medium opacity-90">{award.hours}</span>
+          </div>
+          <div class="px-5 pt-3 pb-4">
+            <ul class="space-y-1.5">
+              {award.bonuses.map((bonus) => (
+                <li class="flex items-start gap-2 text-sm text-gray-700">
+                  <span class="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={`background: ${award.color}`}></span>
+                  {bonus}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <CTA
+      title="Climb the ranks with Qatari Virtual"
+      description="Every hour brings you closer to new aircraft, new routes, and new challenges. Start your journey today."
+    />
+  </div>
+</section>
+
+<style>
+  .rank-card:hover,
+  .award-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .rank-card,
+  .award-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .cargo-banner {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cargo-banner::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 160px;
+    height: 160px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    .cargo-banner {
+      padding: 1.25rem;
+    }
+  }
+</style>
 </Layout>

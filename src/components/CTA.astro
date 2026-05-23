@@ -1,0 +1,46 @@
+---
+import MdiIcon from '@mdi/react';
+import { mdiArrowTopRightThick } from '@mdi/js';
+
+const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = 'Ready to join us?', description = 'Apply now and start your journey with Qatari Virtual.' } = Astro.props;
+---
+
+<div class="cta-section text-white text-center py-10 px-6 md:py-12 md:px-8 mt-8 shadow-lg" style="background: linear-gradient(135deg, #4a0c2b, #6e0038);">
+  <h2 class="text-3xl md:text-3xl font-bold mb-3">{title}</h2>
+  <p class="text-white/80 mb-6 max-w-xl mx-auto leading-relaxed">{description}</p>
+  <a
+    href="/apply"
+    class="cta-btn group inline-flex items-center gap-2 bg-white text-[#6e0038] font-bold px-7 py-3 rounded-full text-base hover:bg-[#f8f1f3] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+  >
+    Apply Now
+    <span class="cta-icon inline-flex items-center transition-transform duration-200 group-hover:translate-x-1">
+      <Icon path={mdiArrowTopRightThick} size={1} />
+    </span>
+  </a>
+</div>
+
+<style>
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cta-btn:hover .cta-icon {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 768px) {
+    .cta-section {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+  }
+</style>

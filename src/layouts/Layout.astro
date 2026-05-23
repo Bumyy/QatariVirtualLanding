@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import MdiIcon from '@mdi/react';
 import { mdiArrowTopRightThick, mdiMenu, mdiClose } from '@mdi/js';
+import Footer from '../components/Footer.astro';
 
 const { title = 'Qatari Virtual Landing' } = Astro.props;
 const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
@@ -28,7 +29,7 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
 
 
       .header-shell.is-scrolled {
-        background: linear-gradient(120deg, rgba(88, 14, 51, 0.96), rgba(117, 24, 66, 0.94));
+        background: linear-gradient(120deg, #4a0c2b, #6e0038);
         color: white;
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         box-shadow: 0 16px 45px rgba(24, 8, 16, 0.22);
@@ -470,6 +471,7 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
             <div class="dropdown-menu">
               <a href="/fleet">Fleet</a>
               <a href="/codeshares">Codeshares</a>
+              <a href="/routes">Route Database</a>
               <a href="/map">Route Map</a>
               <a href="/ranks">Ranks</a>
               <a href="/tours">Tours</a>
@@ -477,7 +479,7 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
           </li>
 
           <li class="nav-item">
-            <a href="/crew-center" class="nav-link">Crew Center</a>
+            <a href="https://crew.qatarivirtual.xyz" target="_blank" rel="noopener noreferrer" class="nav-link">Crew Center</a>
           </li>
 
           <li class="nav-item">
@@ -496,9 +498,7 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
       <slot />
     </main>
 
-    <footer class="bg-secondary p-4 text-center text-white">
-      &copy; 2026 Qatari Virtual Landing. All rights reserved.
-    </footer>
+    <Footer />
 
     <script>
       const header = document.querySelector('.header-shell');
