@@ -1,0 +1,88 @@
+---
+import Layout from '../layouts/Layout.astro';
+import airlinesData from '../assets/airlines.json';
+
+// We filter out Qatar Airways since this is specifically a codeshare partners page
+const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'QR');
+---
+
+<Layout>
+  <section class="px-6 py-8 min-h-screen">
+    <div class="mb-8">
+      <div class="flex justify-between items-start gap-4 mb-3">
+        <h1 class="text-5xl font-bold text-[#8B1538]">Our Codeshares</h1>
+        <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
+          <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Codeshares
+        </p>
+      </div>
+
+      <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+        Explore Qatari Virtual’s growing network of codeshare partners across the world. Through these partnerships,
+        our pilots can enjoy a wider range of destinations, routes, and operational experiences while representing the
+        excellence and professionalism of Qatari Virtual.
+      </p>
+    </div>
+
+    <div class="mb-8 flex justify-end">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search airlines or codes..."
+        class="border border-gray-300 px-4 py-2 rounded-md w-full sm:w-72 shadow-sm focus:outline-none focus:border-[#8B1538] focus:ring-1 focus:ring-[#8B1538] transition"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {codeshares.map((airline) => (
+        <div class="airline-card bg-white rounded-lg border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200" data-search={`${airline.name.toLowerCase()} ${airline.codeshare_code.toLowerCase()}`}>
+          <div class="h-[250px] flex items-center justify-center p-6">
+            {airline.logo ? (
+              <img
+                src={airline.logo}
+                alt={airline.name}
+                class="max-h-[120px] object-contain"
+              />
+            ) : (
+              <p class="text-gray-400 text-sm font-medium tracking-wide uppercase">
+                Insert Image Here
+              </p>
+            )}
+          </div>
+
+          <div class="border-t bg-[#faf7f8] px-4 py-3 flex justify-between items-center">
+            <span class="text-[#8B1538] font-semibold text-sm">
+              {airline.name} ({airline.codeshare_code})
+            </span>
+            <a href={`/map?airline=${airline.prefix}`} class="text-sm text-gray-500 hover:text-[#8B1538] hover:underline flex items-center gap-1" title={`View ${airline.name} Route Map`}>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              Map
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <script>
+    // Client-side script to handle the filtering
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.airline-card');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        cards.forEach((card) => {
+          const searchData = card.getAttribute('data-search') || '';
+          if (searchData.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+  </script>
+</Layout>

@@ -1,0 +1,182 @@
+---
+const links = [
+  { label: 'Instagram', href: 'https://www.instagram.com/if.qatarivirtual/?utm_source=ig_web_button_share_sheet' },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@if.qatarivirtual?_t=ZT-8zaYXemJv2l&_r=1' },
+  { label: 'Infinite Flight Community', href: 'https://community.infiniteflight.com/t/qatari-virtual-official-thread-2024-qatars-wings-to-adventure/797118?u=qatarivirtual' },
+  { label: 'Crew Center', href: 'https://crew.qatarivirtual.xyz' },
+  { label: 'Youtube', href: 'https://www.youtube.com/@QatariVirtual' },
+];
+---
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="/images/QRV-Logo1.png" alt="Qatari Virtual" class="footer-logo" />
+      <p class="footer-tagline">The Home Of Excellence</p>
+      <p class="footer-copy">&copy; 2026 Qatari Virtual. All rights reserved.</p>
+    </div>
+
+    <div class="footer-links">
+      <h4 class="footer-heading">Links</h4>
+      <ul>
+        {links.map((link) => (
+          <li><a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-assist">
+      <h4 class="footer-heading">Need Assistance?</h4>
+      <p class="footer-assist-text">
+        Either contact us via our <a href="https://community.infiniteflight.com/t/qatari-virtual-official-thread-2024-qatars-wings-to-adventure/797118?u=qatarivirtual" target="_blank" rel="noopener noreferrer">IFC Account</a>, or DM one of our Executive Team members via IFC or Discord.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer-disclaimer">
+    <p>
+      Infinite Flight's Qatari Virtual is not affiliated with, endorsed, or sponsored by the real world airline, Qatar Airways. All Qatar Airways logos are registered trademarks of Qatar Airways. Qatari Virtual is an organization operating under the regulation of the IFVARB, the governing body for virtual airlines in Infinite Flight.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: linear-gradient(135deg, #4a0c2b, #6e0038);
+    color: white;
+    padding: 3rem 2rem 1.5rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .footer-logo {
+    height: clamp(40px, 3.2vw, 60px);
+    width: auto;
+    max-width: 200px;
+    margin-bottom: 0.5rem;
+    object-fit: contain;
+    object-position: left center;
+    display: block;
+  }
+
+  .footer-tagline {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    opacity: 0.95;
+  }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+  }
+
+  .footer-heading {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+    margin-bottom: 0.65rem;
+  }
+
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .footer-links a {
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    color: white;
+    opacity: 1;
+  }
+
+  .footer-assist-text {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.78;
+  }
+
+  .footer-assist-text a {
+    color: white;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .footer-disclaimer {
+    max-width: 1100px;
+    margin: 2rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.72rem;
+    line-height: 1.65;
+    opacity: 0.5;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .site-footer {
+      padding: 1.5rem 1rem 0.75rem;
+    }
+
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      height: 36px;
+      max-width: 160px;
+      margin: 0 auto;
+      object-position: center;
+    }
+
+    .footer-tagline {
+      font-size: 1rem;
+    }
+
+    .footer-links ul {
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .footer-heading {
+      margin-bottom: 0.4rem;
+    }
+
+    .footer-disclaimer {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+    }
+
+    .footer-assist-text {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+  }
+</style>

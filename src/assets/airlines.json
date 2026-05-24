@@ -1,0 +1,516 @@
+{
+  "airlines": [
+    {
+      "name": "Qatar Airways",
+      "prefix": "QR",
+      "hubs": ["OTHH"],
+      "color": "#8B1538",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Qatar_Airways_Logo.svg/1024px-Qatar_Airways_Logo.svg.png",
+      "codeshare_code": "QTR/QR"
+    },
+    {
+      "name": "Aegean",
+      "prefix": "A3",
+      "hubs": ["LGAV"],
+      "color": "#4E6E81",
+      "logo": "https://1000logos.net/wp-content/uploads/2021/04/Aegean-Airlines-logo.png",
+      "codeshare_code": "AEE/A3"
+    },
+    {
+      "name": "Aer Lingus",
+      "prefix": "EI",
+      "hubs": ["EIDW"],
+      "color": "#008374",
+      "logo": "https://images.vasystem.org/myOTQH6eMtJOAxJIb0-9UFeGNLx-hbewbT-1JouJY6E/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsLzRmLzJmLzRmMmYyM2JjMTE4NGE0MWQ1YTA0YzNiZDJiNWIwZWQyM2I5ZTExMGQ",
+      "codeshare_code": "EIN/EI"
+    },
+    {
+      "name": "Aeroflot",
+      "prefix": "SU",
+      "hubs": ["UUEE"],
+      "color": "#043484",
+      "logo": "https://logos-world.net/wp-content/uploads/2023/01/Aeroflot-Logo-2003.png",
+      "codeshare_code": "AFL/SU"
+    },
+    {
+      "name": "Aeromexico",
+      "prefix": "AMX",
+      "hubs": ["MMMX"],
+      "color": "#035CF7",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Aeromexico.png/1280px-Aeromexico.png",
+      "codeshare_code": "AMX/AM"
+    },
+    {
+      "name": "Air Algerie",
+      "prefix": "AH",
+      "hubs": ["DAAG"],
+      "color": "#ED1B24",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Logo_Air_Alg%C3%A9rie.svg/3840px-Logo_Air_Alg%C3%A9rie.svg.png",
+      "codeshare_code": "DAH/AH"
+    },
+    {
+      "name": "Air Botswana",
+      "prefix": "BP",
+      "hubs": ["FBSK"],
+      "color": "#14B4E4",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/e/e5/Air_Botswana_logo.svg",
+      "codeshare_code": "BOT/BP"
+    },
+    {
+      "name": "Air India",
+      "prefix": "AI",
+      "hubs": ["VIDP"],
+      "color": "#FF6600",
+      "logo": "https://1000logos.net/wp-content/uploads/2020/09/Air-India-Logo.png",
+      "codeshare_code": "AIC/AI"
+    },
+    {
+      "name": "Airlink",
+      "prefix": "4Z",
+      "hubs": ["FAOR"],
+      "color": "#0C6433",
+      "logo": "https://images.vasystem.org/P7HLQsARSt89-8xAvKRwFPVrZo9140NZdPyMyrAiUCI/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL0xKL2VIL0xKZUhrc1NFUXZwT2hDQ1NkS0FvbEtJQUlZSERvUW5xSkVhRWFxdVFJeFZPdHVlSmxSYXFhY2RpRUZrVFhKT3UucG5n",
+      "codeshare_code": "LNK/4Z"
+    },
+    {
+      "name": "Air Malta",
+      "prefix": "KM",
+      "hubs": ["LMML"],
+      "color": "#DC0434",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Logo_airmalta.svg",
+      "codeshare_code": "AMC/KM"
+    },
+    {
+      "name": "Air Serbia",
+      "prefix": "JU",
+      "hubs": ["LYBE"],
+      "color": "#002E5D",
+      "logo": "https://i.logos-download.com/11849/2898-og-122d3fe989062348bd026cbaa5faaced.png/Air_Serbia_logo_logotype_og.png",
+      "codeshare_code": "ASL/JU"
+    },
+    {
+      "name": "Air Seychelles",
+      "prefix": "HM",
+      "hubs": ["FSIA"],
+      "color": "#A6CE42",
+      "logo": "https://logos-world.net/wp-content/uploads/2023/01/Air-Seychelles-Logo.png",
+      "codeshare_code": "SEY/HM"
+    },
+    {
+      "name": "Air Transat",
+      "prefix": "TS",
+      "hubs": ["CYYZ"],
+      "color": "#3CBCEC",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Air_Transat_logo.svg/960px-Air_Transat_logo.svg.png",
+      "codeshare_code": "TSC/TS"
+    },
+    {
+      "name": "Alaska Airlines",
+      "prefix": "AS",
+      "hubs": ["KSEA"],
+      "color": "#0C446B",
+      "logo": "https://images.vasystem.org/7CN_n9_yf-Iuqy4tQtowbYKmkM2msAPIvHxtlPaTakM/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL2dmL3NiL2dmc2J0Wm1Va0RFTW9lWW1nc2RYZndVbXFqTnhyTWZrWlNudVlxa1dGeU51QVFqWWFVSExLQ0Jmc0tZRENreEYucG5n",
+      "codeshare_code": "ASA/AS"
+    },
+    {
+      "name": "American Airlines",
+      "prefix": "AA",
+      "hubs": ["KJFK"],
+      "color": "#C8102E",
+      "logo": "https://images.vasystem.org/CgZRp3AadHW3PThZkxELQBCn595G3amdATVVrWB3LbE/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsL2Q5L2Q3L2Q5ZDdlMmFjYjdkMjI3OWZmNDczYzVkNjI1MGEyZWEwMDk0ZDQ0Yjc",
+      "codeshare_code": "AAL/AA"
+    },
+    {
+      "name": "Asiana Airlines",
+      "prefix": "OZ",
+      "hubs": ["RKSI"],
+      "color": "#C21E3F",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Asiana_Airlines-Logo_New.svg/1280px-Asiana_Airlines-Logo_New.svg.png",
+      "codeshare_code": "AAR/OZ"
+    },
+    {
+      "name": "Azerbaijan Airlines",
+      "prefix": "J2",
+      "hubs": ["UBBB"],
+      "color": "#043464",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/Azerbaijan_Airlines_logo.svg/1280px-Azerbaijan_Airlines_logo.svg.png",
+      "codeshare_code": "AHY/J2"
+    },
+    {
+      "name": "Bangkok Airways",
+      "prefix": "PG",
+      "hubs": ["VTBS"],
+      "color": "#0C149C",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/0/01/Bangkok_Airways_logo.svg",
+      "codeshare_code": "BKP/PG"
+    },
+    {
+      "name": "British Airways",
+      "prefix": "BA",
+      "hubs": ["EGLL"],
+      "color": "#075AAA",
+      "logo": "https://images.vasystem.org/H5rGKLb9w0Iu3Km4RSfhcyDQABeQrJYDGP0iZcajqDY/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsLzgwLzY5LzgwNjkzNTkxNjMyNDU2ZTk0ZTNjZGM1ZjIzYWM4NmQ4MzkyMzFhMjk",
+      "codeshare_code": "BAW/BA"
+    },
+    {
+      "name": "Bulgaria Air",
+      "prefix": "FB",
+      "hubs": ["LBSF"],
+      "color": "#C03B35",
+      "logo": "https://air.bg/media/logo/bg-air-light-en.svg",
+      "codeshare_code": "LZB/FB"
+    },
+    {
+      "name": "Caribbean Airlines",
+      "prefix": "BW",
+      "hubs": ["TTPP"],
+      "color": "#CB5BA4",
+      "logo": "https://assets.planespotters.net/files/airlines/5/caribbean-airlines_f8f9b9_opr.png",
+      "codeshare_code": "BWA/BW"
+    },
+    {
+      "name": "Cathay Pacific",
+      "prefix": "CX",
+      "hubs": ["VHHH"],
+      "color": "#005D63",
+      "logo": "https://images.vasystem.org/KfXpOAsuWJ80Wvp36WAILqoUdXjloF5_hipCHAyblm0/rt:fit/w:640/h:640/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvb25ld29ybGR2aXJ0dWFsLzJhL2MyLzJhYzI4ZjkzOTdkZDBiODgxNmIzZTI4MGUwYTliMjJjMGNkNTlkMmU",
+      "codeshare_code": "CPA/CX"
+    },
+    {
+      "name": "China Southern",
+      "prefix": "CZ",
+      "hubs": ["ZGGG"],
+      "color": "#0093D0",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/China_Southern_Airlines_logo.svg/500px-China_Southern_Airlines_logo.svg.png",
+      "codeshare_code": "CSN/CZ"
+    },
+    {
+      "name": "Condor",
+      "prefix": "DE",
+      "hubs": ["EDDF"],
+      "color": "#FFA200",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Condor_logo_2022.svg/500px-Condor_logo_2022.svg.png",
+      "codeshare_code": "CFG/DE"
+    },
+    {
+      "name": "Copa Airlines",
+      "prefix": "CM",
+      "hubs": ["MPTO"],
+      "color": "#0060A9",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Copa_airlines_logo.svg/500px-Copa_airlines_logo.svg.png",
+      "codeshare_code": "CMP/CM"
+    },
+    {
+      "name": "Fiji Airways",
+      "prefix": "FJ",
+      "hubs": ["NFFN"],
+      "color": "#2C1C14",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/Fiji_Airways_logo.svg/960px-Fiji_Airways_logo.svg.png",
+      "codeshare_code": "FJI/FJ"
+    },
+    {
+      "name": "Finnair",
+      "prefix": "AY",
+      "hubs": ["EFHK"],
+      "color": "#003580",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Finnair_Logo.svg/500px-Finnair_Logo.svg.png",
+      "codeshare_code": "FIN/AY"
+    },
+    {
+      "name": "Garuda Indonesia",
+      "prefix": "GA",
+      "hubs": ["WIII"],
+      "color": "#2F6F7E",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/Garuda_Indonesia_Logo.svg/960px-Garuda_Indonesia_Logo.svg.png",
+      "codeshare_code": "GIA/GA"
+    },
+    {
+      "name": "GOL Linhas Aéreas",
+      "prefix": "G3",
+      "hubs": ["SBSP"],
+      "color": "#FF6F1F",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Gol_airlines_logo.png",
+      "codeshare_code": "GLO/G3"
+    },
+    {
+      "name": "Gulf Air",
+      "prefix": "GF",
+      "hubs": ["OBBI"],
+      "color": "#A29061",
+      "logo": "https://logos-world.net/wp-content/uploads/2023/01/Gulf-Air-Logo.png",
+      "codeshare_code": "GFA/GF"
+    },
+    {
+      "name": "Hainan Airlines",
+      "prefix": "HU",
+      "hubs": ["ZJHK"],
+      "color": "#E60012",
+      "logo": "https://upload.wikimedia.org/wikipedia/de/thumb/c/cd/Hainan_Airlines_Logo.svg/960px-Hainan_Airlines_Logo.svg.png",
+      "codeshare_code": "CHH/HU"
+    },
+    {
+      "name": "Hawaiian",
+      "prefix": "HA",
+      "hubs": ["PHNL"],
+      "color": "#D2058A",
+      "logo": "https://www.flysfo.com/sites/default/files/styles/original_image_webp/public/2024-12/Hawaiian%20Logo.png.webp?itok=2B-Eip_8",
+      "codeshare_code": "HAL/HA"
+    },
+    {
+      "name": "Iberia",
+      "prefix": "IB",
+      "hubs": ["LEMD"],
+      "color": "#D7192D",
+      "logo": "https://logos-world.net/wp-content/uploads/2020/12/Iberia-Logo.png",
+      "codeshare_code": "IBE/IB"
+    },
+    {
+      "name": "IndiGo",
+      "prefix": "6E",
+      "hubs": ["VABB"],
+      "color": "#4B0082",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/6/69/IndiGo.svg/500px-IndiGo.svg.png",
+      "codeshare_code": "IGO/6E"
+    },
+    {
+      "name": "Japan Airlines",
+      "prefix": "JL",
+      "hubs": ["RJTT"],
+      "color": "#C90000",
+      "logo": "https://logodownload.org/wp-content/uploads/2020/03/japan-airlines-logo-1.png",
+      "codeshare_code": "JAL/JL"
+    },
+    {
+      "name": "Jet2",
+      "prefix": "LS",
+      "hubs": ["EGCC"],
+      "color": "#EE3123",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Jet2Logo.svg/3840px-Jet2Logo.svg.png",
+      "codeshare_code": "EXS/LS"
+    },
+    {
+      "name": "jetBlue",
+      "prefix": "JB",
+      "hubs": ["KJFK"],
+      "color": "#003876",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/JetBlue_Airways_Logo.svg/1280px-JetBlue_Airways_Logo.svg.png",
+      "codeshare_code": "JBU/B6"
+    },
+    {
+      "name": "Kenya Airways",
+      "prefix": "KQ",
+      "hubs": ["HKJK"],
+      "color": "#EC2227",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Kenya_Airways_Logo.svg/3840px-Kenya_Airways_Logo.svg.png",
+      "codeshare_code": "KQA/KQ"
+    },
+    {
+      "name": "LATAM",
+      "prefix": "LA",
+      "hubs": ["SBGR"],
+      "color": "#2A0087",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Latam-logo_-v_%28Indigo%29.svg",
+      "codeshare_code": "TAM/LA"
+    },
+    {
+      "name": "Malaysia Airlines",
+      "prefix": "MH",
+      "hubs": ["WMKK"],
+      "color": "#002B5C",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Malaysia_Airlines_Logo.svg/500px-Malaysia_Airlines_Logo.svg.png",
+      "codeshare_code": "MAS/MH"
+    },
+    {
+      "name": "Maldivian",
+      "prefix": "Q2",
+      "hubs": ["VRMM"],
+      "color": "#E0163B",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/8/84/Maldivian_%28airline%29_logo.svg/3840px-Maldivian_%28airline%29_logo.svg.png",
+      "codeshare_code": "DQA/Q2"
+    },
+    {
+      "name": "MEA",
+      "prefix": "ME",
+      "hubs": ["OLBA"],
+      "color": "#007B5E",
+      "logo": "https://vectorseek.com/wp-content/uploads/2023/09/MEA-Middle-East-Airlines-Logo-Vector.svg-.png",
+      "codeshare_code": "MEA/ME"
+    },
+    {
+      "name": "Norwegian",
+      "prefix": "NOS",
+      "hubs": ["ENGM"],
+      "color": "#BA0C2F",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png?_=20241221162114",
+      "codeshare_code": "NOS/DY"
+    },
+    {
+      "name": "Oman Air",
+      "prefix": "WY",
+      "hubs": ["OOMS"],
+      "color": "#B5985A",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/Oman_Air_logo.svg/500px-Oman_Air_logo.svg.png",
+      "codeshare_code": "OMA/WY"
+    },
+    {
+      "name": "Philippine Airlines",
+      "prefix": "PR",
+      "hubs": ["RPLL"],
+      "color": "#FDCB0A",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d2/Philippine_Airlines_logo.svg/1920px-Philippine_Airlines_logo.svg.png",
+      "codeshare_code": "PAL/PR"
+    },
+    {
+      "name": "Pakistan International Airlines",
+      "prefix": "PK",
+      "hubs": ["OPIS"],
+      "color": "#004F30",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Pakistan_International_Airlines_Logo.svg/1280px-Pakistan_International_Airlines_Logo.svg.png",
+      "codeshare_code": "PIA/PK"
+    },
+    {
+      "name": "Qantas",
+      "prefix": "QF",
+      "hubs": ["YSSY"],
+      "color": "#E40000",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/0/02/Qantas_Airways_logo_2016.svg/500px-Qantas_Airways_logo_2016.svg.png",
+      "codeshare_code": "QFA/QF"
+    },
+    {
+      "name": "Royal Air Maroc",
+      "prefix": "AT",
+      "hubs": ["GMMN"],
+      "color": "#C40434",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Logo_Royal_Air_Maroc.svg/1280px-Logo_Royal_Air_Maroc.svg.png",
+      "codeshare_code": "RAM/AT"
+    },
+    {
+      "name": "Royal Jordanian",
+      "prefix": "RJ",
+      "hubs": ["OJAI"],
+      "color": "#A8854A",
+      "logo": "https://upload.wikimedia.org/wikipedia/it/6/6e/Royal_Jordanian_Logo.png",
+      "codeshare_code": "RJA/RJ"
+    },
+    {
+      "name": "Rwandair",
+      "prefix": "WB",
+      "hubs": ["HRYR"],
+      "color": "#1CA3DB",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/5/50/RwandAir_Logotype.png",
+      "codeshare_code": "RWD/WB"
+    },
+    {
+      "name": "Ryanair",
+      "prefix": "FR",
+      "hubs": ["EIDW"],
+      "color": "#073590",
+      "logo": "https://logos-world.net/wp-content/uploads/2020/06/Ryanair-Logo.png",
+      "codeshare_code": "RYR/FR"
+    },
+    {
+      "name": "SkyAlps",
+      "prefix": "BQ",
+      "hubs": ["LIPB"],
+      "color": "#043C2C",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/SkyAlps_Logo.svg/1280px-SkyAlps_Logo.svg.png",
+      "codeshare_code": "SKP/BQ"
+    },
+    {
+      "name": "South African Airways",
+      "prefix": "SA",
+      "hubs": ["FAOR"],
+      "color": "#182E55",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/SAA_logo_%282019%29.svg/330px-SAA_logo_%282019%29.svg.png",
+      "codeshare_code": "SAA/SA"
+    },
+    {
+      "name": "SriLankan",
+      "prefix": "UL",
+      "hubs": ["VCBI"],
+      "color": "#01742F",
+      "logo": "https://images.vasystem.org/QVaPkuwnm9LGiWw5nr0fSIGpcwk-RqSVFxnaEeSfbgY/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvYmEvYjcvYmFiNzdhOTdiZWNjY2M3MTM1YjU1ZmZhZDBlN2ExYTI1YzY4MTI4MQ==",
+      "codeshare_code": "ALK/UL"
+    },
+    {
+      "name": "Starlux",
+      "prefix": "JX",
+      "hubs": ["RCTP"],
+      "color": "#9C6C4C",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/9/93/STARLUX_Airlines_logo.svg/500px-STARLUX_Airlines_logo.svg.png",
+      "codeshare_code": "SJX/JX"
+    },
+    {
+      "name": "VARIG",
+      "prefix": "VRG",
+      "hubs": ["SBGR"],
+      "color": "#000080",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Varig_logo_%282007%29.svg",
+      "codeshare_code": "VRG/RG"
+    },
+    {
+      "name": "Vietnam Airlines",
+      "prefix": "VN",
+      "hubs": ["VVTS"],
+      "color": "#0090BC",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/Vietnam_Airlines_logo_2015.svg/960px-Vietnam_Airlines_logo_2015.svg.png?_=20230121032939",
+      "codeshare_code": "HVN/VN"
+    },
+    {
+      "name": "Virgin Australia",
+      "prefix": "VA",
+      "hubs": ["VA"],
+      "color": "#D6083B",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/0/06/Virgin_Australia_Logo_2022.svg/960px-Virgin_Australia_Logo_2022.svg.png",
+      "codeshare_code": "VOZ/VA"
+    },
+    {
+      "name": "Volotea",
+      "prefix": "V7",
+      "hubs": ["LFML"],
+      "color": "#ED164A",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Volotea.svg/1280px-Volotea.svg.png",
+      "codeshare_code": "VOE/V7"
+    },
+    {
+      "name": "Vueling",
+      "prefix": "VY",
+      "hubs": ["LEBL"],
+      "color": "#FFCC00",
+      "logo": "https://1000logos.net/wp-content/uploads/2021/04/Vueling-Airlines-logo.png",
+      "codeshare_code": "VLG/VY"
+    },
+    {
+      "name": "Webjet",
+      "prefix": "WEB",
+      "hubs": ["SBRJ"],
+      "color": "#90C833",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/WebJet_Linhas_A%C3%A9reas_logo.svg/3840px-WebJet_Linhas_A%C3%A9reas_logo.svg.png",
+      "codeshare_code": "WEB/WH"
+    },
+    {
+      "name": "WestJet",
+      "prefix": "WS",
+      "hubs": ["CYYC"],
+      "color": "#00AAA6",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/WestJetLogo2018.svg/960px-WestJetLogo2018.svg.png",
+      "codeshare_code": "WJA/WS"
+    },
+    {
+      "name": "Widerøe",
+      "prefix": "WIF",
+      "hubs": ["ENBR"],
+      "color": "#4EA322",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Wideroe_logo_2002.svg/3840px-Wideroe_logo_2002.svg.png",
+      "codeshare_code": "WIF/WF"
+    },
+    {
+      "name": "Xiamen Airlines",
+      "prefix": "MF",
+      "hubs": ["ZSAM"],
+      "color": "#008CD5",
+      "logo": "https://images.vasystem.org/SFkZof9RsfpBZ0VNID4C3CknV5CMjXkzbX5fwQLuABo/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvc2t5dGVhbXZpcnR1YWwvMTAvZjgvMTBmOGU0NjE4MDA3ZTQ2ZmE3MDdlNTFhZGU4N2Y1YWE3ZjViMWZjMy5wbmc",
+      "codeshare_code": "CXA/MF"
+    }
+  ]
+}

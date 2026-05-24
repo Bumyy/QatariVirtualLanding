@@ -1,0 +1,1101 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const tours = [
+  {
+    id: 'great-asian-expedition',
+    title: 'The Great Asian Expedition',
+    subtitle: 'Explore Asia and beyond across 30 unforgettable flights',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: '31,500 nm',
+    estimatedDuration: '78h 30m',
+    description:
+      'Embark on an epic journey through the largest continent on Earth and its intercontinental connections. Discover remarkable cities, diverse cultures, and some of the most exciting destinations in the Qatari Virtual network using realistic codeshares with Garuda Indonesia, Cathay Pacific, China Southern, Vietnam Airlines, Malaysia Airlines, Asiana, Japan Airlines, Starlux, and Indigo.',
+    image:
+      'https://wallpapercat.com/w/full/2/2/b/1451526-3840x2160-desktop-4k-asia-wallpaper-photo.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'OTHH - VOKN', summary: 'Fly Indigo from Doha to Kannur.', eligibleRoutes: [{ flight: '6E1326', depLoc: 'Doha', arrLoc: 'Kannur', duration: '04:00', aircraft: 'A20N' }] },
+      { leg: 'Leg 2', route: 'VOKN - OTHH', summary: 'Fly Indigo from Kannur to Doha.', eligibleRoutes: [{ flight: '6E1325', depLoc: 'Kannur', arrLoc: 'Doha', duration: '03:35', aircraft: 'A20N' }] },
+      { leg: 'Leg 3', route: 'OTHH - VIDP', summary: 'Fly Indigo from Doha to Delhi.', eligibleRoutes: [{ flight: '6E1308', depLoc: 'Doha', arrLoc: 'Delhi', duration: '03:50', aircraft: 'A20N' }] },
+      { leg: 'Leg 4', route: 'VIDP - VVTS', summary: 'Fly Vietnam Airlines from Delhi to Ho Chi Minh City.', eligibleRoutes: [{ flight: 'VN977', depLoc: 'Delhi', arrLoc: 'Ho Chi Minh City', duration: '04:30', aircraft: 'A321, A359, B789' }] },
+      { leg: 'Leg 5', route: 'VVTS - VHHH', summary: 'Fly Cathay Pacific from Ho Chi Minh City to Hong Kong.', eligibleRoutes: [{ flight: 'CX766', depLoc: 'Ho Chi Minh City', arrLoc: 'Hong Kong', duration: '02:10', aircraft: 'A21N, A333, B77W' }] },
+      { leg: 'Leg 6', route: 'VHHH - ZBAD', summary: 'Fly China Southern from Hong Kong to Beijing.', eligibleRoutes: [{ flight: 'CZ356', depLoc: 'Hong Kong', arrLoc: 'Beijing', duration: '02:45', aircraft: 'A21N' }] },
+      { leg: 'Leg 7', route: 'ZBAD - ZLXY', summary: "Fly China Southern from Beijing to Xi'an.", eligibleRoutes: [{ flight: 'CZ6948', depLoc: 'Beijing', arrLoc: "Xi'an", duration: '01:35', aircraft: 'B738' }] },
+      { leg: 'Leg 8', route: 'ZLXY - ZBAD', summary: "Fly China Southern from Xi'an to Beijing.", eligibleRoutes: [{ flight: 'CZ6949', depLoc: "Xi'an", arrLoc: 'Beijing', duration: '01:25', aircraft: 'B738' }] },
+      { leg: 'Leg 9', route: 'ZBAD - RJTT', summary: 'Fly China Southern from Beijing to Tokyo Haneda.', eligibleRoutes: [{ flight: 'CZ647', depLoc: 'Beijing', arrLoc: 'Tokyo Haneda', duration: '02:35', aircraft: 'A21N, A333' }] },
+      { leg: 'Leg 10', route: 'RJTT - RJCB', summary: 'Fly Japan Airlines from Tokyo Haneda to Obihiro.', eligibleRoutes: [{ flight: 'JL573', depLoc: 'Tokyo Haneda', arrLoc: 'Obihiro', duration: '01:15', aircraft: 'B738, B772' }] },
+      { leg: 'Leg 11', route: 'RJCB - RJTT', summary: 'Fly Japan Airlines from Obihiro to Tokyo Haneda.', eligibleRoutes: [{ flight: 'JL574', depLoc: 'Obihiro', arrLoc: 'Tokyo Haneda', duration: '01:20', aircraft: 'B738, B772' }] },
+      { leg: 'Leg 12', route: 'RJTT - RJFT', summary: 'Fly Japan Airlines from Tokyo Haneda to Kumamoto.', eligibleRoutes: [{ flight: 'JL625', depLoc: 'Tokyo Haneda', arrLoc: 'Kumamoto', duration: '01:20', aircraft: 'B738, B772' }] },
+      { leg: 'Leg 13', route: 'RJFT - RCTP', summary: 'Fly Starlux from Kumamoto to Taipei.', eligibleRoutes: [{ flight: 'JX847', depLoc: 'Kumamoto', arrLoc: 'Taipei', duration: '02:00', aircraft: 'A21N, A339' }] },
+      { leg: 'Leg 14', route: 'RCTP - RJSS', summary: 'Fly Starlux from Taipei to Sendai.', eligibleRoutes: [{ flight: 'JX862', depLoc: 'Taipei', arrLoc: 'Sendai', duration: '02:10', aircraft: 'A21N, A339' }] },
+      { leg: 'Leg 15', route: 'RJSS - RCTP', summary: 'Fly Starlux from Sendai to Taipei.', eligibleRoutes: [{ flight: 'JX863', depLoc: 'Sendai', arrLoc: 'Taipei', duration: '02:05', aircraft: 'A21N, A339' }] },
+      { leg: 'Leg 16', route: 'RCTP - WIII', summary: 'Fly Starlux from Taipei to Jakarta.', eligibleRoutes: [{ flight: 'JX761', depLoc: 'Taipei', arrLoc: 'Jakarta', duration: '04:50', aircraft: 'A21N, A339, A359' }] },
+      { leg: 'Leg 17', route: 'WIII - WAJJ', summary: 'Fly Garuda Indonesia from Jakarta to Jayapura.', eligibleRoutes: [{ flight: 'GA662', depLoc: 'Jakarta', arrLoc: 'Jayapura', duration: '05:00', aircraft: 'B738' }] },
+      { leg: 'Leg 18', route: 'WAJJ - WIII', summary: 'Fly Garuda Indonesia from Jayapura to Jakarta.', eligibleRoutes: [{ flight: 'GA663', depLoc: 'Jayapura', arrLoc: 'Jakarta', duration: '04:50', aircraft: 'B738' }] },
+      { leg: 'Leg 19', route: 'WIII - WMKK', summary: 'Fly Malaysia Airlines from Jakarta to Kuala Lumpur.', eligibleRoutes: [{ flight: 'MH720', depLoc: 'Jakarta', arrLoc: 'Kuala Lumpur', duration: '01:35', aircraft: 'A333, B738, B38M' }] },
+      { leg: 'Leg 20', route: 'WMKK - WMKN', summary: 'Fly Malaysia Airlines from Kuala Lumpur to Kuala Terengganu.', eligibleRoutes: [{ flight: 'MH1326', depLoc: 'Kuala Lumpur', arrLoc: 'Kuala Terengganu', duration: '00:35', aircraft: 'B738, B38M' }] },
+      { leg: 'Leg 21', route: 'WMKN - WMKK', summary: 'Fly Malaysia Airlines from Kuala Terengganu to Kuala Lumpur.', eligibleRoutes: [{ flight: 'MH1327', depLoc: 'Kuala Terengganu', arrLoc: 'Kuala Lumpur', duration: '00:45', aircraft: 'B738, B38M' }] },
+      { leg: 'Leg 22', route: 'WMKK - VTSP', summary: 'Fly Malaysia Airlines from Kuala Lumpur to Phuket.', eligibleRoutes: [{ flight: 'MH794', depLoc: 'Kuala Lumpur', arrLoc: 'Phuket', duration: '01:10', aircraft: 'B738, B38M' }] },
+      { leg: 'Leg 23', route: 'VTSP - VHHH', summary: 'Fly Cathay Pacific from Phuket to Hong Kong.', eligibleRoutes: [{ flight: 'CX778', depLoc: 'Phuket', arrLoc: 'Hong Kong', duration: '03:20', aircraft: 'A21N, A333' }] },
+      { leg: 'Leg 24', route: 'VHHH - VVNB', summary: 'Fly Cathay Pacific from Hong Kong to Hanoi.', eligibleRoutes: [{ flight: 'CX743', depLoc: 'Hong Kong', arrLoc: 'Hanoi', duration: '01:35', aircraft: 'A21N, A333' }] },
+      { leg: 'Leg 25', route: 'VVNB - VLLB', summary: 'Fly Vietnam Airlines from Hanoi to Luang Prabang.', eligibleRoutes: [{ flight: 'VN931', depLoc: 'Hanoi', arrLoc: 'Luang Prabang', duration: '00:45', aircraft: 'A321' }] },
+      { leg: 'Leg 26', route: 'VLLB - VVNB', summary: 'Fly Vietnam Airlines from Luang Prabang to Hanoi.', eligibleRoutes: [{ flight: 'VN930', depLoc: 'Luang Prabang', arrLoc: 'Hanoi', duration: '00:50', aircraft: 'A321' }] },
+      { leg: 'Leg 27', route: 'VVNB - VVTS', summary: 'Fly Vietnam Airlines from Hanoi to Ho Chi Minh City.', eligibleRoutes: [{ flight: 'VN243', depLoc: 'Hanoi', arrLoc: 'Ho Chi Minh City', duration: '02:00', aircraft: 'A321, A359, B789' }] },
+      { leg: 'Leg 28', route: 'VVTS - RKSI', summary: 'Fly Vietnam Airlines from Ho Chi Minh City to Seoul.', eligibleRoutes: [{ flight: 'VN408', depLoc: 'Ho Chi Minh City', arrLoc: 'Seoul', duration: '04:20', aircraft: 'A321, A359, B789' }] },
+      { leg: 'Leg 29', route: 'RKSI - VTBS', summary: 'Fly Asiana Airlines from Seoul to Bangkok.', eligibleRoutes: [{ flight: 'OZ741', depLoc: 'Seoul', arrLoc: 'Bangkok', duration: '05:45', aircraft: 'A321, A380' }] },
+      { leg: 'Leg 30', route: 'VTBS - RKSI', summary: 'Fly Asiana Airlines from Bangkok to Seoul.', eligibleRoutes: [{ flight: 'OZ742', depLoc: 'Bangkok', arrLoc: 'Seoul', duration: '04:35', aircraft: 'A321, A380' }] }
+    ]
+  },
+  {
+    id: 'south-american-expedition',
+    title: 'South American Explorer',
+    subtitle: 'A stunning 15-leg loop across LATAM and Copa networks',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: '14,250 nm',
+    estimatedDuration: '44h 45m',
+    description:
+      'Experience the breathtaking diversity of South America. From the bustling hub of Panama and the beaches of Rio, to the deep south of Patagonia and the extreme altitudes of the Andes. This continuous tour utilizes realistic codeshares with Copa Airlines, LATAM Brazil, and LATAM Chile/Peru.',
+    image:
+      'https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?auto=format&fit=crop&w=1600&q=80',
+    legs: [
+      { leg: 'Leg 1', route: 'MPTO - SBBR', summary: 'Depart Copa Airlines hub in Panama City and head south to Brazil’s modern capital.', eligibleRoutes: [{ flight: 'CM205', depLoc: 'Panama City', arrLoc: 'Brasilia', duration: '05:45', aircraft: 'B738, B38M' }] },
+      { leg: 'Leg 2', route: 'SBBR - SBGR', summary: 'A domestic hop from Brasilia down to the major international hub of São Paulo.', eligibleRoutes: [{ flight: 'LA3285', depLoc: 'Brasilia', arrLoc: 'Sao Paulo', duration: '01:45', aircraft: 'A320, A20N' }] },
+      { leg: 'Leg 3', route: 'SBGR - SBRJ', summary: 'A quick, highly scenic shuttle flight into Rio de Janeiro’s Santos Dumont airport.', eligibleRoutes: [{ flight: 'QR5232 / LA3550', depLoc: 'Sao Paulo', arrLoc: 'Rio de Janeiro', duration: '00:40', aircraft: 'A319, A20N' }] },
+      { leg: 'Leg 4', route: 'SBRJ - SBGR', summary: 'Return via the shuttle corridor back to São Paulo Guarulhos.', eligibleRoutes: [{ flight: 'QR5225 / LA4714', depLoc: 'Rio de Janeiro', arrLoc: 'Sao Paulo', duration: '01:00', aircraft: 'A319, A20N' }] },
+      { leg: 'Leg 5', route: 'SBGR - SCEL', summary: 'Cross the continent and the Andes mountains as you fly from Brazil to Santiago, Chile.', eligibleRoutes: [{ flight: 'LA750', depLoc: 'Sao Paulo', arrLoc: 'Santiago', duration: '04:15', aircraft: 'B789' }] },
+      { leg: 'Leg 6', route: 'SCEL - SCCI', summary: 'Head into the deep south of Patagonia with a flight to Punta Arenas.', eligibleRoutes: [{ flight: 'LA81', depLoc: 'Santiago', arrLoc: 'Punta Arenas', duration: '03:40', aircraft: 'A320, A20N, A321' }] },
+      { leg: 'Leg 7', route: 'SCCI - SCEL', summary: 'Return north from Punta Arenas back to the Santiago hub.', eligibleRoutes: [{ flight: 'LA82', depLoc: 'Punta Arenas', arrLoc: 'Santiago', duration: '03:55', aircraft: 'A320, A20N, A321' }] },
+      { leg: 'Leg 8', route: 'SCEL - SCNT', summary: 'Another beautiful Patagonian excursion, this time to Puerto Natales.', eligibleRoutes: [{ flight: 'LA1', depLoc: 'Santiago', arrLoc: 'Puerto Natales', duration: '03:30', aircraft: 'A320' }] },
+      { leg: 'Leg 9', route: 'SCNT - SCEL', summary: 'Fly back from Puerto Natales to Santiago to complete your Patagonian operations.', eligibleRoutes: [{ flight: 'LA2', depLoc: 'Puerto Natales', arrLoc: 'Santiago', duration: '03:30', aircraft: 'A320' }] },
+      { leg: 'Leg 10', route: 'SCEL - SPJC', summary: 'Follow the Pacific coast north as you leave Chile and arrive in Lima, Peru.', eligibleRoutes: [{ flight: 'LA530', depLoc: 'Santiago', arrLoc: 'Lima', duration: '03:50', aircraft: 'A320' }] },
+      { leg: 'Leg 11', route: 'SPJC - SACO', summary: 'A challenging, high-altitude arrival into Cusco, gateway to the Sacred Valley.', eligibleRoutes: [{ flight: 'LA2166', depLoc: 'Lima', arrLoc: 'Cusco', duration: '01:25', aircraft: 'A319, A320, A20N' }] },
+      { leg: 'Leg 12', route: 'SACO - SPJC', summary: 'Carefully depart the high terrain of Cusco and descend back to sea level at Lima.', eligibleRoutes: [{ flight: 'LA2165', depLoc: 'Cusco', arrLoc: 'Lima', duration: '01:25', aircraft: 'A319, A320, A20N' }] },
+      { leg: 'Leg 13', route: 'SPJC - SLLP', summary: 'Push your aircraft to its limits with a flight to La Paz, one of the highest commercial airports in the world.', eligibleRoutes: [{ flight: 'LA2400', depLoc: 'Lima', arrLoc: 'La Paz', duration: '03:15', aircraft: 'A319, A320' }] },
+      { leg: 'Leg 14', route: 'SLLP - SPJC', summary: 'Leave Bolivia behind as you return to the LATAM Peru hub in Lima.', eligibleRoutes: [{ flight: 'LA2399', depLoc: 'La Paz', arrLoc: 'Lima', duration: '03:15', aircraft: 'A319, A320' }] },
+      { leg: 'Leg 15', route: 'SPJC - MPTO', summary: 'Complete your grand South American tour by flying back to Panama City.', eligibleRoutes: [{ flight: 'CM338', depLoc: 'Lima', arrLoc: 'Panama City', duration: '03:40', aircraft: 'B738, B38M' }] }
+    ]
+  },
+  {
+    id: 'tour-deurope',
+    title: "Tour d'Europe",
+    subtitle: 'A highly varied 20-leg loop connecting the continent',
+    status: 'Upcoming',
+    expires: '30 September 2026',
+    totalNm: '16,100 nm',
+    estimatedDuration: '44h 30m',
+    description:
+      'Experience a dynamic expedition flying across Europe and its surrounding borders. You will operate codeshares for British Airways, Finnair, Ryanair, Jet2, Vueling, Bulgaria Air, and Iberia, touching major hubs, scenic Mediterranean outposts, and Northern European frontiers.',
+    image:
+      'https://cdn.wallpapersafari.com/3/79/kOyjGT.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'EGLL - EDDK', summary: 'Fly British Airways from London Heathrow over to Cologne.', eligibleRoutes: [{ flight: 'BA932', depLoc: 'London Heathrow', arrLoc: 'Cologne', duration: '00:45', aircraft: 'A319, A320' }] },
+      { leg: 'Leg 2', route: 'EDDK - EGLL', summary: 'Fly British Airways back from Cologne to London Heathrow.', eligibleRoutes: [{ flight: 'BA931', depLoc: 'Cologne', arrLoc: 'London Heathrow', duration: '00:55', aircraft: 'A319, A320' }] },
+      { leg: 'Leg 3', route: 'EGLL - EFHK', summary: 'Depart the UK and head to Scandinavia with Finnair.', eligibleRoutes: [{ flight: 'AY1332', depLoc: 'London Heathrow', arrLoc: 'Helsinki', duration: '02:25', aircraft: 'A321, A359' }] },
+      { leg: 'Leg 4', route: 'EFHK - EGPH', summary: 'Connect the Nordics with Scotland aboard Finnair.', eligibleRoutes: [{ flight: 'AY1371', depLoc: 'Helsinki', arrLoc: 'Edinburgh', duration: '02:30', aircraft: 'A321' }] },
+      { leg: 'Leg 5', route: 'EGPH - ESGG', summary: 'Hop over the North Sea with Ryanair to Gothenburg.', eligibleRoutes: [{ flight: 'FR5657', depLoc: 'Edinburgh', arrLoc: 'Gothenburg', duration: '01:30', aircraft: 'B738, B38M' }] },
+      { leg: 'Leg 6', route: 'ESGG - LDDU', summary: 'Fly Ryanair down into the Balkans towards the Adriatic Sea.', eligibleRoutes: [{ flight: 'FR8730', depLoc: 'Gothenburg', arrLoc: 'Dubrovnik', duration: '02:20', aircraft: 'B738' }] },
+      { leg: 'Leg 7', route: 'LDDU - EGNM', summary: 'Operate a Jet2 holiday sector back to Leeds.', eligibleRoutes: [{ flight: 'LS440', depLoc: 'Dubrovnik', arrLoc: 'Leeds', duration: '02:55', aircraft: 'B738' }] },
+      { leg: 'Leg 8', route: 'EGNM - LDDU', summary: 'Bring a fresh load of tourists back down to the Croatian sunshine with Jet2.', eligibleRoutes: [{ flight: 'LS439', depLoc: 'Leeds', arrLoc: 'Dubrovnik', duration: '02:55', aircraft: 'B738' }] },
+      { leg: 'Leg 9', route: 'LDDU - LIRF', summary: 'A short visual hop across the Adriatic to Rome with Vueling.', eligibleRoutes: [{ flight: 'VY6737', depLoc: 'Dubrovnik', arrLoc: 'Rome', duration: '00:50', aircraft: 'A320' }] },
+      { leg: 'Leg 10', route: 'LIRF - LBSF', summary: 'Fly Bulgaria Air eastward from Italy into Sofia.', eligibleRoutes: [{ flight: 'FB450', depLoc: 'Rome', arrLoc: 'Sofia', duration: '01:20', aircraft: 'E190' }] },
+      { leg: 'Leg 11', route: 'LBSF - LKPR', summary: 'Fly Bulgaria Air north into the Czech capital.', eligibleRoutes: [{ flight: 'FB301', depLoc: 'Sofia', arrLoc: 'Prague', duration: '01:35', aircraft: 'E190' }] },
+      { leg: 'Leg 12', route: 'LKPR - LFOB', summary: 'Connect Prague to Paris Beauvais with Ryanair.', eligibleRoutes: [{ flight: 'FR1828', depLoc: 'Prague', arrLoc: 'Paris Beauvais', duration: '01:20', aircraft: 'B38M' }] },
+      { leg: 'Leg 13', route: 'LFOB - LROP', summary: 'A long low-cost Ryanair sector across the continent to Bucharest.', eligibleRoutes: [{ flight: 'FR9160', depLoc: 'Paris Beauvais', arrLoc: 'Bucharest', duration: '02:25', aircraft: 'B738' }] },
+      { leg: 'Leg 14', route: 'LROP - LEMD', summary: 'Fly Ryanair from Romania all the way into Madrid.', eligibleRoutes: [{ flight: 'FR2514', depLoc: 'Bucharest', arrLoc: 'Madrid', duration: '03:20', aircraft: 'B38M' }] },
+      { leg: 'Leg 15', route: 'LEMD - GCTS', summary: 'Venture into the Canary Islands with Iberia from Madrid to Tenerife.', eligibleRoutes: [{ flight: 'IB3910', depLoc: 'Madrid', arrLoc: 'Tenerife', duration: '02:45', aircraft: 'A321' }] },
+      { leg: 'Leg 16', route: 'GCTS - LEMD', summary: 'Return from Tenerife back to the Madrid hub with Iberia.', eligibleRoutes: [{ flight: 'IB3911', depLoc: 'Tenerife', arrLoc: 'Madrid', duration: '02:45', aircraft: 'A321' }] },
+      { leg: 'Leg 17', route: 'LEMD - LIRQ', summary: 'A regional jump into Florence aboard Vueling.', eligibleRoutes: [{ flight: 'VY1501', depLoc: 'Madrid', arrLoc: 'Florence', duration: '02:20', aircraft: 'A320' }] },
+      { leg: 'Leg 18', route: 'LIRQ - LEBL', summary: 'Follow the coast towards Barcelona aboard Vueling.', eligibleRoutes: [{ flight: 'VY6002', depLoc: 'Florence', arrLoc: 'Barcelona', duration: '01:15', aircraft: 'A320' }] },
+      { leg: 'Leg 19', route: 'LEBL - GEML', summary: 'A short Iberia shuttle across the Alboran Sea into Melilla.', eligibleRoutes: [{ flight: 'IB2250', depLoc: 'Barcelona', arrLoc: 'Melilla', duration: '01:00', aircraft: 'CRJX' }] },
+      { leg: 'Leg 20', route: 'GEML - LEBL', summary: 'Finish your grand tour by flying Iberia back into Barcelona.', eligibleRoutes: [{ flight: 'IB2251', depLoc: 'Melilla', arrLoc: 'Barcelona', duration: '01:05', aircraft: 'CRJX' }] }
+    ]
+  },
+  {
+    id: 'african-adventure',
+    title: 'An African Adventure',
+    subtitle: 'Discover the beauty of Africa across 15 vast legs',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: '14,800 nm',
+    estimatedDuration: '45h 15m',
+    description:
+      'A massive, continent-spanning tour featuring a rich variety of airports, landscapes, and operations. You will weave through East Africa, fly down into the deep south, bounce back up the West African coast into Morocco, and conclude this epic loop in Johannesburg.',
+    image:
+      'https://a-z-animals.com/media/2025/11/shutterstock-1859164087-huge-licensed-scaled.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'OTHH - HRYR', summary: 'Depart the Middle East with a flight over the Red Sea down to Kigali, Rwanda.', eligibleRoutes: [{ flight: 'WB303', depLoc: 'Doha', arrLoc: 'Kigali', duration: '05:25', aircraft: 'A333' }] },
+      { leg: 'Leg 2', route: 'HRYR - HKJK', summary: 'A short hop across East Africa into the Kenyan capital.', eligibleRoutes: [{ flight: 'KQ471', depLoc: 'Kigali', arrLoc: 'Nairobi', duration: '04:00', aircraft: 'B738' }] },
+      { leg: 'Leg 3', route: 'HKJK - FMMI', summary: 'Fly across the Indian Ocean to the beautiful island of Madagascar.', eligibleRoutes: [{ flight: 'KQ262', depLoc: 'Nairobi', arrLoc: 'Antananarivo', duration: '02:55', aircraft: 'E190' }] },
+      { leg: 'Leg 4', route: 'FMMI - FAOR', summary: "Leave Madagascar and head across to South Africa's largest aviation hub.", eligibleRoutes: [{ flight: '4Z253', depLoc: 'Antananarivo', arrLoc: 'Johannesburg', duration: '03:05', aircraft: 'E190' }] },
+      { leg: 'Leg 5', route: 'FAOR - FACT', summary: 'A busy domestic sector down to the scenic city of Cape Town.', eligibleRoutes: [{ flight: 'SA303', depLoc: 'Johannesburg', arrLoc: 'Cape Town', duration: '01:35', aircraft: 'A333, B738' }] },
+      { leg: 'Leg 6', route: 'FACT - FAUP', summary: 'Take an AirLink regional flight inland to Upington.', eligibleRoutes: [{ flight: '4Z645', depLoc: 'Cape Town', arrLoc: 'Upington', duration: '01:05', aircraft: 'E190' }] },
+      { leg: 'Leg 7', route: 'FAUP - FACT', summary: 'Return from the desert back to the coastal hub of Cape Town.', eligibleRoutes: [{ flight: '4Z646', depLoc: 'Upington', arrLoc: 'Cape Town', duration: '01:10', aircraft: 'E190' }] },
+      { leg: 'Leg 8', route: 'FACT - FASZ', summary: 'Fly direct to Skukuza, the gateway to the famous Kruger National Park.', eligibleRoutes: [{ flight: '4Z651', depLoc: 'Cape Town', arrLoc: 'Skukuza', duration: '02:05', aircraft: 'E190' }] },
+      { leg: 'Leg 9', route: 'FASZ - FAOR', summary: 'A short shuttle flight from the safari park back to Johannesburg.', eligibleRoutes: [{ flight: '4Z866', depLoc: 'Skukuza', arrLoc: 'Johannesburg', duration: '01:00', aircraft: 'E190' }] },
+      { leg: 'Leg 10', route: 'FAOR - DNMM', summary: 'A long trans-continental sector from South Africa up to Lagos, Nigeria.', eligibleRoutes: [{ flight: 'SA60', depLoc: 'Johannesburg', arrLoc: 'Lagos', duration: '06:30', aircraft: 'A333' }] },
+      { leg: 'Leg 11', route: 'DNMM - GMMN', summary: 'Continue your journey north into North Africa, arriving in Casablanca.', eligibleRoutes: [{ flight: 'AT554', depLoc: 'Lagos', arrLoc: 'Casablanca', duration: '04:05', aircraft: 'B738, B38M, B788' }] },
+      { leg: 'Leg 12', route: 'GMMN - GMAD', summary: 'A quick domestic flight down the Moroccan coast to Agadir.', eligibleRoutes: [{ flight: 'AT439', depLoc: 'Casablanca', arrLoc: 'Agadir', duration: '00:40', aircraft: 'B738' }] },
+      { leg: 'Leg 13', route: 'GMAD - GMMN', summary: 'Return to the Royal Air Maroc hub in Casablanca.', eligibleRoutes: [{ flight: 'AT422', depLoc: 'Agadir', arrLoc: 'Casablanca', duration: '00:45', aircraft: 'B738' }] },
+      { leg: 'Leg 14', route: 'GMMN - DGAA', summary: 'Head south along the West African coast to Accra, Ghana.', eligibleRoutes: [{ flight: 'AT515', depLoc: 'Casablanca', arrLoc: 'Accra', duration: '04:05', aircraft: 'B738, B38M' }] },
+      { leg: 'Leg 15', route: 'DGAA - FAOR', summary: 'Conclude this massive African expedition with a long-haul flight back to Johannesburg.', eligibleRoutes: [{ flight: 'SA53', depLoc: 'Accra', arrLoc: 'Johannesburg', duration: '06:50', aircraft: 'A333' }] }
+    ]
+  },
+  {
+    id: 'north-america-tour',
+    title: 'North American Journey',
+    subtitle: 'Explore the vast landscapes of North America',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: 'Various',
+    estimatedDuration: 'Various',
+    description: 'Fly across the United States and Canada, visiting major hubs and coastal cities. Experience diverse weather from the sunny skies of Florida to the rugged terrain of the Pacific Northwest.',
+    image: 'https://wallpapers.com/images/hd/colorful-new-york-skyline-american-city-c2gcq7pse3byaucd.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'CYVR - KSEA', summary: 'Short hop over the border', eligibleRoutes: [{ flight: 'AS101', depLoc: 'Vancouver', arrLoc: 'Seattle', duration: '01:00', aircraft: 'B738' }] },
+      { leg: 'Leg 2', route: 'KSEA - KSFO', summary: 'West Coast coastal run', eligibleRoutes: [{ flight: 'AS102', depLoc: 'Seattle', arrLoc: 'San Francisco', duration: '02:15', aircraft: 'B739' }] },
+      { leg: 'Leg 3', route: 'KSFO - KLAX', summary: 'Classic California shuttle', eligibleRoutes: [{ flight: 'AA103', depLoc: 'San Francisco', arrLoc: 'Los Angeles', duration: '01:30', aircraft: 'A321' }] },
+      { leg: 'Leg 4', route: 'KLAX - KPHX', summary: 'Desert arrival', eligibleRoutes: [{ flight: 'AA104', depLoc: 'Los Angeles', arrLoc: 'Phoenix', duration: '01:25', aircraft: 'A320' }] },
+      { leg: 'Leg 5', route: 'KPHX - KDEN', summary: 'Rockies crossing', eligibleRoutes: [{ flight: 'AA105', depLoc: 'Phoenix', arrLoc: 'Denver', duration: '02:00', aircraft: 'B738' }] },
+      { leg: 'Leg 6', route: 'KDEN - KMSP', summary: 'Midwest skies', eligibleRoutes: [{ flight: 'DL106', depLoc: 'Denver', arrLoc: 'Minneapolis', duration: '02:10', aircraft: 'B739' }] },
+      { leg: 'Leg 7', route: 'KMSP - KORD', summary: 'Busy hub-to-hub', eligibleRoutes: [{ flight: 'AA107', depLoc: 'Minneapolis', arrLoc: 'Chicago O\'Hare', duration: '01:30', aircraft: 'E175' }] },
+      { leg: 'Leg 8', route: 'KORD - KDTW', summary: 'Great Lakes hop', eligibleRoutes: [{ flight: 'AA108', depLoc: 'Chicago O\'Hare', arrLoc: 'Detroit', duration: '01:15', aircraft: 'CRJ9' }] },
+      { leg: 'Leg 9', route: 'KDTW - CYYZ', summary: 'Cross-border into Canada', eligibleRoutes: [{ flight: 'AA109', depLoc: 'Detroit', arrLoc: 'Toronto', duration: '01:10', aircraft: 'E175' }] },
+      { leg: 'Leg 10', route: 'CYYZ - CYUL', summary: 'Bilingual corridor', eligibleRoutes: [{ flight: 'AC110', depLoc: 'Toronto', arrLoc: 'Montreal', duration: '01:15', aircraft: 'A220' }] },
+      { leg: 'Leg 11', route: 'CYUL - KBOS', summary: 'Northeast coastal hop', eligibleRoutes: [{ flight: 'AA111', depLoc: 'Montreal', arrLoc: 'Boston', duration: '01:20', aircraft: 'E190' }] },
+      { leg: 'Leg 12', route: 'KBOS - KEWR', summary: 'Busy airspace, short leg', eligibleRoutes: [{ flight: 'AA112', depLoc: 'Boston', arrLoc: 'Newark', duration: '01:05', aircraft: 'CRJ7' }] },
+      { leg: 'Leg 13', route: 'KEWR - KDCA', summary: 'Potomac River approach', eligibleRoutes: [{ flight: 'AA113', depLoc: 'Newark', arrLoc: 'Washington National', duration: '01:10', aircraft: 'A319' }] },
+      { leg: 'Leg 14', route: 'KDCA - KCLT', summary: 'East Coast connector', eligibleRoutes: [{ flight: 'AA114', depLoc: 'Washington National', arrLoc: 'Charlotte', duration: '01:25', aircraft: 'A320' }] },
+      { leg: 'Leg 15', route: 'KCLT - KMIA', summary: 'Down to South Florida', eligibleRoutes: [{ flight: 'AA115', depLoc: 'Charlotte', arrLoc: 'Miami', duration: '02:10', aircraft: 'A321' }] },
+      { leg: 'Leg 16', route: 'KMIA - MYNN', summary: 'First island hop', eligibleRoutes: [{ flight: 'AA116', depLoc: 'Miami', arrLoc: 'Nassau', duration: '01:05', aircraft: 'B738' }] },
+      { leg: 'Leg 17', route: 'MYNN - MKJP', summary: 'Over turquoise water', eligibleRoutes: [{ flight: 'BW117', depLoc: 'Nassau', arrLoc: 'Kingston', duration: '01:45', aircraft: 'B738' }] },
+      { leg: 'Leg 18', route: 'MKJP - TTPP', summary: 'Island-to-island', eligibleRoutes: [{ flight: 'BW118', depLoc: 'Kingston', arrLoc: 'Port of Spain', duration: '02:30', aircraft: 'B738' }] },
+      { leg: 'Leg 19', route: 'TTPP - TBPB', summary: 'Turboprop Caribbean leg', eligibleRoutes: [{ flight: 'BW119', depLoc: 'Port of Spain', arrLoc: 'Barbados', duration: '01:05', aircraft: 'DH8D' }] },
+      { leg: 'Leg 20', route: 'TBPB - TJSJ', summary: 'Back north through islands', eligibleRoutes: [{ flight: 'BW120', depLoc: 'Barbados', arrLoc: 'San Juan', duration: '01:30', aircraft: 'B738' }] },
+      { leg: 'Leg 21', route: 'TJSJ - KMCO', summary: 'Resort traffic', eligibleRoutes: [{ flight: 'B6121', depLoc: 'San Juan', arrLoc: 'Orlando', duration: '02:50', aircraft: 'A320' }] },
+      { leg: 'Leg 22', route: 'KMCO - KATL', summary: 'Major hub arrival', eligibleRoutes: [{ flight: 'DL122', depLoc: 'Orlando', arrLoc: 'Atlanta', duration: '01:35', aircraft: 'B738' }] },
+      { leg: 'Leg 23', route: 'KATL - KDFW', summary: 'Southern cross-country', eligibleRoutes: [{ flight: 'AA123', depLoc: 'Atlanta', arrLoc: 'Dallas/Fort Worth', duration: '02:20', aircraft: 'B738' }] },
+      { leg: 'Leg 24', route: 'KDFW - KIAH', summary: 'Texas shuttle', eligibleRoutes: [{ flight: 'AA124', depLoc: 'Dallas/Fort Worth', arrLoc: 'Houston', duration: '01:15', aircraft: 'E175' }] },
+      { leg: 'Leg 25', route: 'KIAH - MMUN', summary: 'Finish at the beach', eligibleRoutes: [{ flight: 'AA125', depLoc: 'Houston', arrLoc: 'Cancún', duration: '02:15', aircraft: 'B738' }] }
+    ]
+  },
+  {
+    id: 'oceania-tour',
+    title: 'Oceania Explorer',
+    subtitle: 'Hop around Australia and New Zealand',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: 'Various',
+    estimatedDuration: 'Various',
+    description: 'Experience the wonders of Down Under. Connect the major population centers of Australia with the stunning natural beauty of New Zealand and the remote Outback.',
+    image: 'https://wallpapercat.com/w/full/2/9/c/167018-3840x2160-desktop-4k-australia-background-photo.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'YPPH - YPAD', summary: 'Long Australian west–south hop', eligibleRoutes: [{ flight: 'QF101', depLoc: 'Perth', arrLoc: 'Adelaide', duration: '02:40', aircraft: 'B738' }] },
+      { leg: 'Leg 2', route: 'YPAD - YMML', summary: 'Into a big coastal city', eligibleRoutes: [{ flight: 'QF102', depLoc: 'Adelaide', arrLoc: 'Melbourne', duration: '01:20', aircraft: 'B738' }] },
+      { leg: 'Leg 3', route: 'YMML - YSSY', summary: 'Classic trunk route', eligibleRoutes: [{ flight: 'QF103', depLoc: 'Melbourne', arrLoc: 'Sydney', duration: '01:25', aircraft: 'A333' }] },
+      { leg: 'Leg 4', route: 'YSSY - YSCB', summary: 'Short hop to the capital', eligibleRoutes: [{ flight: 'QF104', depLoc: 'Sydney', arrLoc: 'Canberra', duration: '00:55', aircraft: 'DH8D' }] },
+      { leg: 'Leg 5', route: 'YSCB - YBBN', summary: 'East coast climb', eligibleRoutes: [{ flight: 'QF105', depLoc: 'Canberra', arrLoc: 'Brisbane', duration: '01:45', aircraft: 'B738' }] },
+      { leg: 'Leg 6', route: 'YBBN - YBTL', summary: 'Up the Queensland coast', eligibleRoutes: [{ flight: 'QF106', depLoc: 'Brisbane', arrLoc: 'Townsville', duration: '02:00', aircraft: 'B738' }] },
+      { leg: 'Leg 7', route: 'YBTL - YBCS', summary: 'Tropical turboprop', eligibleRoutes: [{ flight: 'QF107', depLoc: 'Townsville', arrLoc: 'Cairns', duration: '01:00', aircraft: 'DH8D' }] },
+      { leg: 'Leg 8', route: 'YBCS - AGGH', summary: 'Into the Solomons', eligibleRoutes: [{ flight: 'FJ108', depLoc: 'Cairns', arrLoc: 'Honiara', duration: '02:20', aircraft: 'B738' }] },
+      { leg: 'Leg 9', route: 'AGGH - NFFN', summary: 'Pacific island hop', eligibleRoutes: [{ flight: 'FJ109', depLoc: 'Honiara', arrLoc: 'Nadi', duration: '02:45', aircraft: 'B738' }] },
+      { leg: 'Leg 10', route: 'NFFN - NFTF', summary: 'Deep Pacific leg', eligibleRoutes: [{ flight: 'FJ110', depLoc: 'Nadi', arrLoc: 'Fuaʻamotu', duration: '01:40', aircraft: 'B738' }] },
+      { leg: 'Leg 11', route: 'NFTF - NCRG', summary: 'Remote island run', eligibleRoutes: [{ flight: 'FJ111', depLoc: 'Fuaʻamotu', arrLoc: 'Rarotonga', duration: '02:30', aircraft: 'B738' }] },
+      { leg: 'Leg 12', route: 'NCRG - NZAA', summary: 'Into New Zealand', eligibleRoutes: [{ flight: 'QF112', depLoc: 'Rarotonga', arrLoc: 'Auckland', duration: '04:15', aircraft: 'B738' }] },
+      { leg: 'Leg 13', route: 'NZAA - NZWN', summary: 'Windy approach', eligibleRoutes: [{ flight: 'QF113', depLoc: 'Auckland', arrLoc: 'Wellington', duration: '01:05', aircraft: 'B717' }] },
+      { leg: 'Leg 14', route: 'NZWN - NZCH', summary: 'Across Cook Strait', eligibleRoutes: [{ flight: 'QF114', depLoc: 'Wellington', arrLoc: 'Christchurch', duration: '00:55', aircraft: 'B717' }] },
+      { leg: 'Leg 15', route: 'NZCH - NZQN', summary: 'Scenic mountain arrival finale', eligibleRoutes: [{ flight: 'QF115', depLoc: 'Christchurch', arrLoc: 'Queenstown', duration: '01:10', aircraft: 'A320' }] }
+    ]
+  },
+  {
+    id: 'china-tour',
+    title: 'Wonders of China',
+    subtitle: 'Traverse the diverse regions of China',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: 'Various',
+    estimatedDuration: 'Various',
+    description: 'Fly across China utilizing the extensive network of China Southern and partners. From the sprawling metropolis of Beijing to the mountainous regions of Chengdu.',
+    image: 'https://images7.alphacoders.com/898/898714.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'ZGGG - ZGSZ', summary: 'Pearl River Delta hop', eligibleRoutes: [{ flight: 'CZ101', depLoc: 'Guangzhou', arrLoc: 'Shenzhen', duration: '00:50', aircraft: 'A320' }] },
+      { leg: 'Leg 2', route: 'ZGSZ - ZBAA', summary: 'Big northbound trunk', eligibleRoutes: [{ flight: 'CZ102', depLoc: 'Shenzhen', arrLoc: 'Beijing Capital', duration: '03:15', aircraft: 'B789' }] },
+      { leg: 'Leg 3', route: 'ZBAA - ZYHB', summary: 'Into the northeast', eligibleRoutes: [{ flight: 'CZ103', depLoc: 'Beijing Capital', arrLoc: 'Harbin', duration: '02:10', aircraft: 'A321' }] },
+      { leg: 'Leg 4', route: 'ZYHB - ZYTL', summary: 'Along the Bohai Sea', eligibleRoutes: [{ flight: 'CZ104', depLoc: 'Harbin', arrLoc: 'Dalian', duration: '01:40', aircraft: 'B738' }] },
+      { leg: 'Leg 5', route: 'ZYTL - ZSPD', summary: 'Coastal city pair', eligibleRoutes: [{ flight: 'CZ105', depLoc: 'Dalian', arrLoc: 'Shanghai Pudong', duration: '02:00', aircraft: 'A333' }] },
+      { leg: 'Leg 6', route: 'ZSPD - ZSSS', summary: 'Tiny city hop', eligibleRoutes: [{ flight: 'CZ106', depLoc: 'Shanghai Pudong', arrLoc: 'Shanghai Hongqiao', duration: '00:45', aircraft: 'A220' }] },
+      { leg: 'Leg 7', route: 'ZSSS - ZSHC', summary: 'Short scenic leg', eligibleRoutes: [{ flight: 'CZ107', depLoc: 'Shanghai Hongqiao', arrLoc: 'Hangzhou', duration: '00:55', aircraft: 'E190' }] },
+      { leg: 'Leg 8', route: 'ZSHC - ZSNJ', summary: 'Yangtze corridor', eligibleRoutes: [{ flight: 'CZ108', depLoc: 'Hangzhou', arrLoc: 'Nanjing', duration: '01:10', aircraft: 'A320' }] },
+      { leg: 'Leg 9', route: 'ZSNJ - ZSCN', summary: 'Inland hop', eligibleRoutes: [{ flight: 'CZ109', depLoc: 'Nanjing', arrLoc: 'Nanchang', duration: '01:20', aircraft: 'B738' }] },
+      { leg: 'Leg 10', route: 'ZSCN - ZUGY', summary: 'Into the hills', eligibleRoutes: [{ flight: 'CZ110', depLoc: 'Nanchang', arrLoc: 'Guiyang', duration: '02:00', aircraft: 'A320' }] },
+      { leg: 'Leg 11', route: 'ZUGY - ZPPP', summary: 'Yunnan plateau', eligibleRoutes: [{ flight: 'CZ111', depLoc: 'Guiyang', arrLoc: 'Kunming', duration: '01:30', aircraft: 'B738' }] },
+      { leg: 'Leg 12', route: 'ZPPP - ZWSH', summary: 'Jungle edge', eligibleRoutes: [{ flight: 'CZ112', depLoc: 'Kunming', arrLoc: 'Xishuangbanna', duration: '01:15', aircraft: 'E190' }] },
+      { leg: 'Leg 13', route: 'ZWSH - ZGHA', summary: 'Back toward central China', eligibleRoutes: [{ flight: 'CZ113', depLoc: 'Xishuangbanna', arrLoc: 'Changsha', duration: '02:10', aircraft: 'A320' }] },
+      { leg: 'Leg 14', route: 'ZGHA - ZHHH', summary: 'Yangtze hub', eligibleRoutes: [{ flight: 'CZ114', depLoc: 'Changsha', arrLoc: 'Wuhan', duration: '01:05', aircraft: 'A321' }] },
+      { leg: 'Leg 15', route: 'ZHHH - ZUCK', summary: 'Mountainous basin', eligibleRoutes: [{ flight: 'CZ115', depLoc: 'Wuhan', arrLoc: 'Chongqing', duration: '01:45', aircraft: 'B738' }] },
+      { leg: 'Leg 16', route: 'ZUCK - ZUUU', summary: 'Short Sichuan hop', eligibleRoutes: [{ flight: 'CZ116', depLoc: 'Chongqing', arrLoc: 'Chengdu', duration: '01:00', aircraft: 'A320' }] },
+      { leg: 'Leg 17', route: 'ZUUU - ZLXY', summary: 'Terracotta route', eligibleRoutes: [{ flight: 'CZ117', depLoc: 'Chengdu', arrLoc: 'Xi\'an', duration: '01:30', aircraft: 'B738' }] },
+      { leg: 'Leg 18', route: 'ZLXY - ZHCC', summary: 'Central plains', eligibleRoutes: [{ flight: 'CZ118', depLoc: 'Xi\'an', arrLoc: 'Zhengzhou', duration: '01:15', aircraft: 'A320' }] },
+      { leg: 'Leg 19', route: 'ZHCC - ZBTJ', summary: 'To the coast again', eligibleRoutes: [{ flight: 'CZ119', depLoc: 'Zhengzhou', arrLoc: 'Tianjin', duration: '01:35', aircraft: 'A321' }] },
+      { leg: 'Leg 20', route: 'ZBTJ - ZBAA', summary: 'Loop back to Beijing', eligibleRoutes: [{ flight: 'CZ120', depLoc: 'Tianjin', arrLoc: 'Beijing Capital', duration: '00:50', aircraft: 'A320' }] }
+    ]
+  },
+  {
+    id: 'challenging-approaches',
+    title: 'Challenging Approaches',
+    subtitle: 'Test your piloting skills globally',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: 'Various',
+    estimatedDuration: 'Various',
+    description: 'A collection of some of the most demanding approaches in the world. From the deep alpine valleys of Innsbruck to the high altitude thrills of La Paz and the mountainous terrains of Aspen. Note: These flights do not follow on from each other.',
+    image: 'https://pictures.altai-travel.com/1920x0/mount-everest-aerial-view-himalayas-istock-3745.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'LOWW - LOWI', summary: 'Tight valley, circling procedures', eligibleRoutes: [{ flight: 'OS101', depLoc: 'Vienna', arrLoc: 'Innsbruck', duration: '01:05', aircraft: 'A320' }] },
+      { leg: 'Leg 2', route: 'LPPT - LPMA', summary: 'Gusty winds, offset runway', eligibleRoutes: [{ flight: 'TP102', depLoc: 'Lisbon', arrLoc: 'Madeira', duration: '01:45', aircraft: 'A320' }] },
+      { leg: 'Leg 3', route: 'LEMD - LXGB', summary: 'Road crossing the runway', eligibleRoutes: [{ flight: 'BA103', depLoc: 'Madrid', arrLoc: 'Gibraltar', duration: '01:15', aircraft: 'A320' }] },
+      { leg: 'Leg 4', route: 'VHHH - VHHX', summary: 'Famous checkerboard turn (historic sim)', eligibleRoutes: [{ flight: 'CX104', depLoc: 'Hong Kong', arrLoc: 'Kai Tak', duration: '00:30', aircraft: 'B744' }] },
+      { leg: 'Leg 5', route: 'NZAA - NZQN', summary: 'Mountainous RNP arrivals', eligibleRoutes: [{ flight: 'QF105', depLoc: 'Auckland', arrLoc: 'Queenstown', duration: '01:50', aircraft: 'B738' }] },
+      { leg: 'Leg 6', route: 'VILK - VQPR', summary: 'Steep valley, visual segments', eligibleRoutes: [{ flight: 'KB106', depLoc: 'Lucknow', arrLoc: 'Paro', duration: '01:20', aircraft: 'A319' }] },
+      { leg: 'Leg 7', route: 'KJAC - KSLC', summary: 'Terrain and winter ops', eligibleRoutes: [{ flight: 'DL107', depLoc: 'Jackson Hole', arrLoc: 'Salt Lake City', duration: '01:10', aircraft: 'B738' }] },
+      { leg: 'Leg 8', route: 'PANC - PADQ', summary: 'Coastal terrain, short-ish runway', eligibleRoutes: [{ flight: 'AS108', depLoc: 'Anchorage', arrLoc: 'Kodiak', duration: '01:00', aircraft: 'B738' }] },
+      { leg: 'Leg 9', route: 'LIRF - LIPR', summary: 'Coastal, sometimes gusty', eligibleRoutes: [{ flight: 'AZ109', depLoc: 'Rome', arrLoc: 'Rimini', duration: '00:55', aircraft: 'E190' }] },
+      { leg: 'Leg 10', route: 'SPJC - SPZO', summary: 'High altitude, valley approach', eligibleRoutes: [{ flight: 'LA110', depLoc: 'Lima', arrLoc: 'Cusco', duration: '01:25', aircraft: 'A319' }] },
+      { leg: 'Leg 11', route: 'VTBS - VTSM', summary: 'Short runway, island setting', eligibleRoutes: [{ flight: 'PG111', depLoc: 'Bangkok', arrLoc: 'Koh Samui', duration: '01:10', aircraft: 'A319' }] },
+      { leg: 'Leg 12', route: 'FACT - FAPE', summary: 'Coastal winds and low levels', eligibleRoutes: [{ flight: 'SA112', depLoc: 'Cape Town', arrLoc: 'Port Elizabeth', duration: '01:15', aircraft: 'DH8D' }] }
+    ]
+  },
+  {
+    id: 'airbus-tour',
+    title: 'The Airbus Showcase',
+    subtitle: 'Experience the full spectrum of Airbus engineering',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: 'Various',
+    estimatedDuration: 'Various',
+    description: 'Fly one unique sector with every major Airbus aircraft type in the fleet. From the nimble A319 to the massive A380 double-decker. Note: These flights do not follow on from each other.',
+    image: 'https://cdn.discordapp.com/attachments/1462850221867401258/1491828925117235350/Airbus_Family_Aircraft__VFORM_AIRBUS_2_.jpg?ex=69d91d74&is=69d7cbf4&hm=7e1b052ead177755ca227c3f6b780a20735b4f0a86021231b49b4bc2abb58411',
+    legs: [
+      { leg: 'Leg 1', route: 'KJFK - KBOS', summary: 'A220: Busy NE corridor in a modern jet', eligibleRoutes: [{ flight: 'B6101', depLoc: 'New York JFK', arrLoc: 'Boston', duration: '01:15', aircraft: 'A220' }] },
+      { leg: 'Leg 2', route: 'EGLL - LEMD', summary: 'A319: Classic Euro city pair', eligibleRoutes: [{ flight: 'BA102', depLoc: 'London Heathrow', arrLoc: 'Madrid', duration: '02:30', aircraft: 'A319' }] },
+      { leg: 'Leg 3', route: 'EIDW - EGLL', summary: 'A320: Short, high‑traffic hop', eligibleRoutes: [{ flight: 'EI103', depLoc: 'Dublin', arrLoc: 'London Heathrow', duration: '01:25', aircraft: 'A320' }] },
+      { leg: 'Leg 4', route: 'VIDP - VABB', summary: 'A20N: Flagship Indian domestic', eligibleRoutes: [{ flight: '6E104', depLoc: 'Delhi', arrLoc: 'Mumbai', duration: '02:15', aircraft: 'A20N' }] },
+      { leg: 'Leg 5', route: 'KPHX - KSEA', summary: 'A321: Long US domestic stretch', eligibleRoutes: [{ flight: 'AA105', depLoc: 'Phoenix', arrLoc: 'Seattle', duration: '03:10', aircraft: 'A321' }] },
+      { leg: 'Leg 6', route: 'LEBL - LIRF', summary: 'A21N: Mediterranean hop', eligibleRoutes: [{ flight: 'VY106', depLoc: 'Barcelona', arrLoc: 'Rome', duration: '01:45', aircraft: 'A21N' }] },
+      { leg: 'Leg 7', route: 'YSSY - YBBN', summary: 'A332: Widebody on a short leg', eligibleRoutes: [{ flight: 'QF107', depLoc: 'Sydney', arrLoc: 'Brisbane', duration: '01:30', aircraft: 'A332' }] },
+      { leg: 'Leg 8', route: 'EFHK - LEMD', summary: 'A333: Long Euro sector', eligibleRoutes: [{ flight: 'AY108', depLoc: 'Helsinki', arrLoc: 'Madrid', duration: '04:25', aircraft: 'A333' }] },
+      { leg: 'Leg 9', route: 'WMKK - WIII', summary: 'A339: Busy SE Asia trunk', eligibleRoutes: [{ flight: 'MH109', depLoc: 'Kuala Lumpur', arrLoc: 'Jakarta', duration: '02:10', aircraft: 'A339' }] },
+      { leg: 'Leg 10', route: 'FAOR - FACT', summary: 'A346: Big quad on a domestic', eligibleRoutes: [{ flight: 'SA110', depLoc: 'Johannesburg', arrLoc: 'Cape Town', duration: '02:15', aircraft: 'A346' }] },
+      { leg: 'Leg 11', route: 'RJTT - VHHH', summary: 'A359: Sleek long‑range regional', eligibleRoutes: [{ flight: 'JL111', depLoc: 'Tokyo Haneda', arrLoc: 'Hong Kong', duration: '04:30', aircraft: 'A359' }] },
+      { leg: 'Leg 12', route: 'EGLL - OMDB', summary: 'A380: Iconic superjumbo route', eligibleRoutes: [{ flight: 'BA112', depLoc: 'London Heathrow', arrLoc: 'Dubai', duration: '07:00', aircraft: 'A380' }] },
+      { leg: 'Leg 13', route: 'KSDF - KONT', summary: 'A33F: Overnight cargo run', eligibleRoutes: [{ flight: '5X113', depLoc: 'Louisville', arrLoc: 'Ontario, CA', duration: '04:10', aircraft: 'A33F' }] }
+    ]
+  },
+  {
+    id: 'boeing-tour',
+    title: 'The Boeing Showcase',
+    subtitle: 'Celebrate the legacy of Boeing aircraft',
+    status: 'Active',
+    expires: '31 December 2026',
+    totalNm: 'Various',
+    estimatedDuration: 'Various',
+    description: 'Fly one unique sector with every major Boeing aircraft type in the fleet. Take to the skies in everything from the 737 workhorse to the legendary 747 Queen of the Skies. Note: These flights do not follow on from each other.',
+    image: 'https://wallpapercave.com/wp/wp12661974.jpg',
+    legs: [
+      { leg: 'Leg 1', route: 'YSSY - YBCS', summary: 'B717: Old-school short-haul jet', eligibleRoutes: [{ flight: 'QF201', depLoc: 'Sydney', arrLoc: 'Cairns', duration: '03:10', aircraft: 'B717' }] },
+      { leg: 'Leg 2', route: 'MMMX - MMUN', summary: 'B737: High-altitude departure to the beach', eligibleRoutes: [{ flight: 'AM202', depLoc: 'Mexico City', arrLoc: 'Cancún', duration: '02:20', aircraft: 'B737' }] },
+      { leg: 'Leg 3', route: 'KDFW - KSEA', summary: 'B738: Long domestic with varied scenery', eligibleRoutes: [{ flight: 'AA203', depLoc: 'Dallas', arrLoc: 'Seattle', duration: '04:20', aircraft: 'B738' }] },
+      { leg: 'Leg 4', route: 'KSEA - PHNL', summary: 'B739: Over-water, vacation vibes', eligibleRoutes: [{ flight: 'AS204', depLoc: 'Seattle', arrLoc: 'Honolulu', duration: '06:10', aircraft: 'B739' }] },
+      { leg: 'Leg 5', route: 'CYYC - CYYZ', summary: 'B38M: Trans-Canada MAX run', eligibleRoutes: [{ flight: 'WS205', depLoc: 'Calgary', arrLoc: 'Toronto', duration: '03:55', aircraft: 'B38M' }] },
+      { leg: 'Leg 6', route: 'OPKC - OPRN', summary: 'B742: Classic jumbo feel', eligibleRoutes: [{ flight: 'PK206', depLoc: 'Karachi', arrLoc: 'Islamabad', duration: '02:00', aircraft: 'B742' }] },
+      { leg: 'Leg 7', route: 'RPLL - RJAA', summary: 'B744: Old flagship route', eligibleRoutes: [{ flight: 'PR207', depLoc: 'Manila', arrLoc: 'Tokyo Narita', duration: '04:15', aircraft: 'B744' }] },
+      { leg: 'Leg 8', route: 'EDDF - OMDB', summary: 'B748F: Heavy cargo over Europe-Middle East', eligibleRoutes: [{ flight: '5X208', depLoc: 'Frankfurt', arrLoc: 'Dubai', duration: '06:30', aircraft: 'B748F' }] },
+      { leg: 'Leg 9', route: 'UBBB - UGTB', summary: 'B757: Short, punchy climb and descent', eligibleRoutes: [{ flight: 'J2209', depLoc: 'Baku', arrLoc: 'Tbilisi', duration: '01:10', aircraft: 'B757' }] },
+      { leg: 'Leg 10', route: 'KJFK - KBOS', summary: 'B767: Widebody on a shuttle', eligibleRoutes: [{ flight: 'DL210', depLoc: 'New York JFK', arrLoc: 'Boston', duration: '01:15', aircraft: 'B767' }] },
+      { leg: 'Leg 11', route: 'KLAX - RJAA', summary: 'B772: Long-haul Pacific', eligibleRoutes: [{ flight: 'AA211', depLoc: 'Los Angeles', arrLoc: 'Tokyo Narita', duration: '11:45', aircraft: 'B772' }] },
+      { leg: 'Leg 12', route: 'VIDP - VABB', summary: 'B77L: Overpowered twin on a trunk route', eligibleRoutes: [{ flight: 'AI212', depLoc: 'Delhi', arrLoc: 'Mumbai', duration: '02:15', aircraft: 'B77L' }] },
+      { leg: 'Leg 13', route: 'EGLL - FAOR', summary: 'B77W: Long southbound overnight', eligibleRoutes: [{ flight: 'BA213', depLoc: 'London Heathrow', arrLoc: 'Johannesburg', duration: '11:10', aircraft: 'B77W' }] },
+      { leg: 'Leg 14', route: 'ELLX - OMDB', summary: 'B77F: Classic freighter sector', eligibleRoutes: [{ flight: '3V214', depLoc: 'Luxembourg', arrLoc: 'Dubai', duration: '06:15', aircraft: 'B77F' }] },
+      { leg: 'Leg 15', route: 'KORD - MMMX', summary: 'B788: High-altitude arrival', eligibleRoutes: [{ flight: 'AM215', depLoc: 'Chicago O\'Hare', arrLoc: 'Mexico City', duration: '04:20', aircraft: 'B788' }] },
+      { leg: 'Leg 16', route: 'YSSY - NZAA', summary: 'B789: Trans-Tasman in style', eligibleRoutes: [{ flight: 'QF216', depLoc: 'Sydney', arrLoc: 'Auckland', duration: '03:05', aircraft: 'B789' }] },
+      { leg: 'Leg 17', route: 'EGLL - KMIA', summary: 'B78X: Long-range leisure route', eligibleRoutes: [{ flight: 'BA217', depLoc: 'London Heathrow', arrLoc: 'Miami', duration: '09:30', aircraft: 'B78X' }] },
+      { leg: 'Leg 18', route: 'FACT - FAPE', summary: 'DH8D: Coastal turboprop', eligibleRoutes: [{ flight: 'SA218', depLoc: 'Cape Town', arrLoc: 'Port Elizabeth', duration: '01:15', aircraft: 'DH8D' }] },
+      { leg: 'Leg 19', route: 'KPHL - KROC', summary: 'CRJ2: Regional jet hop', eligibleRoutes: [{ flight: 'AA219', depLoc: 'Philadelphia', arrLoc: 'Rochester', duration: '01:15', aircraft: 'CRJ2' }] },
+      { leg: 'Leg 20', route: 'KDFW - KAMA', summary: 'CRJ7: Short regional', eligibleRoutes: [{ flight: 'AA220', depLoc: 'Dallas', arrLoc: 'Amarillo', duration: '01:10', aircraft: 'CRJ7' }] },
+      { leg: 'Leg 21', route: 'KCLT - KCHS', summary: 'CRJ9: East Coast RJ', eligibleRoutes: [{ flight: 'AA221', depLoc: 'Charlotte', arrLoc: 'Charleston', duration: '01:05', aircraft: 'CRJ9' }] },
+      { leg: 'Leg 22', route: 'LEMD - LEMH', summary: 'CRJX: Island regional', eligibleRoutes: [{ flight: 'IB222', depLoc: 'Madrid', arrLoc: 'Menorca', duration: '01:25', aircraft: 'CRJX' }] },
+      { leg: 'Leg 23', route: 'VRMM - VRMG', summary: 'C208: Low-and-slow island hop', eligibleRoutes: [{ flight: 'Q2223', depLoc: 'Malé', arrLoc: 'Gan', duration: '01:45', aircraft: 'C208' }] },
+      { leg: 'Leg 24', route: 'KSEA - CYVR', summary: 'E175: Cross-border regional', eligibleRoutes: [{ flight: 'AS224', depLoc: 'Seattle', arrLoc: 'Vancouver', duration: '00:55', aircraft: 'E175' }] },
+      { leg: 'Leg 25', route: 'SBGR - SBGL', summary: 'E190: Iconic Brazilian hop', eligibleRoutes: [{ flight: 'CM225', depLoc: 'São Paulo', arrLoc: 'Rio de Janeiro', duration: '01:00', aircraft: 'E190' }] },
+      { leg: 'Leg 26', route: 'RPLL - RKSI', summary: 'MD-11: Classic tri-jet', eligibleRoutes: [{ flight: 'PR226', depLoc: 'Manila', arrLoc: 'Seoul Incheon', duration: '04:00', aircraft: 'MD11' }] },
+      { leg: 'Leg 27', route: 'KSDF - KMEM', summary: 'MD-11F: Heavy domestic cargo', eligibleRoutes: [{ flight: '5X227', depLoc: 'Louisville', arrLoc: 'Memphis', duration: '01:10', aircraft: 'MD11F' }] }
+    ]
+  }
+];
+---
+
+<Layout>
+  <section class="px-6 py-8 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <div class="flex justify-between items-start gap-4 mb-3">
+          <h1 class="text-5xl font-bold text-[#8B1538]">Tours</h1>
+          <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
+            <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Tours
+          </p>
+        </div>
+
+        <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+          Explore curated journeys across the globe. Open a tour to view its route structure, overview, and eligible flights. All tours can be flown with a 2x multiplier.
+        </p>
+      </div>
+
+      <div class="space-y-5" id="tourList">
+        {tours.map((tour) => (
+          <article
+            class="tour-card rounded-3xl border border-[#ead9df] bg-white shadow-md overflow-hidden"
+            data-tour-card
+            data-tour-id={tour.id}
+          >
+            <button
+              class="tour-summary w-full text-left"
+              type="button"
+              data-tour-toggle
+              aria-expanded="false"
+              aria-controls={`panel-${tour.id}`}
+            >
+              <div class="tour-summary-inner">
+                <div class="tour-image-wrap">
+                  <img src={tour.image} alt={tour.title} class="tour-image" />
+                  <div class="tour-image-overlay"></div>
+                </div>
+
+                <div class="tour-copy">
+                  <div class="flex flex-wrap items-center gap-3 mb-3">
+                    <span class="tour-badge">{tour.status}</span>
+                  </div>
+
+                  <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">{tour.title}</h2>
+                  <p class="text-white/90 text-base md:text-lg max-w-2xl">
+                    {tour.subtitle}
+                  </p>
+                </div>
+
+                <div class="tour-action">
+                  <span class="tour-action-label">View Tour</span>
+                  <span class="tour-chevron">+</span>
+                </div>
+              </div>
+            </button>
+
+            <div id={`panel-${tour.id}`} class="tour-panel" data-tour-panel>
+              <div class="tour-panel-inner">
+                <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-8 mb-8 items-start">
+                  <div>
+                    <p class="text-base md:text-[1.05rem] text-gray-600 leading-7 max-w-4xl mb-6">
+                      {tour.description}
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div class="tour-stat">
+                        <span class="tour-stat-label">Expiry Date</span>
+                        <span class="tour-stat-value">{tour.expires}</span>
+                      </div>
+                      <div class="tour-stat">
+                        <span class="tour-stat-label">Total Length</span>
+                        <span class="tour-stat-value">{tour.totalNm}</span>
+                      </div>
+                      <div class="tour-stat">
+                        <span class="tour-stat-label">Number of Legs</span>
+                        <span class="tour-stat-value">{tour.legs.length}</span>
+                      </div>
+                      <div class="tour-stat">
+                        <span class="tour-stat-label">Estimated Duration</span>
+                        <span class="tour-stat-value">{tour.estimatedDuration}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="tour-map-card">
+                    <div class="tour-map-head">
+                      <h3 class="text-xl font-bold text-[#8B1538]">Tour Map</h3>
+                    </div>
+                    <div
+                      class="tour-map"
+                      id={`map-${tour.id}`}
+                      data-tour-map
+                      data-tour-legs={JSON.stringify(tour.legs.map((leg) => leg.route))}
+                    ></div>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  {tour.legs.map((leg, index) => (
+                    <details
+                      class="leg-card rounded-2xl border border-[#ead9df] bg-[#fcfafb] overflow-hidden"
+                      open={index === 0}
+                    >
+                      <summary class="leg-summary">
+                        <div class="flex items-center justify-between gap-4">
+                          <h3 class="text-2xl font-bold text-[#8B1538]">
+                            {leg.leg}: {leg.route}
+                          </h3>
+                          <span class="leg-toggle-label text-[#8B1538] font-semibold">Expand</span>
+                        </div>
+                      </summary>
+
+                      <div class="leg-content-wrap">
+                        <div class="leg-content-inner px-6 pb-6 md:px-7 md:pb-7">
+                          <p class="text-base md:text-[1.05rem] text-gray-600 leading-7 mb-6">
+                            {leg.summary}
+                          </p>
+
+                          <h4 class="text-2xl font-bold text-[#8B1538] mb-3">Eligible routes</h4>
+                          <p class="text-base md:text-[1.05rem] text-gray-600 leading-7 mb-6">
+                            Choose one of the flight designations below to fly this leg.
+                          </p>
+
+                          <div class="overflow-x-auto">
+                            <table class="w-full min-w-[760px] border-separate border-spacing-0">
+                              <thead>
+                                <tr>
+                                  <th class="tour-th">Flight Number</th>
+                                  <th class="tour-th">Departure Location</th>
+                                  <th class="tour-th">Arrival Location</th>
+                                  <th class="tour-th">Estimated Duration</th>
+                                  <th class="tour-th">Aircraft</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {leg.eligibleRoutes.map((route) => (
+                                  <tr>
+                                    <td class="tour-td">{route.flight}</td>
+                                    <td class="tour-td font-semibold text-gray-700">{route.depLoc}</td>
+                                    <td class="tour-td font-semibold text-gray-700">{route.arrLoc}</td>
+                                    <td class="tour-td">{route.duration}</td>
+                                    <td class="tour-td">
+                                      <div class="flex flex-wrap gap-2">
+                                        {route.aircraft.split(',').map((ac) => (
+                                          <span class="aircraft-pill">{ac.trim()}</span>
+                                        ))}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-arc/bin/leaflet-arc.min.js"></script>
+
+  <style>
+    .tour-card {
+      transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+      box-shadow: 0 10px 30px rgba(139, 21, 56, 0.08);
+    }
+
+    .tour-card:hover {
+      border-color: rgba(139, 21, 56, 0.22);
+      box-shadow: 0 18px 40px rgba(139, 21, 56, 0.12);
+    }
+
+    .tour-summary {
+      display: block;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .tour-summary-inner {
+      position: relative;
+      min-height: 220px;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .tour-image-wrap {
+      position: absolute;
+      inset: 0;
+    }
+
+    .tour-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.45s ease;
+    }
+
+    .tour-card:hover .tour-image {
+      transform: scale(1.03);
+    }
+
+    .tour-image-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(73, 4, 28, 0.82) 0%, rgba(73, 4, 28, 0.55) 40%, rgba(73, 4, 28, 0.35) 100%);
+    }
+
+    .tour-copy,
+    .tour-action {
+      position: relative;
+      z-index: 2;
+    }
+
+    .tour-copy {
+      padding: 2rem 2rem 1.5rem 2rem;
+    }
+
+    .tour-action {
+      position: absolute;
+      right: 1.5rem;
+      top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      color: white;
+      font-weight: 700;
+    }
+
+    .tour-action-label {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.95;
+    }
+
+    .tour-chevron {
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(8px);
+      font-size: 1.4rem;
+      line-height: 1;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .tour-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      background: rgba(255, 255, 255, 0.16);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      backdrop-filter: blur(8px);
+    }
+
+    .tour-panel {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.45s ease;
+      background: white;
+    }
+
+    .tour-panel-inner {
+      overflow: hidden;
+      padding: 0 2rem;
+    }
+
+    .tour-card.is-open .tour-panel {
+      grid-template-rows: 1fr;
+    }
+
+    .tour-card.is-open .tour-panel-inner {
+      padding-top: 1.5rem;
+      padding-bottom: 2rem;
+    }
+
+    .tour-card.is-open .tour-chevron {
+      transform: rotate(45deg);
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .tour-stat {
+      border: 1px solid rgba(139, 21, 56, 0.12);
+      border-radius: 1rem;
+      background: #fcfafb;
+      padding: 1rem 1.1rem;
+    }
+
+    .tour-stat-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(139, 21, 56, 0.72);
+      margin-bottom: 0.35rem;
+    }
+
+    .tour-stat-value {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #4d4d56;
+    }
+
+    .tour-map-card {
+      border: 1px solid rgba(139, 21, 56, 0.12);
+      border-radius: 1.25rem;
+      overflow: hidden;
+      background: #fcfafb;
+      box-shadow: 0 10px 22px rgba(139, 21, 56, 0.05);
+    }
+
+    .tour-map-head {
+      padding: 1rem 1rem 0.75rem 1rem;
+      border-bottom: 1px solid rgba(139, 21, 56, 0.1);
+      background: white;
+    }
+
+    .tour-map {
+      height: 280px;
+      width: 100%;
+    }
+
+    .leg-card {
+      box-shadow: 0 10px 22px rgba(139, 21, 56, 0.05);
+    }
+
+    .leg-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .leg-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .leg-content-wrap {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s ease;
+    }
+
+    .leg-content-inner {
+      overflow: hidden;
+    }
+
+    .leg-card[open] .leg-content-wrap {
+      grid-template-rows: 1fr;
+    }
+
+    .tour-th {
+      text-align: left;
+      padding: 0 1rem 0.9rem 1rem;
+      color: #8B1538;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border-bottom: 2px solid rgba(139, 21, 56, 0.45);
+    }
+
+    .tour-td {
+      padding: 1rem;
+      font-size: 1rem;
+      color: #6b5f64;
+      border-bottom: 2px solid rgba(139, 21, 56, 0.25);
+    }
+
+    .aircraft-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.35rem 0.7rem;
+      border-radius: 0.6rem;
+      background: #3a3a3f;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 1024px) {
+      .tour-map {
+        height: 240px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tour-copy {
+        padding: 1.5rem 1.25rem 1.25rem 1.25rem;
+      }
+
+      .tour-action {
+        right: 1rem;
+        top: 1rem;
+      }
+
+      .tour-panel-inner {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .tour-card.is-open .tour-panel-inner {
+        padding-bottom: 1.25rem;
+      }
+
+      .tour-th,
+      .tour-td {
+        font-size: 0.95rem;
+      }
+
+      .leg-summary h3 {
+        font-size: 1.35rem;
+      }
+
+      .tour-map {
+        height: 220px;
+      }
+    }
+  </style>
+
+  <script>
+    const airportCoords = {
+      OTHH: [25.2731, 51.6081],
+      YSSY: [-33.9399, 151.1753],
+      MPTO: [9.0714, -79.3835],
+      SBBR: [-15.8692, -47.9208],
+      SBGR: [-23.4356, -46.4731],
+      SBRJ: [-22.9105, -43.1631],
+      SCEL: [-33.3930, -70.7858],
+      SCCI: [-53.0026, -70.8546],
+      SCNT: [-51.6708, -72.5281],
+      SPJC: [-12.0219, -77.1143],
+      SACO: [-13.5357, -71.9388],
+      SLLP: [-16.5133, -68.1923],
+      HRYR: [-1.9600, 30.1400],
+      HKJK: [-1.3200, 36.9200],
+      FMMI: [-18.8000, 47.4800],
+      FAOR: [-26.1337, 28.2420],
+      FACT: [-33.9715, 18.6021],
+      FAUP: [-28.4000, 21.2600],
+      FASZ: [-24.9700, 31.5900],
+      DNMM: [6.5800, 3.3200],
+      GMMN: [33.3700, -7.5800],
+      GMAD: [30.3300, -9.4100],
+      DGAA: [5.6100, -0.1700],
+      EDDK: [50.8659, 7.1427],
+      EGLL: [51.4700, -0.4543],
+      EFHK: [60.3172, 24.9633],
+      EGPH: [55.9500, -3.3725],
+      ESGG: [57.6628, 12.2798],
+      LDDU: [42.5614, 18.2683],
+      EGNM: [53.8659, -1.6606],
+      LIRF: [41.8003, 12.2389],
+      LBSF: [42.6952, 23.4061],
+      LKPR: [50.1008, 14.2600],
+      LFOB: [49.4600, 2.1128],
+      LROP: [44.5711, 26.1971],
+      LEMD: [40.4936, -3.5668],
+      GOBD: [14.6710, -17.0733],
+      LIRQ: [43.8100, 11.2051],
+      LEBL: [41.2971, 2.0785],
+      GEML: [35.2798, -2.9563],
+      GCTS: [28.0445, -16.5725],
+      KSFO: [37.6188, -122.3758],
+      VVTS: [10.8188, 106.6519],
+      WMKK: [2.7456, 101.7099],
+      WBKW: [4.2625, 117.8872],
+      WADD: [-8.7482, 115.1672],
+      WAPP: [-3.7049, 128.0838],
+      VVDN: [16.0439, 108.1993],
+      ZBAD: [39.5091, 116.4105],
+      RCTP: [25.0797, 121.2342],
+      VIBY: [28.4208, 79.4503],
+      YPPH: [-31.9403, 115.9668],
+      ZYTX: [41.6397, 123.4833],
+      VIDP: [28.5562, 77.1000],
+      ZGGG: [23.3924, 113.2988],
+      RKSI: [37.4602, 126.4407],
+      RJTT: [35.5494, 139.7798],
+      VHHH: [22.3080, 113.9185],
+      WIII: [-6.1256, 106.6558],
+      VABB: [19.0902, 72.8628],
+      KJFK: [40.6413, -73.7781],
+      KLAX: [33.9416, -118.4085],
+      RJFT: [32.8372, 130.8550],
+      WMKN: [5.3828, 103.1031],
+      WAJJ: [-2.5764, 140.5161],
+      RJSS: [38.1397, 140.9169],
+      VVNB: [21.2211, 105.8072],
+      RJCB: [42.7333, 143.2169],
+      VLLB: [19.8986, 102.1625],
+      ZLXY: [34.4472, 108.7517],
+      VTSP: [8.1132, 98.3169],
+      VTBS: [13.6811, 100.7472],
+      VOKN: [11.9167, 75.5483],
+      PANC: [61.1743, -149.9962],
+      KMIA: [25.7959, -80.2870],
+      KDFW: [32.8998, -97.0403],
+      KSEA: [47.4480, -122.3088],
+      YMML: [-37.6690, 144.8410],
+      YBBN: [-27.3842, 153.1175],
+      NZAA: [-37.0082, 174.7915],
+      NZWN: [-41.3272, 174.8053],
+      ZGSZ: [22.6393, 113.8107],
+      ZUUU: [30.5785, 103.9471],
+      LOWI: [47.2602, 11.3440],
+      LPPR: [41.2481, -8.6814],
+      LPMA: [32.6979, -16.7744],
+      MHTG: [14.0650, -87.2167],
+      VQPR: [27.3981, 89.4246],
+      RJEC: [43.6708, 142.4475],
+      EGGD: [51.3827, -2.7191],
+      EDDF: [50.0333, 8.5706],
+      EHAM: [52.3081, 4.7642],
+      EDDM: [48.3538, 11.7861],
+      RPLL: [14.5086, 121.0194],
+      ZSHC: [30.2295, 120.4344],
+      ZSAM: [24.5440, 118.1277],
+      ZPPP: [25.1019, 102.9292],
+      ZWWW: [43.9071, 87.4742],
+      ZSSS: [31.1979, 121.3363],
+      KORD: [41.9742, -87.9073],
+      KPHX: [33.4342, -112.0081],
+      KLAS: [36.0804, -115.1523],
+      PHNL: [21.3187, -157.9225],
+      YPAD: [-34.9450, 138.5306],
+      YAYE: [-25.1861, 130.9756],
+      YPDN: [-12.4086, 130.8767],
+      VILH: [34.1359, 77.5463],
+      KEGE: [39.6426, -106.9177],
+      KASE: [39.2232, -106.8688],
+      KDEN: [39.8561, -104.6737],
+      CYVR: [49.1967, -123.1815],
+      KMSP: [44.8805, -93.2169],
+      KDTW: [42.2121, -83.3533],
+      CYYZ: [43.6777, -79.6248],
+      CYUL: [45.4706, -73.7408],
+      KBOS: [42.3656, -71.0096],
+      KEWR: [40.6925, -74.1686],
+      KDCA: [38.8521, -77.0377],
+      KCLT: [35.2140, -80.9431],
+      MYNN: [25.0390, -77.4662],
+      MKJP: [17.9356, -76.7874],
+      TTPP: [10.5954, -61.3372],
+      TBPB: [13.0746, -59.4925],
+      TJSJ: [18.4394, -66.0018],
+      KMCO: [28.4284, -81.3167],
+      KATL: [33.6407, -84.4277],
+      KIAH: [29.9902, -95.3368],
+      MMUN: [21.0365, -86.8771],
+      YSCB: [-35.3069, 149.1951],
+      YBTL: [-19.2526, 146.7653],
+      YBCS: [-16.8858, 145.7553],
+      AGGH: [-9.4280, 160.0549],
+      NFFN: [-17.7554, 177.4432],
+      NFTF: [-21.2413, -175.1356],
+      NCRG: [-21.2028, -159.8058],
+      NZCH: [-43.4894, 172.5322],
+      NZQN: [-45.0210, 168.7390],
+      ZBAA: [40.0801, 116.5846],
+      ZYHB: [45.6234, 126.2503],
+      ZYTL: [38.9657, 121.5386],
+      ZSPD: [31.1443, 121.8083],
+      ZSNJ: [31.7420, 118.8621],
+      ZSCN: [28.8611, 115.8997],
+      ZUGY: [26.5385, 106.8009],
+      ZWSH: [21.9739, 100.7594],
+      ZGHA: [28.1892, 113.2197],
+      ZHHH: [30.7838, 114.2081],
+      ZUCK: [29.7192, 106.6417],
+      ZHCC: [34.5197, 113.8408],
+      ZBTJ: [39.1244, 117.3462],
+      LOWW: [48.1103, 16.5697],
+      LPPT: [38.7742, -9.1342],
+      LXGB: [36.1512, -5.3497],
+      VHHX: [22.3167, 114.2033],
+      VILK: [26.7606, 80.8893],
+      KJAC: [43.6073, -110.7377],
+      KSLC: [40.7899, -111.9791],
+      PADQ: [57.7499, -152.4939],
+      LIPR: [44.0203, 12.6117],
+      SPZO: [-13.5357, -71.9388],
+      VTSM: [9.5483, 100.0614],
+      FAPE: [-33.9849, 25.6173],
+      OMDB: [25.2532, 55.3657],
+      KSDF: [38.1744, -85.7360],
+      KONT: [34.0560, -117.6012],
+      MMMX: [19.4361, -99.0719],
+      CYYC: [51.1139, -114.0203],
+      OPKC: [24.9065, 67.1608],
+      OPRN: [33.6167, 73.0992],
+      RJAA: [35.7647, 140.3864],
+      UBBB: [40.4675, 50.0467],
+      UGTB: [41.6692, 44.9547],
+      ELLX: [49.6266, 6.2115],
+      KPHL: [39.8719, -75.2411],
+      KROC: [43.1189, -77.6724],
+      KAMA: [35.2194, -101.7059],
+      KCHS: [32.8986, -80.0405],
+      LEMH: [39.8626, 4.2186],
+      VRMM: [4.1918, 73.5291],
+      VRMG: [-0.6933, 73.1556],
+      KMEM: [35.0424, -89.9767]
+    };
+
+    const tourCards = Array.from(document.querySelectorAll('[data-tour-card]'));
+    const toggles = Array.from(document.querySelectorAll('[data-tour-toggle]'));
+    const mapInstances = new Map();
+
+    function closeAllTours(exceptId = null) {
+      tourCards.forEach((card) => {
+        const id = card.dataset.tourId;
+        const toggle = card.querySelector('[data-tour-toggle]');
+        if (id !== exceptId) {
+          card.classList.remove('is-open');
+          toggle?.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    function drawTourMap(mapEl) {
+      const mapId = mapEl.id;
+      if (mapInstances.has(mapId)) {
+        setTimeout(() => mapInstances.get(mapId).invalidateSize(), 50);
+        return;
+      }
+
+      const routeStrings = JSON.parse(mapEl.dataset.tourLegs || '[]');
+      const parsedRoutes = routeStrings
+        .map((r) => r.split('-').map((s) => s.trim()))
+        .filter((parts) => parts.length === 2 && airportCoords[parts[0]] && airportCoords[parts[1]]);
+
+      const map = L.map(mapEl, {
+        zoomControl: false,
+        worldCopyJump: false,
+        attributionControl: false,
+      }).setView([20, 20], 2);
+
+      L.tileLayer(
+        'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+        {
+          attribution: '&copy; OpenMapTiles &copy; OpenStreetMap contributors',
+          noWrap: false,
+        }
+      ).addTo(map);
+
+      const bounds = [];
+
+      parsedRoutes.forEach(([from, to]) => {
+        const A = airportCoords[from];
+        const B = airportCoords[to];
+        bounds.push(A, B);
+
+        L.circleMarker(A, {
+          radius: 5,
+          fillColor: '#8B1538',
+          color: '#ffffff',
+          weight: 2,
+          fillOpacity: 1,
+        }).addTo(map);
+
+        L.circleMarker(B, {
+          radius: 5,
+          fillColor: '#8B1538',
+          color: '#ffffff',
+          weight: 2,
+          fillOpacity: 1,
+        }).addTo(map);
+
+        try {
+          new L.Polyline.Arc(A, B, {
+            color: '#8B1538',
+            weight: 2,
+            opacity: 0.8,
+            vertices: 80,
+          }).addTo(map);
+        } catch {
+          L.polyline([A, B], {
+            color: '#8B1538',
+            weight: 2,
+            opacity: 0.8,
+          }).addTo(map);
+        }
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [20, 20], maxZoom: 4 });
+      }
+
+      mapInstances.set(mapId, map);
+      setTimeout(() => map.invalidateSize(), 50);
+    }
+
+    toggles.forEach((toggle) => {
+      toggle.addEventListener('click', () => {
+        const card = toggle.closest('[data-tour-card]');
+        const id = card?.dataset.tourId;
+        const isOpen = card?.classList.contains('is-open');
+
+        if (!card || !id) return;
+
+        if (isOpen) {
+          card.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          return;
+        }
+
+        closeAllTours(id);
+        card.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+
+        const mapEl = card.querySelector('[data-tour-map]');
+        if (mapEl) {
+          setTimeout(() => drawTourMap(mapEl), 220);
+        }
+
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      });
+    });
+
+    const legCards = document.querySelectorAll('.leg-card');
+    legCards.forEach((leg) => {
+      const label = leg.querySelector('.leg-toggle-label');
+
+      const syncLabel = () => {
+        if (!label) return;
+        label.textContent = leg.hasAttribute('open') ? 'Collapse' : 'Expand';
+      };
+
+      syncLabel();
+      leg.addEventListener('toggle', syncLabel);
+    });
+  </script>
+</Layout>
