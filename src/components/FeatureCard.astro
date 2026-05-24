@@ -1,0 +1,27 @@
+---
+export interface Props {
+  title: string;
+  // Use a special prop 'class' to allow passing in extra Tailwind classes
+  class?: string;
+}
+
+const { title, class: extraClasses } = Astro.props;
+---
+
+<!-- 
+  - `card`, `bg-base-100`, `shadow-xl` are from DaisyUI.
+  - We add `transition-all duration-300` from Tailwind for a nice hover effect.
+  - The `{extraClasses}` variable will inject any classes you pass to the component.
+-->
+<div class:list={["card bg-base-100 shadow-xl transition-all duration-300", extraClasses]}>
+  <div class="card-body">
+    <h2 class="card-title text-primary">{title}</h2>
+    <!-- The <slot /> allows you to pass content (like paragraphs, images) into the component -->
+    <p class="text-base-content/80">
+      <slot />
+    </p>
+    <div class="card-actions justify-end mt-4">
+      <button class="btn btn-primary">Learn More</button>
+    </div>
+  </div>
+</div>
