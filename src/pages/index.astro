@@ -21,6 +21,25 @@ const rankSteps = [
   { name: 'Oryx', range: '5,000h', color: '#b0802d', craft: 'Executive Jets, full access' },
 ];
 
+const track1 = [
+  { name: 'A350', icao: 'A359', img: '/images/QA_A350.webp', scale: 0.92, offset: '-10px' },
+  { name: 'Challenger 350', icao: 'CL35', img: '/images/QAE_C350.webp', scale: 0.6, offset: '20px' },
+  { name: 'A330', icao: 'A333', img: '/images/QA_A330.webp', scale: 0.88, offset: '-25px' },
+];
+
+const track2 = [
+  { name: 'A321', icao: 'A21N', img: '/images/QA_A321.webp', scale: 0.84, offset: '15px' },
+  { name: 'B777-300ER', icao: 'B77W', img: '/images/QA_B77W.webp', scale: 0.98, offset: '-15px' },
+  { name: 'A320', icao: 'A320', img: '/images/QA_A320.webp', scale: 0.82, offset: '30px' },
+];
+
+const track3 = [
+  { name: 'A380', icao: 'A388', img: '/images/QA_A380.webp', scale: 1.05, offset: '5px' },
+  { name: 'B787-8', icao: 'B788', img: '/images/QA_B788.webp', scale: 0.9, offset: '-30px' },
+  { name: 'B777-200LR', icao: 'B77L', img: '/images/QA_B77L.webp', scale: 0.94, offset: '25px' },
+];
+
+
 const testimonials = [
   { quote: 'I believe that Qatar Airways Virtual Airline is one of the best, if not the best, virtual airlines out there in Infinite Flight. The immersive training, active community, and endless events make every flight meaningful.', author: 'Daniel', callsign: 'QRV012' },
   { quote: 'Qatari Virtual is one of the very best virtual organizations in the Infinite Flight skies. Collaboration and professionalism are embedded into the culture.', author: 'Genav', callsign: 'QRV016' },
@@ -50,7 +69,7 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
 </section>
 
 <!-- Stats -->
-<section class="px-6 py-12">
+<section class="px-6 py-6">
   <div class="max-w-6xl mx-auto">
     <Stats />
   </div>
@@ -85,6 +104,65 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
     <a href="/ranks" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
       View full rank structure &rarr;
     </a>
+  </div>
+</section>
+
+<!-- Fleet -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Fleet Highlights</h2>
+      <p class="text-gray-500 mb-8 max-w-xl mx-auto">From narrow-body staples to flagship long-haul and executive jets.</p>
+    </div>
+    <div class="fleet-stack">
+      <div class="fleet-marquee" aria-hidden="true">
+        <!-- Track 1 -->
+        <div class="fleet-marquee-track track-1">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-1">
+              {track1.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <!-- Track 2 -->
+        <div class="fleet-marquee-track track-2">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-2">
+              {track2.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <!-- Track 3 -->
+        <div class="fleet-marquee-track track-3">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-3">
+              {track3.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div class="fleet-stack-footer">
+      <p class="fleet-stack-intro">ICAO tags highlight standout aircraft in our fleet.</p>
+      <a href="/fleet" class="inline-block mt-3 text-[#8B1538] font-semibold text-sm hover:underline">
+        Explore the full fleet &rarr;
+      </a>
+    </div>
   </div>
 </section>
 
@@ -311,6 +389,108 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
     gap: 0.65rem;
   }
 
+  .fleet-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .fleet-marquee {
+    position: relative;
+    height: 520px;
+    border-radius: 28px;
+    background: radial-gradient(circle at 15% 25%, rgba(255,255,255,0.12), transparent 45%),
+      linear-gradient(135deg, #4a0c2b, #6e0038);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(50, 7, 27, 0.25);
+  }
+
+  .fleet-stack-intro {
+    color: #6b6469;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .fleet-stack-footer {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .fleet-marquee-track {
+    position: absolute;
+    display: flex;
+    width: max-content;
+    align-items: center;
+    will-change: transform;
+    left: 0;
+  }
+
+  .track-1 {
+    top: 5%;
+    z-index: 1;
+    animation: scroll-marquee 45s linear infinite;
+  }
+  .track-2 {
+    top: 32%;
+    z-index: 2;
+    animation: scroll-marquee 35s linear infinite;
+  }
+  .track-3 {
+    top: 58%;
+    z-index: 3;
+    animation: scroll-marquee 25s linear infinite;
+  }
+
+  .fleet-marquee-inner {
+    display: flex;
+    align-items: center;
+    width: max-content;
+  }
+
+  .inner-1 { gap: 6rem; padding-right: 6rem; }
+  .inner-2 { gap: 4rem; padding-right: 4rem; }
+  .inner-3 { gap: 8rem; padding-right: 8rem; }
+
+  .fleet-marquee-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 260px;
+    padding: 0.75rem 0;
+    transform: translateY(var(--plane-offset, 0px));
+  }
+
+  .fleet-marquee-plane {
+    position: relative;
+    z-index: 2;
+    width: clamp(220px, 36vw, 380px);
+    height: auto;
+    transform: scale(var(--plane-scale, 1));
+    filter: drop-shadow(0 18px 35px rgba(0,0,0,0.45));
+  }
+
+  .fleet-icao-ghost {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    letter-spacing: 0.15em;
+    font-weight: 900;
+    color: rgba(255,255,255,0.12);
+    text-transform: uppercase;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes scroll-marquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
   .partner-logo {
     max-height: 36px;
     max-width: 100%;
@@ -441,6 +621,24 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
     }
 
     .partner-logo { max-height: 28px; }
+
+    .fleet-marquee {
+      height: 400px;
+    }
+
+    .inner-1 { gap: 3rem; padding-right: 3rem; }
+    .inner-2 { gap: 2rem; padding-right: 2rem; }
+    .inner-3 { gap: 4rem; padding-right: 4rem; }
+
+    .fleet-marquee-plane {
+      width: clamp(190px, 70vw, 320px);
+    }
+
+    .fleet-icao-ghost {
+      font-size: 1.75rem;
+      letter-spacing: 0.1em;
+      top: 15%;
+    }
   }
 </style>
 

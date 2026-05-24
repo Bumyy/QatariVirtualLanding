@@ -52,8 +52,8 @@ try {
 <style>
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
   }
 
   .stat-card {
@@ -61,8 +61,8 @@ try {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
-    padding: 1.25rem 0.75rem;
+    gap: 0.25rem;
+    padding: 1rem 0.5rem;
     background: white;
     border-radius: 16px;
     overflow: hidden;
@@ -109,7 +109,11 @@ try {
   @media (max-width: 768px) {
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.7rem;
+      gap: 0.5rem;
+    }
+
+    .stat-card {
+      padding: 0.75rem 0.5rem;
     }
 
     .stat-value {

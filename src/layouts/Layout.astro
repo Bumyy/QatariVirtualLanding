@@ -17,6 +17,27 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
     <link rel="icon" type="image/png" href="/images/Logo2.png" />
 
     <style>
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #fdf8f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #8B1538;
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #6e0038;
+      }
+      
+      html {
+        scrollbar-width: thin;
+        scrollbar-color: #8B1538 #fdf8f9;
+      }
+
       .header-shell {
         position: sticky;
         top: 0;
