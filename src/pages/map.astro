@@ -1,2040 +1,582 @@
 ---
-import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
+import { getRoutes } from '../data/route';
+import airlinesData from '../assets/airlines.json';
+import csvText from '../assets/airports.csv?raw';
+
+const airlines = airlinesData.airlines;
+let allRoutes = [];
+
+try {
+  allRoutes = await getRoutes();
+} catch (error) {
+  console.error('Failed to load routes:', error);
+  allRoutes = [];
+}
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Full Routes Map — DOH, GRU, DUB</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
-  <style>
-    html, body { height: 100%; margin: 0; }
-    #map { height: 100vh; width: 100%; }
-    .popup-link { display:inline-block; margin-top:6px; color:#0366d6; text-decoration:underline; }
-    /* small adjustment for marker tooltip text size */
-    .leaflet-popup-content { font-size: 14px; }
-  </style>
-</head>
-<body>
-  <div id="map"></div>
 
-  <!-- Leaflet and Arc plugin -->
-  <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-arc/bin/leaflet-arc.min.js"></script>
+<Layout>
+  <section class="px-6 py-8 min-h-screen">
+    <div class="mb-8">
+      <div class="flex justify-between items-start gap-4 mb-3">
+        <h1 class="text-5xl font-bold text-[#8B1538]">Interactive Route Map</h1>
+        <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
+          <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Route Map
+        </p>
+      </div>
 
-  <script>
-  // ---------------------------
-  // Map setup
-  // ---------------------------
-  const map = L.map('map').setView([20, 0], 2);
+      <p class="max-w-3xl text-lg text-gray-600 leading-relaxed">
+        Explore our global network and discover where Qatari Virtual flies with our interactive route map.
+      </p>
+    </div>
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; CARTO & OpenStreetMap contributors',
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(map);
+    <div class="flex flex-wrap justify-center items-center gap-4 mt-4">
+      <select
+        id="airlineSelect"
+        class="border border-gray-300 px-4 py-2 rounded shadow-sm"
+      >
+        <option value="">Select Airline...</option>
+        {airlines.map((airline) => (
+          <>
+            <option value={airline.prefix} data-color={airline.color}>
+              {airline.name}
+            </option>
+            {(airline.prefix === 'QR' || airline.name === 'Qatar Airways') && (
+              <option value="ALL" data-color="#8B1538">All Routes</option>
+            )}
+          </>
+        ))}
+      </select>
 
-  // ---------------------------
-  // airportLinks (placeholders)
-  // ---------------------------
-  const airportLinks = {
-    "DOH":"LINK INSERT HERE","GRU":"LINK INSERT HERE","MIA":"LINK INSERT HERE","IAH":"LINK INSERT HERE",
-    "DFW":"LINK INSERT HERE","LAX":"LINK INSERT HERE","SFO":"LINK INSERT HERE","SEA":"LINK INSERT HERE",
-    "ORD":"LINK INSERT HERE","YYZ":"LINK INSERT HERE","YUL":"LINK INSERT HERE","JFK":"LINK INSERT HERE",
-    "ATL":"LINK INSERT HERE","IAD":"LINK INSERT HERE","BOS":"LINK INSERT HERE","ABJ":"LINK INSERT HERE",
-    "ACC":"LINK INSERT HERE","LOS":"LINK INSERT HERE","ABV":"LINK INSERT HERE","KAN":"LINK INSERT HERE",
-    "PHC":"LINK INSERT HERE","FIH":"LINK INSERT HERE","LAD":"LINK INSERT HERE","CPT":"LINK INSERT HERE",
-    "MPM":"LINK INSERT HERE","DUR":"LINK INSERT HERE","JNB":"LINK INSERT HERE","LUN":"LINK INSERT HERE",
-    "HRE":"LINK INSERT HERE","SEZ":"LINK INSERT HERE","EBB":"LINK INSERT HERE","KGL":"LINK INSERT HERE",
-    "NBO":"LINK INSERT HERE","JRO":"LINK INSERT HERE","DAR":"LINK INSERT HERE","ZNZ":"LINK INSERT HERE",
-    "JIB":"LINK INSERT HERE","MGQ":"LINK INSERT HERE","CAI":"LINK INSERT HERE","HBE":"LINK INSERT HERE",
-    "CMN":"LINK INSERT HERE","RAK":"LINK INSERT HERE","ALG":"LINK INSERT HERE","TUN":"LINK INSERT HERE",
-    "MLA":"LINK INSERT HERE","AGP":"LINK INSERT HERE","LIS":"LINK INSERT HERE","MAD":"LINK INSERT HERE",
-    "BCN":"LINK INSERT HERE","NCE":"LINK INSERT HERE","FCO":"LINK INSERT HERE","MXP":"LINK INSERT HERE",
-    "GVA":"LINK INSERT HERE","VCE":"LINK INSERT HERE","ZRH":"LINK INSERT HERE","CDG":"LINK INSERT HERE",
-    "LGW":"LINK INSERT HERE","LHR":"LINK INSERT HERE","BHX":"LINK INSERT HERE","MAN":"LINK INSERT HERE",
-    "DUB":"LINK INSERT HERE","EDI":"LINK INSERT HERE","FRA":"LINK INSERT HERE","DUS":"LINK INSERT HERE",
-    "BRU":"LINK INSERT HERE","AMS":"LINK INSERT HERE","HAM":"LINK INSERT HERE","CPH":"LINK INSERT HERE",
-    "BER":"LINK INSERT HERE","MUC":"LINK INSERT HERE","OSL":"LINK INSERT HERE","ARN":"LINK INSERT HERE",
-    "WAW":"LINK INSERT HERE","PRG":"LINK INSERT HERE","VIE":"LINK INSERT HERE","BUD":"LINK INSERT HERE",
-    "ZAG":"LINK INSERT HERE","BEG":"LINK INSERT HERE","SJJ":"LINK INSERT HERE","OTP":"LINK INSERT HERE",
-    "SVO":"LINK INSERT HERE","ATH":"LINK INSERT HERE","JMK":"LINK INSERT HERE","BJV":"LINK INSERT HERE",
-    "AYT":"LINK INSERT HERE","IST":"LINK INSERT HERE","SAW":"LINK INSERT HERE","ESB":"LINK INSERT HERE",
-    "TZX":"LINK INSERT HERE","TBS":"LINK INSERT HERE","EVN":"LINK INSERT HERE","GYD":"LINK INSERT HERE",
-    "LCA":"LINK INSERT HERE","BEY":"LINK INSERT HERE","DAM":"LINK INSERT HERE","AMM":"LINK INSERT HERE",
-    "TUU":"LINK INSERT HERE","NUM":"LINK INSERT HERE","ULH":"LINK INSERT HERE","YNB":"LINK INSERT HERE",
-    "MED":"LINK INSERT HERE","JED":"LINK INSERT HERE","TIF":"LINK INSERT HERE","AHB":"LINK INSERT HERE",
-    "ELQ":"LINK INSERT HERE","RUH":"LINK INSERT HERE","SLL":"LINK INSERT HERE","EBL":"LINK INSERT HERE",
-    "ISU":"LINK INSERT HERE","BGW":"LINK INSERT HERE","NJF":"LINK INSERT HERE","BSR":"LINK INSERT HERE",
-    "KWI":"LINK INSERT HERE","IKA":"LINK INSERT HERE","MHD":"LINK INSERT HERE","SYZ":"LINK INSERT HERE",
-    "DMM":"LINK INSERT HERE","BAH":"LINK INSERT HERE","AUH":"LINK INSERT HERE","DXB":"LINK INSERT HERE",
-    "SHJ":"LINK INSERT HERE","MCT":"LINK INSERT HERE","TAS":"LINK INSERT HERE","ALA":"LINK INSERT HERE",
-    "PEW":"LINK INSERT HERE","ISB":"LINK INSERT HERE","SKT":"LINK INSERT HERE","ATQ":"LINK INSERT HERE",
-    "LHE":"LINK INSERT HERE","MUX":"LINK INSERT HERE","KHI":"LINK INSERT HERE","AMD":"LINK INSERT HERE",
-    "DEL":"LINK INSERT HERE","KTM":"LINK INSERT HERE","DAC":"LINK INSERT HERE","CCU":"LINK INSERT HERE",
-    "NAG":"LINK INSERT HERE","BOM":"LINK INSERT HERE","GOX":"LINK INSERT HERE","HYD":"LINK INSERT HERE",
-    "BLR":"LINK INSERT HERE","MAA":"LINK INSERT HERE","CCJ":"LINK INSERT HERE","COK":"LINK INSERT HERE",
-    "TRV":"LINK INSERT HERE","CMB":"LINK INSERT HERE","MLE":"LINK INSERT HERE","AKL":"LINK INSERT HERE",
-    "BNE":"LINK INSERT HERE","SYD":"LINK INSERT HERE","MEL":"LINK INSERT HERE","ADL":"LINK INSERT HERE",
-    "PER":"LINK INSERT HERE","DPS":"LINK INSERT HERE","CGK":"LINK INSERT HERE","SIN":"LINK INSERT HERE",
-    "KUL":"LINK INSERT HERE","HKT":"LINK INSERT HERE","PEN":"LINK INSERT HERE","BKK":"LINK INSERT HERE",
-    "SGN":"LINK INSERT HERE","PNH":"LINK INSERT HERE","CEB":"LINK INSERT HERE","DVO":"LINK INSERT HERE",
-    "MNL":"LINK INSERT HERE","CRK":"LINK INSERT HERE","HAN":"LINK INSERT HERE","CAN":"LINK INSERT HERE",
-    "TFU":"LINK INSERT HERE","CKG":"LINK INSERT HERE","PKX":"LINK INSERT HERE","HGH":"LINK INSERT HERE",
-    "PVG":"LINK INSERT HERE","ICN":"LINK INSERT HERE","KIX":"LINK INSERT HERE","NRT":"LINK INSERT HERE",
-    "HKG":"LINK INSERT HERE",
-    // GRU additions
-    "AJU":"LINK INSERT HERE","BEL":"LINK INSERT HERE","CNF":"LINK INSERT HERE","BSB":"LINK INSERT HERE",
-    "AEP":"LINK INSERT HERE","CGR":"LINK INSERT HERE","CAC":"LINK INSERT HERE","CXJ":"LINK INSERT HERE",
-    "XAP":"LINK INSERT HERE","CGB":"LINK INSERT HERE","CWB":"LINK INSERT HERE","FEN":"LINK INSERT HERE",
-    "FLN":"LINK INSERT HERE","FOR":"LINK INSERT HERE","IGU":"LINK INSERT HERE","GYN":"LINK INSERT HERE",
-    "IOS":"LINK INSERT HERE","IMP":"LINK INSERT HERE","JJG":"LINK INSERT HERE","JJD":"LINK INSERT HERE",
-    "JPA":"LINK INSERT HERE","JOI":"LINK INSERT HERE","JDO":"LINK INSERT HERE","LIM":"LINK INSERT HERE",
-    "LDB":"LINK INSERT HERE","MCZ":"LINK INSERT HERE","MAO":"LINK INSERT HERE","MGF":"LINK INSERT HERE",
-    "MDZ":"LINK INSERT HERE","MEX":"LINK INSERT HERE","MOC":"LINK INSERT HERE","MVD":"LINK INSERT HERE",
-    "NAT":"LINK INSERT HERE","NVT":"LINK INSERT HERE","PMW":"LINK INSERT HERE","PNZ":"LINK INSERT HERE",
-    "POA":"LINK INSERT HERE","BPS":"LINK INSERT HERE","PVH":"LINK INSERT HERE","REC":"LINK INSERT HERE",
-    "RBR":"LINK INSERT HERE","GIG":"LINK INSERT HERE","SDU":"LINK INSERT HERE","SSA":"LINK INSERT HERE",
-    "SJP":"LINK INSERT HERE","SLZ":"LINK INSERT HERE","OPS":"LINK INSERT HERE","THE":"LINK INSERT HERE",
-    "UDI":"LINK INSERT HERE","VIX":"LINK INSERT HERE","VDC":"LINK INSERT HERE",
-    // DUB and related
-    "DUB":"LINK INSERT HERE","ABZ":"LINK INSERT HERE","AMS":"LINK INSERT HERE","BOD":"LINK INSERT HERE",
-    "BES":"LINK INSERT HERE","BRS":"LINK INSERT HERE","BRU":"LINK INSERT HERE","CFN":"LINK INSERT HERE",
-    "BHD":"LINK INSERT HERE","GLA":"LINK INSERT HERE","LBA":"LINK INSERT HERE","LPL":"LINK INSERT HERE",
-    "ORK":"LINK INSERT HERE","NOC":"LINK INSERT HERE","SNN":"LINK INSERT HERE","LYS":"LINK INSERT HERE",
-    "MAN":"LINK INSERT HERE","NTE":"LINK INSERT HERE","NQY":"LINK INSERT HERE","PGF":"LINK INSERT HERE",
-    "RNS":"LINK INSERT HERE","SOU":"LINK INSERT HERE"
-  };
+      <select
+        id="regionSelect"
+        class="border border-gray-300 px-4 py-2 rounded shadow-sm"
+      >
+        <option value="ALL">All Regions</option>
+        <option value="AF">Africa</option>
+        <option value="AS">Asia & Middle East</option>
+        <option value="EU">Europe</option>
+        <option value="NA">North America</option>
+        <option value="OC">Oceania</option>
+        <option value="SA">South America</option>
+      </select>
 
-  // ---------------------------
-  // Airports dataset (IATA -> name + coords)
-  // (All airports in the order added: DOH set, then GRU set, then DUB set)
-  // ---------------------------
-  const airports = {
-    /* DOH set (from your previous lists) */
-    "DOH": { city:"Doha", name:"Hamad Intl", lat:25.2731, lng:51.6081 },
-    "GRU": { city:"São Paulo", name:"Guarulhos Intl", lat:-23.4356, lng:-46.4731 },
-    "MIA": { city:"Miami", name:"Miami Intl", lat:25.7959, lng:-80.2870 },
-    "IAH": { city:"Houston", name:"George Bush Intercontinental", lat:29.9902, lng:-95.3368 },
-    "DFW": { city:"Dallas", name:"Dallas/Fort Worth Intl", lat:32.8998, lng:-97.0403 },
-    "LAX": { city:"Los Angeles", name:"Los Angeles Intl", lat:33.9416, lng:-118.4085 },
-    "SFO": { city:"San Francisco", name:"San Francisco Intl", lat:37.6213, lng:-122.3790 },
-    "SEA": { city:"Seattle", name:"Seattle-Tacoma Intl", lat:47.4502, lng:-122.3088 },
-    "ORD": { city:"Chicago", name:"O'Hare Intl", lat:41.9742, lng:-87.9073 },
-    "YYZ": { city:"Toronto", name:"Pearson Intl", lat:43.6777, lng:-79.6248 },
-    "YUL": { city:"Montreal", name:"Trudeau Intl", lat:45.4706, lng:-73.7408 },
-    "JFK": { city:"New York", name:"JFK Intl", lat:40.6413, lng:-73.7781 },
-    "ATL": { city:"Atlanta", name:"Hartsfield–Jackson Intl", lat:33.6407, lng:-84.4277 },
-    "IAD": { city:"Washington, D.C.", name:"Dulles Intl", lat:38.9531, lng:-77.4565 },
-    "BOS": { city:"Boston", name:"Logan Intl", lat:42.3656, lng:-71.0096 },
-    "ABJ": { city:"Abidjan", name:"Félix-Houphouët-Boigny Intl", lat:5.2619, lng:-3.9263 },
-    "ACC": { city:"Accra", name:"Kotoka Intl", lat:5.6052, lng:-0.1661 },
-    "LOS": { city:"Lagos", name:"Murtala Muhammed Intl", lat:6.5774, lng:3.3212 },
-    "ABV": { city:"Abuja", name:"Nnamdi Azikiwe Intl", lat:9.0068, lng:7.2632 },
-    "KAN": { city:"Kano", name:"Mallam Aminu Kano Intl", lat:12.0476, lng:8.5246 },
-    "PHC": { city:"Port Harcourt", name:"Port Harcourt Intl", lat:5.0155, lng:6.9496 },
-    "FIH": { city:"Kinshasa", name:"N'Djili Intl", lat:-4.3857, lng:15.4446 },
-    "LAD": { city:"Luanda", name:"Quatro de Fevereiro", lat:-8.8575, lng:13.2312 },
-    "CPT": { city:"Cape Town", name:"Cape Town Intl", lat:-33.9696, lng:18.5972 },
-    "MPM": { city:"Maputo", name:"Maputo Intl", lat:-25.9208, lng:32.5726 },
-    "DUR": { city:"Durban", name:"King Shaka Intl", lat:-29.6144, lng:31.1197 },
-    "JNB": { city:"Johannesburg", name:"O. R. Tambo Intl", lat:-26.1337, lng:28.2420 },
-    "LUN": { city:"Lusaka", name:"Kenneth Kaunda Intl", lat:-15.3308, lng:28.4521 },
-    "HRE": { city:"Harare", name:"Robert Gabriel Mugabe Intl", lat:-17.9318, lng:31.0928 },
-    "SEZ": { city:"Mahé", name:"Seychelles Intl", lat:-4.6743, lng:55.5218 },
-    "EBB": { city:"Entebbe", name:"Entebbe Intl", lat:0.0424, lng:32.4435 },
-    "KGL": { city:"Kigali", name:"Kigali Intl", lat:-1.9686, lng:30.1395 },
-    "NBO": { city:"Nairobi", name:"Jomo Kenyatta Intl", lat:-1.3192, lng:36.9278 },
-    "JRO": { city:"Kilimanjaro", name:"Kilimanjaro Intl", lat:-3.4294, lng:37.0745 },
-    "DAR": { city:"Dar es Salaam", name:"Julius Nyerere Intl", lat:-6.8781, lng:39.2026 },
-    "ZNZ": { city:"Zanzibar", name:"Abeid Amani Karume Intl", lat:-6.2219, lng:39.2249 },
-    "JIB": { city:"Djibouti", name:"Ambouli Intl", lat:11.5473, lng:43.1595 },
-    "MGQ": { city:"Mogadishu", name:"Aden Adde Intl", lat:2.0144, lng:45.3048 },
-    "CAI": { city:"Cairo", name:"Cairo Intl", lat:30.1127, lng:31.4004 },
-    "HBE": { city:"Alexandria", name:"Borg El Arab", lat:30.9177, lng:29.6964 },
-    "CMN": { city:"Casablanca", name:"Mohammed V Intl", lat:33.3672, lng:-7.5898 },
-    "RAK": { city:"Marrakesh", name:"Menara Intl", lat:31.6069, lng:-8.0363 },
-    "ALG": { city:"Algiers", name:"Houari Boumediene", lat:36.6910, lng:3.2153 },
-    "TUN": { city:"Tunis", name:"Carthage Intl", lat:36.8510, lng:10.2272 },
-    "MLA": { city:"Malta", name:"Luqa Airport", lat:35.8575, lng:14.4775 },
-    "AGP": { city:"Málaga", name:"Costa del Sol Airport", lat:36.6749, lng:-4.4991 },
-    "LIS": { city:"Lisbon", name:"Humberto Delgado", lat:38.7742, lng:-9.1342 },
-    "MAD": { city:"Madrid", name:"Adolfo Suárez Madrid–Barajas", lat:40.4983, lng:-3.5676 },
-    "BCN": { city:"Barcelona", name:"El Prat", lat:41.2974, lng:2.0833 },
-    "NCE": { city:"Nice", name:"Côte d'Azur Intl", lat:43.6606, lng:7.2159 },
-    "FCO": { city:"Rome", name:"Fiumicino", lat:41.8003, lng:12.2389 },
-    "MXP": { city:"Milan", name:"Malpensa", lat:45.6306, lng:8.7281 },
-    "GVA": { city:"Geneva", name:"Geneva Airport", lat:46.2381, lng:6.1090 },
-    "VCE": { city:"Venice", name:"Venice Marco Polo", lat:45.5053, lng:12.3519 },
-    "ZRH": { city:"Zurich", name:"Zurich Airport", lat:47.4581, lng:8.5556 },
-    "CDG": { city:"Paris", name:"Charles de Gaulle", lat:49.0097, lng:2.5479 },
-    "LGW": { city:"London", name:"Gatwick", lat:51.1537, lng:-0.1821 },
-    "LHR": { city:"London", name:"Heathrow", lat:51.4700, lng:-0.4543 },
-    "BHX": { city:"Birmingham", name:"Birmingham Airport", lat:52.4539, lng:-1.7480 },
-    "MAN": { city:"Manchester", name:"Manchester Airport", lat:53.3651, lng:-2.2727 },
-    "DUB": { city:"Dublin", name:"Dublin Airport", lat:53.4213, lng:-6.2701 },
-    "EDI": { city:"Edinburgh", name:"Edinburgh Airport", lat:55.9500, lng:-3.3725 },
-    "FRA": { city:"Frankfurt", name:"Frankfurt Airport", lat:50.0379, lng:8.5622 },
-    "DUS": { city:"Düsseldorf", name:"Düsseldorf Airport", lat:51.2895, lng:6.7668 },
-    "BRU": { city:"Brussels", name:"Brussels Airport", lat:50.9014, lng:4.4844 },
-    "AMS": { city:"Amsterdam", name:"Schiphol", lat:52.3105, lng:4.7683 },
-    "HAM": { city:"Hamburg", name:"Hamburg Airport", lat:53.6304, lng:9.9882 },
-    "CPH": { city:"Copenhagen", name:"Kastrup", lat:55.6181, lng:12.6561 },
-    "BER": { city:"Berlin", name:"Berlin Brandenburg", lat:52.3667, lng:13.5033 },
-    "MUC": { city:"Munich", name:"Munich Airport", lat:48.3538, lng:11.7861 },
-    "OSL": { city:"Oslo", name:"Gardermoen", lat:60.1976, lng:11.1004 },
-    "ARN": { city:"Stockholm", name:"Arlanda", lat:59.6498, lng:17.9237 },
-    "WAW": { city:"Warsaw", name:"Chopin Airport", lat:52.1657, lng:20.9671 },
-    "PRG": { city:"Prague", name:"Václav Havel", lat:50.1008, lng:14.26 },
-    "VIE": { city:"Vienna", name:"Vienna Intl", lat:48.1103, lng:16.5697 },
-    "BUD": { city:"Budapest", name:"Ferenc Liszt Intl", lat:47.4393, lng:19.2619 },
-    "ZAG": { city:"Zagreb", name:"Franjo Tuđman", lat:45.7429, lng:16.0688 },
-    "BEG": { city:"Belgrade", name:"Nikola Tesla", lat:44.8194, lng:20.3069 },
-    "SJJ": { city:"Sarajevo", name:"Sarajevo Intl", lat:43.8246, lng:18.3315 },
-    "OTP": { city:"Bucharest", name:"Henri Coandă", lat:44.5711, lng:26.0850 },
-    "SVO": { city:"Moscow", name:"Sheremetyevo Intl", lat:55.9726, lng:37.4146 },
-    "ATH": { city:"Athens", name:"Athens Intl", lat:37.9364, lng:23.9475 },
-    "JMK": { city:"Mykonos", name:"Mykonos Airport", lat:37.4351, lng:25.3481 },
-    "BJV": { city:"Bodrum", name:"Milas–Bodrum", lat:37.2506, lng:27.6672 },
-    "AYT": { city:"Antalya", name:"Antalya Airport", lat:36.8993, lng:30.8006 },
-    "IST": { city:"Istanbul", name:"Istanbul Airport", lat:41.2753, lng:28.7519 },
-    "SAW": { city:"Istanbul", name:"Sabiha Gökçen", lat:40.8986, lng:29.3092 },
-    "ESB": { city:"Ankara", name:"Esenboğa Intl", lat:40.1281, lng:32.9951 },
-    "TZX": { city:"Trabzon", name:"Trabzon Airport", lat:40.9951, lng:39.7897 },
-    "TBS": { city:"Tbilisi", name:"Tbilisi Intl", lat:41.6692, lng:44.9547 },
-    "EVN": { city:"Yerevan", name:"Zvartnots Intl", lat:40.1473, lng:44.3959 },
-    "GYD": { city:"Baku", name:"Heydar Aliyev Intl", lat:40.4675, lng:50.0467 },
-    "LCA": { city:"Larnaca", name:"Larnaca Intl", lat:34.8751, lng:33.6249 },
-    "BEY": { city:"Beirut", name:"Rafic Hariri Intl", lat:33.8209, lng:35.4884 },
-    "DAM": { city:"Damascus", name:"Damascus Intl", lat:33.4115, lng:36.5156 },
-    "AMM": { city:"Amman", name:"Queen Alia Intl", lat:31.7226, lng:35.9932 },
-    "TUU": { city:"Tabuk", name:"Tabuk Regional", lat:28.3654, lng:36.6189 },
-    "NUM": { city:"Neom", name:"Neom Bay Airport", lat:27.9276, lng:35.2881 },
-    "ULH": { city:"AlUla", name:"Prince Abdul Majeed", lat:26.6367, lng:37.9080 },
-    "YNB": { city:"Yanbu", name:"Yanbu Airport", lat:24.1442, lng:38.0634 },
-    "MED": { city:"Medina", name:"Prince Mohammad bin Abdulaziz", lat:24.5534, lng:39.7051 },
-    "JED": { city:"Jeddah", name:"King Abdulaziz Intl", lat:21.6702, lng:39.1528 },
-    "TIF": { city:"Taif", name:"Taif Regional", lat:21.4834, lng:40.5443 },
-    "AHB": { city:"Abha", name:"Abha Intl", lat:18.2404, lng:42.6566 },
-    "ELQ": { city:"Buraidah", name:"Prince Nayef", lat:26.3028, lng:43.7744 },
-    "RUH": { city:"Riyadh", name:"King Khalid Intl", lat:24.9576, lng:46.6988 },
-    "SLL": { city:"Salalah", name:"Salalah Airport", lat:17.0387, lng:54.0913 },
-    "EBL": { city:"Erbil", name:"Erbil Intl", lat:36.2376, lng:43.9632 },
-    "ISU": { city:"Sulaymaniyah", name:"Sulaymaniyah Intl", lat:35.5618, lng:45.3167 },
-    "BGW": { city:"Baghdad", name:"Baghdad Intl", lat:33.2625, lng:44.2346 },
-    "NJF": { city:"Najaf", name:"Al Najaf Intl", lat:31.9899, lng:44.4043 },
-    "BSR": { city:"Basra", name:"Basra Intl", lat:30.5491, lng:47.6621 },
-    "KWI": { city:"Kuwait City", name:"Kuwait Intl", lat:29.2266, lng:47.9689 },
-    "IKA": { city:"Tehran", name:"Imam Khomeini Intl", lat:35.4161, lng:51.1522 },
-    "MHD": { city:"Mashhad", name:"Mashhad Intl", lat:36.2352, lng:59.6409 },
-    "SYZ": { city:"Shiraz", name:"Shiraz Intl", lat:29.5392, lng:52.5898 },
-    "DMM": { city:"Dammam", name:"King Fahd Intl", lat:26.4711, lng:49.7979 },
-    "BAH": { city:"Bahrain", name:"Bahrain Intl", lat:26.2708, lng:50.6336 },
-    "AUH": { city:"Abu Dhabi", name:"Zayed Intl", lat:24.4539, lng:54.3773 },
-    "DXB": { city:"Dubai", name:"Dubai Intl", lat:25.2532, lng:55.3657 },
-    "SHJ": { city:"Sharjah", name:"Sharjah Intl", lat:25.3286, lng:55.5172 },
-    "MCT": { city:"Muscat", name:"Muscat Intl", lat:23.5933, lng:58.2844 },
-    "TAS": { city:"Tashkent", name:"Tashkent Intl", lat:41.2622, lng:69.2636 },
-    "ALA": { city:"Almaty", name:"Almaty Intl", lat:43.3521, lng:77.0405 },
-    "PEW": { city:"Peshawar", name:"Bacha Khan Intl", lat:33.9939, lng:71.5146 },
-    "ISB": { city:"Islamabad", name:"Islamabad Intl", lat:33.5607, lng:72.8516 },
-    "SKT": { city:"Sialkot", name:"Sialkot Intl", lat:32.5356, lng:74.3639 },
-    "ATQ": { city:"Amritsar", name:"Sri Guru Ram Dass Jee Intl", lat:31.7096, lng:74.7973 },
-    "LHE": { city:"Lahore", name:"Allama Iqbal Intl", lat:31.5216, lng:74.4036 },
-    "MUX": { city:"Multan", name:"Multan Intl", lat:30.2032, lng:71.4191 },
-    "KHI": { city:"Karachi", name:"Jinnah Intl", lat:24.9065, lng:67.1608 },
-    "AMD": { city:"Ahmedabad", name:"Sardar Vallabhbhai Patel Intl", lat:23.0772, lng:72.6347 },
-    "DEL": { city:"Delhi", name:"Indira Gandhi Intl", lat:28.5562, lng:77.1000 },
-    "KTM": { city:"Kathmandu", name:"Tribhuvan Intl", lat:27.6966, lng:85.3591 },
-    "DAC": { city:"Dhaka", name:"Hazrat Shahjalal Intl", lat:23.8433, lng:90.3978 },
-    "CCU": { city:"Kolkata", name:"Netaji Subhas Chandra Bose Intl", lat:22.6547, lng:88.4467 },
-    "NAG": { city:"Nagpur", name:"Dr. Babasaheb Ambedkar Intl", lat:21.0922, lng:79.0472 },
-    "BOM": { city:"Mumbai", name:"Chhatrapati Shivaji Maharaj Intl", lat:19.0896, lng:72.8656 },
-    "GOX": { city:"Mopa", name:"Manohar Intl", lat:15.3808, lng:73.8381 },
-    "HYD": { city:"Hyderabad", name:"Rajiv Gandhi Intl", lat:17.2403, lng:78.4294 },
-    "BLR": { city:"Bengaluru", name:"Kempegowda Intl", lat:13.1986, lng:77.7066 },
-    "MAA": { city:"Chennai", name:"Chennai Intl", lat:12.9941, lng:80.1709 },
-    "CCJ": { city:"Kozhikode", name:"Calicut Intl", lat:11.1368, lng:75.9553 },
-    "COK": { city:"Kochi", name:"Cochin Intl", lat:10.1520, lng:76.4019 },
-    "TRV": { city:"Thiruvananthapuram", name:"Trivandrum Intl", lat:8.4821, lng:76.9201 },
-    "CMB": { city:"Colombo", name:"Bandaranaike Intl", lat:7.1808, lng:79.8841 },
-    "MLE": { city:"Male", name:"Velana Intl", lat:4.1918, lng:73.5291 },
-    "AKL": { city:"Auckland", name:"Auckland Intl", lat:-37.0082, lng:174.7850 },
-    "BNE": { city:"Brisbane", name:"Brisbane Airport", lat:-27.3842, lng:153.1175 },
-    "SYD": { city:"Sydney", name:"Kingsford Smith Intl", lat:-33.9399, lng:151.1753 },
-    "MEL": { city:"Melbourne", name:"Melbourne Airport", lat:-37.6733, lng:144.8430 },
-    "ADL": { city:"Adelaide", name:"Adelaide Airport", lat:-34.9450, lng:138.5306 },
-    "PER": { city:"Perth", name:"Perth Airport", lat:-31.9403, lng:115.9672 },
-    "DPS": { city:"Bali", name:"Ngurah Rai Intl", lat:-8.7482, lng:115.1670 },
-    "CGK": { city:"Jakarta", name:"Soekarno–Hatta Intl", lat:-6.1256, lng:106.6559 },
-    "SIN": { city:"Singapore", name:"Changi Airport", lat:1.3644, lng:103.9915 },
-    "KUL": { city:"Kuala Lumpur", name:"Kuala Lumpur Intl", lat:2.7456, lng:101.7096 },
-    "HKT": { city:"Phuket", name:"Phuket Intl", lat:8.1132, lng:98.3169 },
-    "PEN": { city:"Penang", name:"Penang Intl", lat:5.2971, lng:100.2770 },
-    "BKK": { city:"Bangkok", name:"Suvarnabhumi Airport", lat:13.6900, lng:100.7501 },
-    "SGN": { city:"Ho Chi Minh City", name:"Tan Son Nhat Intl", lat:10.8188, lng:106.6520 },
-    "PNH": { city:"Phnom Penh", name:"Phnom Penh Intl", lat:11.5466, lng:104.8440 },
-    "CEB": { city:"Cebu", name:"Mactan–Cebu Intl", lat:10.3133, lng:123.9826 },
-    "DVO": { city:"Davao", name:"Francisco Bangoy Intl", lat:7.1257, lng:125.6467 },
-    "MNL": { city:"Manila", name:"Ninoy Aquino Intl", lat:14.5086, lng:121.0198 },
-    "CRK": { city:"Clark", name:"Clark Intl", lat:15.1860, lng:120.5596 },
-    "HAN": { city:"Hanoi", name:"Noi Bai Intl", lat:21.2211, lng:105.8072 },
-    "CAN": { city:"Guangzhou", name:"Guangzhou Baiyun Intl", lat:23.3924, lng:113.2988 },
-    "TFU": { city:"Chengdu", name:"Tianfu Intl", lat:30.3144, lng:104.4410 },
-    "CKG": { city:"Chongqing", name:"Jiangbei Intl", lat:29.7192, lng:106.6417 },
-    "PKX": { city:"Beijing", name:"Beijing Daxing Intl", lat:39.5098, lng:116.4106 },
-    "HGH": { city:"Hangzhou", name:"Hangzhou Xiaoshan Intl", lat:30.2295, lng:120.4345 },
-    "PVG": { city:"Shanghai", name:"Shanghai Pudong Intl", lat:31.1443, lng:121.8083 },
-    "ICN": { city:"Seoul", name:"Incheon Intl", lat:37.4602, lng:126.4407 },
-    "KIX": { city:"Osaka", name:"Kansai Intl", lat:34.4273, lng:135.2440 },
-    "NRT": { city:"Tokyo", name:"Narita Intl", lat:35.7732, lng:140.3874 },
-    "HKG": { city:"Hong Kong", name:"Hong Kong Intl", lat:22.3080, lng:113.9185 },
+      <input
+        id="airportSearch"
+        type="text"
+        placeholder="Search airport..."
+        class="border border-gray-300 px-4 py-2 rounded w-60 shadow-sm"
+      />
 
-    /* GRU additions (order preserved) */
-    "AJU": { city: "Aracaju", name: "Santa Maria Airport", lat: -10.9840, lng: -37.0703 },
-    "BEL": { city: "Belém", name: "Val de Cans Intl", lat: -1.3793, lng: -48.4763 },
-    "CNF": { city: "Belo Horizonte", name: "Tancredo Neves Intl", lat: -19.6244, lng: -43.9719 },
-    "BSB": { city: "Brasília", name: "Brasília Intl", lat: -15.8697, lng: -47.9208 },
-    "AEP": { city: "Buenos Aires", name: "Aeroparque Jorge Newbery", lat: -34.5592, lng: -58.4156 },
-    "CGR": { city: "Campo Grande", name: "Campo Grande Intl", lat: -20.4695, lng: -54.6725 },
-    "CAC": { city: "Cascavel", name: "Cascavel Airport", lat: -25.0003, lng: -53.5008 },
-    "CXJ": { city: "Caxias do Sul", name: "Hugo Cantergiani Airport", lat: -29.1971, lng: -51.1875 },
-    "XAP": { city: "Chapecó", name: "Serafin Enoss Bertaso Airport", lat: -27.1342, lng: -52.6566 },
-    "CGB": { city: "Cuiabá", name: "Marechal Rondon Intl", lat: -15.6529, lng: -56.1167 },
-    "CWB": { city: "Curitiba", name: "Afonso Pena Intl", lat: -25.5285, lng: -49.1758 },
-    "FEN": { city: "Fernando de Noronha", name: "Fernando de Noronha Airport", lat: -3.8549, lng: -32.4233 },
-    "FLN": { city: "Florianópolis", name: "Hercílio Luz Intl", lat: -27.6705, lng: -48.5525 },
-    "FOR": { city: "Fortaleza", name: "Pinto Martins Intl", lat: -3.7763, lng: -38.5326 },
-    "IGU": { city: "Foz do Iguaçu", name: "Cataratas Intl", lat: -25.6003, lng: -54.4850 },
-    "GYN": { city: "Goiânia", name: "Santa Genoveva Airport", lat: -16.6320, lng: -49.2207 },
-    "IOS": { city: "Ilhéus", name: "Jorge Amado Airport", lat: -14.8150, lng: -39.0332 },
-    "IMP": { city: "Imperatriz", name: "Prefeito Renato Moreira Airport", lat: -5.5313, lng: -47.4598 },
-    "JJG": { city: "Jaguaruna", name: "Humberto Ghizzo Bortoluzzi Airport", lat: -28.6753, lng: -49.0596 },
-    "JJD": { city: "Jericoacoara", name: "Comandante Ariston Pessoa Airport", lat: -2.9060, lng: -40.3547 },
-    "JPA": { city: "João Pessoa", name: "Presidente Castro Pinto Intl", lat: -7.1450, lng: -34.9486 },
-    "JOI": { city: "Joinville", name: "Lauro Carneiro de Loyola Airport", lat: -26.2245, lng: -48.7974 },
-    "JDO": { city: "Juazeiro do Norte", name: "Orlando Bezerra de Menezes Airport", lat: -7.2189, lng: -39.2701 },
-    "LIM": { city: "Lima", name: "Jorge Chávez Intl", lat: -12.0219, lng: -77.1143 },
-    "LDB": { city: "Londrina", name: "Governador José Richa Airport", lat: -23.3336, lng: -51.1301 },
-    "MCZ": { city: "Maceió", name: "Zumbi dos Palmares Intl", lat: -9.5108, lng: -35.7917 },
-    "MAO": { city: "Manaus", name: "Eduardo Gomes Intl", lat: -3.0386, lng: -60.0497 },
-    "MGF": { city: "Maringá", name: "Silvio Name Junior Regional Airport", lat: -23.4764, lng: -52.0164 },
-    "MDZ": { city: "Mendoza", name: "Governor Francisco Gabrielli Intl", lat: -32.8328, lng: -68.7929 },
-    "MEX": { city: "Mexico City", name: "Mexico City Intl", lat: 19.4361, lng: -99.0719 },
-    "MOC": { city: "Montes Claros", name: "Mario Ribeiro Airport", lat: -16.7069, lng: -43.8189 },
-    "MVD": { city: "Montevideo", name: "Carrasco Intl", lat: -34.8384, lng: -56.0308 },
-    "NAT": { city: "Natal", name: "Greater Natal Intl", lat: -5.7681, lng: -35.3761 },
-    "NVT": { city: "Navegantes", name: "Ministro Victor Konder Intl", lat: -26.8799, lng: -48.6514 },
-    "PMW": { city: "Palmas", name: "Palmas Airport", lat: -10.2915, lng: -48.3560 },
-    "PNZ": { city: "Petrolina", name: "Senador Nilo Coelho Airport", lat: -9.3624, lng: -40.5691 },
-    "POA": { city: "Porto Alegre", name: "Salgado Filho Intl", lat: -29.9939, lng: -51.1711 },
-    "BPS": { city: "Porto Seguro", name: "Porto Seguro Airport", lat: -16.4386, lng: -39.0809 },
-    "PVH": { city: "Porto Velho", name: "Governador Jorge Teixeira de Oliveira Intl", lat: -8.7093, lng: -63.9023 },
-    "REC": { city: "Recife", name: "Recife/Guararapes Intl", lat: -8.1265, lng: -34.9236 },
-    "RBR": { city: "Rio Branco", name: "Rio Branco Intl", lat: -9.8689, lng: -67.8981 },
-    "GIG": { city: "Rio de Janeiro", name: "Galeão–Antonio Carlos Jobim", lat: -22.8090, lng: -43.2506 },
-    "SDU": { city: "Rio de Janeiro", name: "Santos Dumont Airport", lat: -22.9105, lng: -43.1631 },
-    "SSA": { city: "Salvador", name: "Deputado Luís Eduardo Magalhães Intl", lat: -12.9086, lng: -38.3225 },
-    "SJP": { city: "São José do Rio Preto", name: "Prof. Eribelto Manoel Reino Airport", lat: -20.8166, lng: -49.4065 },
-    "SLZ": { city: "São Luís", name: "Marechal Cunha Machado Intl", lat: -2.5864, lng: -44.2361 },
-    "OPS": { city: "Sinop", name: "Presidente João Batista Figueiredo Airport", lat: -11.8850, lng: -55.5860 },
-    "THE": { city: "Teresina", name: "Teresina Airport", lat: -5.0599, lng: -42.8235 },
-    "UDI": { city: "Uberlândia", name: "Uberlândia Airport", lat: -18.8836, lng: -48.2253 },
-    "VIX": { city: "Vitória", name: "Eurico de Aguiar Salles Airport", lat: -20.2581, lng: -40.2864 },
-    "VDC": { city: "Vitória da Conquista", name: "Glauber Rocha Airport", lat: -14.8628, lng: -40.8631 },
+      <label class="flex items-center gap-2 cursor-pointer text-gray-700 font-medium">
+        <input
+          type="checkbox"
+          id="showLinesToggle"
+          class="w-4 h-4 accent-[#8B1538] cursor-pointer"
+        />
+        Show Lines
+      </label>
+    </div>
 
-    /* DUB & UK / FR / BE airports (order preserved) */
-    "ABZ": { city: "Aberdeen", name: "Aberdeen Airport", lat: 57.2019, lng: -2.1978 },
-    "BOD": { city: "Bordeaux", name: "Bordeaux–Mérignac Airport", lat: 44.8283, lng: -0.7156 },
-    "BES": { city: "Brest", name: "Brest Bretagne Airport", lat: 48.4479, lng: -4.4185 },
-    "BRS": { city: "Bristol", name: "Bristol Airport", lat: 51.3827, lng: -2.7191 },
-    "CFN": { city: "Donegal", name: "Donegal Airport", lat: 55.0442, lng: -8.3400 },
-    "BHD": { city: "Belfast", name: "George Best Belfast City Airport", lat: 54.6181, lng: -5.8725 },
-    "GLA": { city: "Glasgow", name: "Glasgow Airport", lat: 55.8719, lng: -4.4331 },
-    "LBA": { city: "Leeds", name: "Leeds Bradford Airport", lat: 53.8659, lng: -1.6606 },
-    "LPL": { city: "Liverpool", name: "Liverpool John Lennon Airport", lat: 53.3336, lng: -2.8497 },
-    "ORK": { city: "Cork", name: "Cork Airport", lat: 51.8413, lng: -8.4911 },
-    "NOC": { city: "Knock", name: "Ireland West Airport Knock", lat: 53.9103, lng: -8.8185 },
-    "SNN": { city: "Shannon", name: "Shannon Airport", lat: 52.7019, lng: -8.9248 },
-    "LYS": { city: "Lyon", name: "Lyon–Saint-Exupéry Airport", lat: 45.7256, lng: 5.0811 },
-    "NTE": { city: "Nantes", name: "Nantes Atlantique Airport", lat: 47.1532, lng: -1.6107 },
-    "NQY": { city: "Newquay", name: "Cornwall Airport Newquay", lat: 50.4406, lng: -4.9954 },
-    "PGF": { city: "Perpignan", name: "Perpignan–Rivesaltes Airport", lat: 42.7404, lng: 2.8707 },
-    "RNS": { city: "Rennes", name: "Rennes–Saint-Jacques Airport", lat: 48.0695, lng: -1.7348 },
-    "SOU": { city: "Southampton", name: "Southampton Airport", lat: 50.9503, lng: -1.3568 },
-"OUD": { city: "Oujda", name: "Oujda Angads Airport", lat: 34.7872, lng: -1.92399 },
-"VIL": { city: "Dakhla", name: "Dakhla Airport", lat: 23.7183, lng: -15.9320 },
-"EUN": { city: "El Aaiún", name: "Hassan I Airport", lat: 27.1517, lng: -13.2192 },
-"AGA": { city: "Agadir", name: "Agadir–Al Massira Airport", lat: 30.3250, lng: -9.41307 },
-"DSS": { city: "Dakar", name: "Blaise Diagne International Airport", lat: 14.6711, lng: -17.0731 },
-"NDR": { city: "Nador", name: "Nador International Airport", lat: 34.9888, lng: -3.0282 },
-"LBV": { city: "Libreville", name: "Libreville International Airport", lat: 0.4586, lng: 9.4123 },
-"SSG": { city: "Malabo", name: "Malabo International Airport", lat: 3.7553, lng: 8.7087 },
-"ERH": { city: "Errachidia", name: "Moulay Ali Cherif Airport", lat: 31.9475, lng: -4.3983 },
-"TTU": { city: "Tetouan", name: "Sania Ramel Airport", lat: 35.5943, lng: -5.3200 },
-"AHU": { city: "Al Hoceima", name: "Cherif Al Idrissi Airport", lat: 35.1771, lng: -3.8395 },
-"VLC": { city: "Valencia", name: "Valencia Airport", lat: 39.4893, lng: -0.4816 },
-"OZZ": { city: "Ouarzazate", name: "Ouarzazate Airport", lat: 30.9390, lng: -6.9094 },
-"NKC": { city: "Nouakchott", name: "Nouakchott–Oumtounsy International Airport", lat: 18.0979, lng: -15.9470 },
-"BJL": { city: "Banjul", name: "Banjul International Airport", lat: 13.3380, lng: -16.6522 },
-"CKY": { city: "Conakry", name: "Conakry International Airport", lat: 9.5769, lng: -13.6120 },
-"NSI": { city: "Yaoundé", name: "Yaoundé Nsimalen International Airport", lat: 3.7226, lng: 11.5533 },
-"OUA": { city: "Ouagadougou", name: "Ouagadougou Airport", lat: 12.3532, lng: -1.5124 },
-"BKO": { city: "Bamako", name: "Modibo Keita International Airport", lat: 12.5335, lng: -7.9499 },
-"NIM": { city: "Niamey", name: "Diori Hamani International Airport", lat: 13.4815, lng: 2.1836 },
-"WVB": { city: "Walvis Bay", name: "Walvis Bay Airport", lat: -22.9799, lng: 14.6453 },
-"TET": { city: "Tete", name: "Chingozi Airport", lat: -16.1048, lng: 33.6402 },
-"FBM": { city: "Lubumbashi", name: "Lubumbashi International Airport", lat: -11.5913, lng: 27.5309 },
-"BEW": { city: "Beira", name: "Beira Airport", lat: -19.7964, lng: 34.9076 },
-"LLW": { city: "Lilongwe", name: "Lilongwe International Airport", lat: -13.7894, lng: 33.7800 },
-"LVI": { city: "Livingstone", name: "Harry Mwanga Nkumbula Intl", lat: -17.8218, lng: 25.8227 },
-"VNX": { city: "Vilankulo", name: "Vilankulo Airport", lat: -22.0184, lng: 35.3133 },
-"POL": { city: "Pemba", name: "Pemba Airport", lat: -12.9918, lng: 40.5240 },
-"VFA": { city: "Victoria Falls", name: "Victoria Falls Airport", lat: -18.0959, lng: 25.8390 },
-"BBK": { city: "Kasane", name: "Kasane Airport", lat: -17.8329, lng: 25.1624 },
-"MUB": { city: "Maun", name: "Maun Airport", lat: -19.9726, lng: 23.4311 },
-"HDS": { city: "Hoedspruit", name: "Air Force Base Hoedspruit", lat: -24.3686, lng: 31.0487 },
-"SZK": { city: "Skukuza", name: "Skukuza Airport", lat: -24.9609, lng: 31.5887 },
-"BUQ": { city: "Bulawayo", name: "Joshua Mqabuko Nkomo Intl", lat: -20.0174, lng: 28.6179 },
-"WDH": { city: "Windhoek", name: "Hosea Kutako International Airport", lat: -22.4799, lng: 17.4700 },
-"GBE": { city: "Gaborone", name: "Sir Seretse Khama International Airport", lat: -24.5552, lng: 25.9182 },
-"UTN": { city: "Upington", name: "Upington Airport", lat: -28.3991, lng: 21.2602 },
-"PTG": { city: "Polokwane", name: "Polokwane International Airport", lat: -23.8453, lng: 29.4586 },
-"PLZ": { city: "Port Elizabeth", name: "Chief Dawid Stuurman Intl", lat: -33.9849, lng: 25.6106 },
-"MQP": { city: "Nelspruit", name: "Kruger Mpumalanga Intl", lat: -25.3832, lng: 31.1056 },
-"NLA": { city: "Ndola", name: "Simon Mwansa Kapwepwe Intl", lat: -12.9981, lng: 28.6649 },
-"APL": { city: "Nampula", name: "Nampula Airport", lat: -15.1056, lng: 39.2818 },
-"BLZ": { city: "Blantyre", name: "Chileka International Airport", lat: -15.6791, lng: 34.9740 },
-"UTT": { city: "Mthatha", name: "Mthatha Airport", lat: -31.5479, lng: 28.6748 },
-"KIM": { city: "Kimberley", name: "Kimberley Airport", lat: -28.8028, lng: 24.7652 },
-"HRE": { city: "Harare", name: "Robert Gabriel Mugabe Intl", lat: -17.9318, lng: 31.0928 },
-"PZB": { city: "Pietermaritzburg", name: "Pietermaritzburg Airport", lat: -29.6490, lng: 30.3987 },
-"BFN": { city: "Bloemfontein", name: "Bram Fischer International Airport", lat: -29.0927, lng: 26.3024 },
-"ELS": { city: "East London", name: "East London Airport", lat: -33.0356, lng: 27.8259 },
-"TNR": { city: "Antananarivo", name: "Ivato International Airport", lat: -18.7969, lng: 47.4788 },
-"MSU": { city: "Maseru", name: "Moshoeshoe I International Airport", lat: -29.4623, lng: 27.5525 },
-"RCB": { city: "Richards Bay", name: "Richards Bay Airport", lat: -28.7410, lng: 32.0921 },
-"HLE": { city: "Jamestown", name: "Saint Helena Airport", lat: -15.9577, lng: -5.6450 },
-"AUS": { city:"Austin", name:"Austin–Bergstrom International", lat:30.1944, lng:-97.6700 },
-"BOG": { city:"Bogotá", name:"El Dorado International", lat:4.7014, lng:-74.1469 },
-"CME": { city:"Ciudad del Carmen", name:"Ciudad del Carmen International", lat:18.6537, lng:-91.7990 },
-"DEN": { city:"Denver", name:"Denver International", lat:39.8617, lng:-104.6731 },
-"GDL": { city:"Guadalajara", name:"Miguel Hidalgo y Costilla International", lat:20.5197, lng:-103.3067 },
-"GUA": { city:"Guatemala City", name:"La Aurora International", lat:14.5833, lng:-90.5275 },
-"LAS": { city:"Las Vegas", name:"Harry Reid International", lat:36.0831, lng:-115.1483 },
-"LIM": { city:"Lima", name:"Jorge Chávez International", lat:-12.0219, lng:-77.1143 },
-"MCO": { city:"Orlando", name:"Orlando International", lat:28.4286, lng:-81.3086 },
-"UIO": { city:"Quito", name:"Mariscal Sucre International", lat:-0.1133, lng:-78.3586 },
-"SJO": { city:"San José", name:"Juan Santamaría International", lat:9.9936, lng:-84.2086 },
-"SJD": { city:"San José del Cabo", name:"Los Cabos International", lat:23.1550, lng:-109.7250 },
-"SCL": { city:"Santiago", name:"Arturo Merino Benítez International", lat:-33.3906, lng:-70.7858 },
-"TIJ": { city:"Tijuana", name:"General Abelardo L. Rodríguez International", lat:32.54106, lng:-116.96995 },
-"AOR": { city:"Alor Star", name:"Sultan Abdul Halim Airport", lat:6.1897, lng:100.3981 },
-"BTU": { city:"Bintulu", name:"Bintulu Airport", lat:3.1240, lng:113.0200 },
-"CNX": { city:"Chiang Mai", name:"Chiang Mai International", lat:18.7670, lng:98.9626 },
-"DAD": { city:"Da Nang", name:"Da Nang International", lat:16.0436, lng:108.1990 },
-"BKI": { city:"Kota Kinabalu", name:"Kota Kinabalu International", lat:5.9447, lng:116.0586 },
-"TGG": { city:"Kuala Terengganu", name:"Sultan Mahmud Airport", lat:5.3828, lng:103.1278 },
-"KUA": { city:"Kuantan", name:"Sultan Haji Ahmad Shah Airport", lat:3.7900, lng:103.3310 },
-"KCH": { city:"Kuching", name:"Kuching International Airport", lat:1.4846, lng:110.3460 },
-"LBU": { city:"Labuan", name:"Labuan Airport", lat:5.3017, lng:115.2483 },
-"MYY": { city:"Miri", name:"Miri Airport", lat:4.3842, lng:113.9910 },
-"KNO": { city:"Medan", name:"Kualanamu International Airport", lat:3.6425, lng:98.8945 },
-"SDK": { city:"Sandakan", name:"Sandakan Airport", lat:5.8458, lng:118.0592 },
-"SBW": { city:"Sibu", name:"Sibu Airport", lat:2.2969, lng:111.8330 },
-"SUB": { city:"Surabaya", name:"Juanda International Airport", lat:-7.3791, lng:112.6670 },
-"TWU": { city:"Tawau", name:"Tawau Airport", lat:4.3133, lng:118.1219 },
-"RGN": { city:"Yangon", name:"Yangon International Airport", lat:16.9073, lng:96.1336 },
-"XCH": { city:"Christmas Island", name:"Christmas Island Airport", lat:-10.4506, lng:105.6900 },
-"BTJ": { city:"Banda Aceh", name:"Sultan Iskandar Muda International", lat:5.5235, lng:95.4204 },
-"DTB": { city:"Siborong-Borong", name:"Raja Sisingamangaraja XII Airport", lat:2.2597, lng:98.9953 },
-"DJJ": { city:"Jayapura", name:"Sentani (Dortheys Hiyo Eluay) International", lat:-2.5719, lng:140.5114 },
-"LBJ": { city:"Labuan Bajo", name:"Komodo International Airport", lat:-8.4867, lng:119.8892 },
-"UPG": { city:"Makassar", name:"Sultan Hasanuddin International", lat:-5.0619, lng:119.5543 },
-"AMQ": { city:"Ambon", name:"Pattimura International", lat:-3.7103, lng:128.0890 },
-"LPQ": { city:"Luang Prabang", name:"Luang Prabang International", lat:19.8833, lng:102.1333 },
-"DAD": { city:"Da Nang", name:"Da Nang International", lat:16.0436, lng:108.1990 },
-"TPE": { city:"Taipei", name:"Taoyuan International", lat:25.0777, lng:121.2320 },
-"BSL": { city:"Basel", name:"EuroAirport Basel–Mulhouse–Freiburg", lat:47.5892, lng:7.5290 },  
-"FDF": { city:"Fort-de-France", name:"Martinique Aimé Césaire International Airport", lat:14.5900, lng:-61.0030 },  
-"SUF": { city:"Lamezia Terme", name:"Lamezia Terme International Airport", lat:38.8904, lng:16.2422 },  
-"LIR": { city:"Liberia", name:"Daniel Oduber Quirós International Airport", lat:10.5933, lng:-85.5444 },  
-"PUJ": { city:"Punta Cana", name:"Punta Cana International Airport", lat:18.5704, lng:-68.3633 },  
-"TLS": { city:"Toulouse", name:"Toulouse Blagnac Airport", lat:43.6293, lng:1.3630 },  
-"VLC": { city:"Valencia", name:"Valencia Airport", lat:39.4894, lng:-0.4815 },  
-"CTG": { city:"Cartagena", name:"Rafael Núñez International Airport", lat:10.4424, lng:-75.5131 },  
-"PTP": { city:"Pointe-à-Pitre", name:"Pointe-à-Pitre International Airport", lat:16.2650, lng:-61.5320 },  
-"CCC": { city:"Cayo Coco", name:"Jardines del Rey Airport", lat:21.5080, lng:-78.8150 },  
-"PVR": { city:"Puerto Vallarta", name:"Licenciado Gustavo Díaz Ordaz International Airport", lat:20.6800, lng:-105.2542 },  
-"ACA": { city:"Acapulco", name:"General Juan N. Álvarez International Airport", lat:16.7570, lng:-99.7530 },  
-"CZM": { city:"Cozumel", name:"Cozumel International Airport", lat:20.5228, lng:-86.9253 },  
-"MBJ": { city:"Montego Bay", name:"Sangster International Airport", lat:18.5034, lng:-77.9130 },  
-"RIH": { city:"Rio Hondo", name:"Rio Hondo Airport (Cozumel region?)", lat:20.7700, lng:-87.0000 },  
-"YHZ": { city:"Halifax", name:"Halifax Stanfield International Airport", lat:44.8804, lng:-63.5070 },  
-"FLL": { city:"Fort Lauderdale", name:"Fort Lauderdale–Hollywood International Airport", lat:26.0726, lng:-80.1527 },  
-"VRA": { city:"Varadero", name:"Juan Gualberto Gómez Airport", lat:23.0404, lng:-81.5170 },  
-"YQB": { city:"Québec City", name:"Québec City Jean Lesage International Airport", lat:46.79195, lng:-71.39337 },
-"PEG": { city:"Perugia", name:"Perugia San Francesco d’Assisi – Umbria International Airport", lat:43.0940, lng:12.5130 },  
-"RHO": { city:"Rhodes", name:"Rhodes International Airport", lat:36.4058, lng:28.0858 },  
-"CTA": { city:"Catania", name:"Catania–Fontanarossa Airport", lat:37.4668, lng:15.0667 },  
-"GOT": { city:"Gothenburg", name:"Göteborg Landvetter Airport", lat:57.7750, lng:12.3208 },   
-"DBV": { city:"Dubrovnik", name:"Dubrovnik Airport", lat:42.5603, lng:18.2622 },  
-"STN": { city:"London", name:"Stansted Airport", lat:51.8840, lng:0.2350 },  
-"BRE": { city:"Bremen", name:"Bremen Airport", lat:53.0474, lng:8.7862 },  
-"ZAD": { city:"Zadar", name:"Zadar Airport", lat:44.1150, lng:15.3460 },  
-"NUE": { city:"Nuremberg", name:"Nuremberg Airport", lat:49.4989, lng:11.0780 },  
-"CAG": { city:"Cagliari", name:"Cagliari Elmas Airport", lat:39.2514, lng:9.0544 },  
-"FAO": { city:"Faro", name:"Faro Airport", lat:37.0145, lng:-7.9659 },  
-"ALC": { city:"Alicante", name:"Alicante–Elche Airport", lat:38.2820, lng:-0.5580 },  
-"MRS": { city:"Marseille", name:"Marseille Provence Airport", lat:43.4393, lng:5.2130 },  
-"WRO": { city:"Wroclaw", name:"Wrocław Copernicus Airport", lat:51.1026, lng:16.8859 },  
-"TGD": { city:"Podgorica", name:"Podgorica Airport", lat:42.3642, lng:19.2514 },  
-"KLX": { city:"Kalamata", name:"Kalamata Airport", lat:37.0250, lng:22.1140 },  
-"HHN": { city:"Frankfurt", name:"Frankfurt–Hahn Airport", lat:49.9480, lng:7.2631 },  
-"JMK": { city:"Mykonos", name:"Mykonos Airport", lat:37.4356, lng:25.3483 },  
-"FUE": { city:"Fuerteventura", name:"Fuerteventura Airport", lat:28.4524, lng:-13.8631 },
-"KTW": { city:"Katowice", name:"Katowice Airport", lat:50.4743, lng:19.0804 },  
-"TER": { city:"Terceira", name:"Lajes Airport", lat:38.7692, lng:-27.0904 },  
-"PMI": { city:"Palma", name:"Palma de Mallorca Airport", lat:39.5496, lng:2.7342 },
-"TSF": { city:"Treviso", name:"Treviso Airport", lat:45.6481, lng:12.1946 },
-"GRO": { city:"Girona", name:"Girona-Costa Brava Airport", lat:41.9038, lng:2.7601 },
-"POZ": { city:"Poznań", name:"Poznań–Ławica Airport", lat:52.4211, lng:16.8269 },
-"PUY": { city:"Pula", name:"Pula Airport", lat:44.8848, lng:13.8551 },
-"LTN": { city:"London", name:"London Luton Airport", lat:51.8747, lng:-0.3683 },
-"LUZ": { city:"Lublin", name:"Lublin Airport", lat:51.2358, lng:22.7151 },
-"GDN": { city:"Gdańsk", name:"Gdańsk Lech Wałęsa Airport", lat:54.3770, lng:18.4662 },
-"PFO": { city:"Paphos", name:"Paphos International Airport", lat:34.7110, lng:32.4850 },
-"BGY": { city:"Bergamo", name:"Orio al Serio International Airport", lat:45.6730, lng:9.7000 },
-"RVN": { city:"Rovaniemi", name:"Rovaniemi Airport", lat:66.5580, lng:25.8275 },
-"RIX": { city:"Riga", name:"Riga International Airport", lat:56.9236, lng:23.9712 },
-"CFU": { city:"Corfu", name:"Corfu International Airport", lat:39.6010, lng:19.9115 },
-"QSR": { city:"Salerno", name:"Costa d'Amalfi Airport", lat:40.6189, lng:14.9105 },
-"VNO": { city:"Vilnius", name:"Vilnius Airport", lat:54.6380, lng:25.2858 },
-"TLL": { city:"Tallinn", name:"Tallinn Airport", lat:59.4133, lng:24.8322 },
-"BIQ": { city:"Biarritz", name:"Biarritz Pays Basque Airport", lat:43.4680, lng:-1.5233 },
-"EMA": { city:"Nottingham/Derby", name:"East Midlands Airport", lat:52.8311, lng:-1.3289 },
-"LIG": { city:"Limoges", name:"Bellegarde Airport", lat:45.8631, lng:1.1818 },
-"TRN": { city:"Turin", name:"Turin Airport", lat:45.2000, lng:7.6492 },
-"FNC": { city:"Funchal (Madeira)", name:"Madeira Airport (Cristiano Ronaldo International)", lat:32.6978, lng:-16.7744 },  
-"BRI": { city:"Bari", name:"Karol Wojtyła Airport", lat:41.1389, lng:16.7606 },  
-"MST": { city:"Maastricht", name:"Maastricht Aachen Airport", lat:50.9158, lng:5.7769 },  
-"PSA": { city:"Pisa", name:"Pisa–Galileo Galilei Airport", lat:43.6839, lng:10.3927 },    
-"NAP": { city:"Naples", name:"Naples International Airport", lat:40.8860, lng:14.2900 },  
-"BVA": { city:"Beauvais", name:"Beauvais–Tillé Airport", lat:49.4542, lng:2.1128 },  
-"CRL": { city:"Brussels", name:"Brussels South Charleroi Airport", lat:50.4594, lng:4.4539 },  
-"PDL": { city:"Ponta Delgada", name:"Ponta Delgada–João Paulo II Airport", lat:37.7412, lng:-25.6995 },  
-"OPO": { city:"Porto", name:"Francisco Sá Carneiro Airport", lat:41.2486, lng:-8.6812 },  
-"TRS": { city:"Trieste", name:"Trieste – Friuli Venezia Giulia Airport", lat:45.8278, lng:13.4728 },  
-"KTW": { city:"Katowice", name:"Katowice Airport", lat:50.4743, lng:19.0804 },  
-"TER": { city:"Terceira", name:"Lajes Airport", lat:38.7692, lng:-27.0904 },
-"ADD": { city:"Addis Ababa", name:"Addis Ababa Bole International Airport", lat:8.977889, lng:38.799305 },
-"BJM": { city:"Bujumbura", name:"Melchior Ndadaye International Airport", lat:-3.324019, lng:29.318519 },
-"DZA": { city:"Dzaoudzi", name:"Dzaoudzi–Pamandzi International Airport", lat:-12.804722, lng:45.281113 },
-"KIS": { city:"Kisumu", name:"Kisumu International Airport", lat:-0.086139, lng:34.728893 },
-"MRU": { city:"Port Louis", name:"Sir Seewoosagur Ramgoolam International Airport", lat:-20.430235, lng:57.6836 },
-"MBA": { city:"Mombasa", name:"Moi International Airport", lat:-4.034833, lng:39.59425 },
-"HAH": { city:"Moroni", name:"Prince Said Ibrahim International Airport", lat:-11.533661, lng:43.27185 },
-"DLA": { city:"Douala", name:"Douala International Airport", lat:4.006081, lng:9.719481 },
-"BGI": { city:"Bridgetown", name:"Grantley Adams International Airport", lat:13.074603, lng:-59.492456 },
-"ANU": { city:"St. John's", name:"V. C. Bird International Airport", lat:17.1367, lng:-61.7927 },
-"POS": { city:"Port of Spain", name:"Piarco International Airport", lat:10.595369, lng:-61.337189 },
-"EIS": { city:"Tortola", name:"Terrance B. Lettsome International Airport", lat:18.4448, lng:-64.5430 },
-"SKB": { city:"Basseterre", name:"Robert L. Bradshaw International Airport", lat:17.3112, lng:-62.7187 },
-"OGL": { city:"Georgetown", name:"Eugene F. Correia International Airport", lat:6.8061, lng:-58.1059 },
-"GND": { city:"St. George's", name:"Maurice Bishop International Airport", lat:12.0042, lng:-61.7861 },
-"HAV": { city:"Havana", name:"José Martí International Airport", lat:22.9892, lng:-82.4091 },
-"SXM": { city:"Philipsburg", name:"Princess Juliana International Airport", lat:18.041, lng:-63.1089 },
-"KIN": { city:"Kingston", name:"Norman Manley International Airport", lat:17.935667, lng:-76.7875 },
-"GEO": { city:"Georgetown", name:"Cheddi Jagan International Airport", lat:6.4985, lng:-58.2541 },
-"NAS": { city:"Nassau", name:"Lynden Pindling International Airport", lat:25.039, lng:-77.466 },
-"TAB": { city:"Tobago", name:"A. N. R. Robinson International Airport", lat:11.1497, lng:-60.8322 },
-"EWR": { city:"Newark", name:"Newark Liberty International Airport", lat:40.6895, lng:-74.1745 },
-"IXR": { city:"Ranchi", name:"Birsa Munda Airport", lat:23.3143, lng:85.3217 },
-"JAI": { city:"Jaipur", name:"Jaipur International Airport", lat:26.8242, lng:75.8122 },
-"YVR": { city:"Vancouver", name:"Vancouver International Airport", lat:49.1947, lng:-123.1792 },
-"IXL": { city:"Leh", name:"Kushok Bakula Rimpochee Airport", lat:34.1359, lng:77.5465 },
-"UBN": { city:"Ulaanbaatar", name:"Ulaanbaatar International Airport", lat:47.6514, lng:106.8216 },
-"AUA": { city:"Oranjestad", name:"Queen Beatrix International Airport", lat:12.5026, lng:-70.0086 },        
-"BDA": { city:"Bermuda", name:"L.F. Wade International Airport", lat:32.3646, lng:-64.6783 },            
-"BON": { city:"Kralendijk", name:"Flamingo International Airport", lat:12.1389, lng:-68.2683 },           
-"CUR": { city:"Willemstad", name:"Curaçao International Airport", lat:12.1899, lng:-68.9598 },           
-"FPO": { city:"Freeport", name:"Grand Bahama International Airport", lat:26.5580, lng:-78.6956 },         
-"GNV": { city:"Gainesville", name:"Gainesville Regional Airport", lat:29.6901, lng:-82.2718 },             
-"GGT": { city:"George Town", name:"Exuma International Airport", lat:23.5116, lng:-75.8071 },              
-"GHB": { city:"Great Harbour Cay", name:"Great Harbour Cay Airport", lat:24.3560, lng:-77.5320 },          
-"NAS": { city:"Nassau", name:"Lynden Pindling International Airport", lat:25.0390, lng:-77.4662 },          
-"ELH": { city:"North Eleuthera", name:"North Eleuthera Airport", lat:25.4748, lng:-76.6831 },              
-"PTY": { city:"Panama City", name:"Tocumen International Airport", lat:9.0711, lng:-79.3836 },             
-"POS": { city:"Port-of-Spain", name:"Piarco International Airport", lat:10.5954, lng:-61.3372 },           
-"PLS": { city:"Providenciales", name:"Providenciales International Airport", lat:21.7735, lng:-72.2654 },  
-"PUJ": { city:"Punta Cana", name:"Punta Cana International Airport", lat:18.5704, lng:-68.3633 },            
-"GIG": { city:"Rio de Janeiro", name:"Rio de Janeiro–Galeão International Airport", lat:-22.8090, lng:-43.2506 }, 
-"UVF": { city:"Castries", name:"Hewanorra International Airport", lat:13.7331, lng:-60.9526 },             
-"STX": { city:"St. Croix", name:"Henry E. Rohlsen Airport", lat:17.7010, lng:-64.7984 },                   
-"SKB": { city:"Basseterre", name:"Robert L. Bradshaw International Airport", lat:17.3112, lng:-62.7186 },
-"ANU": { city:"St. John's", name:"V. C. Bird International Airport", lat:17.1367, lng:-61.7927 },
-"BDA": { city:"Hamilton", name:"L.F. Wade International Airport", lat:32.3646, lng:-64.6783 },
-"BGI": { city:"Bridgetown", name:"Grantley Adams International Airport", lat:13.0746, lng:-59.4925 },
-"CUN": { city:"Cancún", name:"Cancún International Airport", lat:21.0365, lng:-86.8771 },
-"DEL": { city:"Delhi", name:"Indira Gandhi International Airport", lat:28.5562, lng:77.1003 },
-"GEO": { city:"Georgetown", name:"Cheddi Jagan International Airport", lat:6.4986, lng:-58.2541 },
-"IND": { city:"Indianapolis", name:"Indianapolis International Airport", lat:39.7173, lng:-86.2944 },
-"SJD": { city:"San José del Cabo", name:"Los Cabos International Airport", lat:23.1519, lng:-109.7210 },
-"SJC": { city:"San Jose", name:"San Jose International Airport", lat:37.3639, lng:-121.9289 },
-"SBP": { city:"San Luis Obispo", name:"San Luis Obispo County Regional Airport", lat:35.2368, lng:-120.6424 },
-"SLP": { city:"San Luis Potosí", name:"Ponciano Arriaga International Airport", lat:22.2543, lng:-100.9307 },
-"SAL": { city:"San Salvador", name:"El Salvador International Airport", lat:13.4409, lng:-89.0557 },
-"SBA": { city:"Santa Barbara", name:"Santa Barbara Municipal Airport", lat:34.4262, lng:-119.8400 },
-"SAF": { city:"Santa Fe", name:"Santa Fe Regional Airport", lat:35.6171, lng:-106.0894 },
-"SCL": { city:"Santiago", name:"Comodoro Arturo Merino Benítez International Airport", lat:-33.3930, lng:-70.7858 },
-"ICN": { city:"Seoul", name:"Incheon International Airport", lat:37.4602, lng:126.4407 },
-"PVG": { city:"Shanghai", name:"Shanghai Pudong International Airport", lat:31.1443, lng:121.8083 },
-"SHV": { city:"Shreveport", name:"Shreveport Regional Airport", lat:32.4466, lng:-93.8256 },
-"BJX": { city:"Silao", name:"Del Bajío International Airport", lat:20.9935, lng:-101.4808 },
-"SBN": { city:"South Bend", name:"South Bend International Airport", lat:41.7081, lng:-86.3185 },
-"GEG": { city:"Spokane", name:"Spokane International Airport", lat:47.6199, lng:-117.5350 },
-"SGU": { city:"St. George", name:"St. George Regional Airport", lat:37.0364, lng:-113.5103 },
-"SWO": { city:"Stillwater", name:"Stillwater Regional Airport", lat:36.1612, lng:-97.0857 },
-"TLH": { city:"Tallahassee", name:"Tallahassee International Airport", lat:30.3965, lng:-84.3503 },
-"TXK": { city:"Texarkana", name:"Texarkana Regional Airport", lat:33.4537, lng:-93.9910 },
-"NRT": { city:"Tokyo", name:"Narita International Airport", lat:35.7720, lng:140.3929 },
-"TRC": { city:"Torreón", name:"Francisco Sarabia International Airport", lat:25.5683, lng:-103.4106 },
-"TUS": { city:"Tucson", name:"Tucson International Airport", lat:32.1161, lng:-110.9410 },
-"TYR": { city:"Tyler", name:"Tyler Pounds Regional Airport", lat:32.3541, lng:-95.4024 },
-"YVR": { city:"Vancouver", name:"Vancouver International Airport", lat:49.1947, lng:-123.1792 },
-"ACT": { city:"Waco", name:"Waco Regional Airport", lat:31.6113, lng:-97.2305 },
-"SPS": { city:"Wichita Falls", name:"Wichita Falls Regional Airport", lat:33.9888, lng:-98.4919 },
-"YUM": { city:"Yuma", name:"Yuma International Airport", lat:32.6566, lng:-114.6060 },
-"ABQ": { city:"Albuquerque", name:"Albuquerque International Sunport", lat:35.0402, lng:-106.6090 },       
-"HNL": { city:"Honolulu", name:"Daniel K. Inouye International Airport", lat:21.3187, lng:-157.9225 },      
-"LIH": { city:"Lihue", name:"Lihue Airport", lat:21.9760, lng:-159.3386 },                                
-"SYD": { city:"Sydney", name:"Sydney Kingsford Smith Airport", lat:-33.9399, lng:151.1753 },               
-"TUS": { city:"Tucson", name:"Tucson International Airport", lat:32.1161, lng:-110.9410 },              
-"LIH": { city:"Lihue", name:"Lihue Airport", lat:21.9760, lng:-159.3386 },  
-"LIT": { city:"Little Rock", name:"Bill and Hillary Clinton National Airport", lat:34.7290, lng:-92.2243 },
-"GGG": { city:"Longview", name:"East Texas Regional Airport", lat:32.3840, lng:-94.7115 },
-"LBB": { city:"Lubbock", name:"Lubbock Preston Smith International Airport", lat:33.6636, lng:-101.8228 },
-"MFE": { city:"McAllen", name:"McAllen International Airport", lat:26.1758, lng:-98.2386 },
-"MID": { city:"Mérida", name:"Manuel Crescencio Rejón International Airport", lat:20.9369, lng:-89.6577 },
-"MEX": { city:"Mexico City", name:"Mexico City International Airport", lat:19.4363, lng:-99.0721 },
-"MAF": { city:"Midland/Odessa", name:"Midland International Air and Space Port", lat:31.9425, lng:-102.2022 },
-"MSO": { city:"Missoula", name:"Missoula Montana Airport", lat:46.9163, lng:-114.0906 },
-"MOB": { city:"Mobile", name:"Mobile Regional Airport", lat:30.6914, lng:-88.2428 },
-"MLU": { city:"Monroe", name:"Monroe Regional Airport", lat:32.5109, lng:-92.0377 },
-"MRY": { city:"Monterey", name:"Monterey Regional Airport", lat:36.5870, lng:-121.8430 },
-"MTY": { city:"Monterrey", name:"Monterrey International Airport", lat:25.7785, lng:-100.1070 },
-"MTJ": { city:"Montrose", name:"Montrose Regional Airport", lat:38.5098, lng:-107.8938 },
-"OAX": { city:"Oaxaca", name:"Xoxocotlán International Airport", lat:17.9995, lng:-96.7266 },
-"ONT": { city:"Ontario", name:"Ontario International Airport", lat:34.0560, lng:-117.6012 },
-"PSP": { city:"Palm Springs", name:"Palm Springs International Airport", lat:33.8297, lng:-116.5067 },
-"ECP": { city:"Panama City", name:"Northwest Florida Beaches International Airport", lat:30.3579, lng:-85.7956 },
-"PNS": { city:"Pensacola", name:"Pensacola International Airport", lat:30.4734, lng:-87.1874 },
-"PVU": { city:"Provo", name:"Provo Municipal Airport", lat:40.2181, lng:-111.7220 },
-"PVR": { city:"Puerto Vallarta", name:"Licenciado Gustavo Díaz Ordaz International Airport", lat:20.6801, lng:-105.2542 },
-"QRO": { city:"Querétaro", name:"Querétaro Intercontinental Airport", lat:20.6192, lng:-100.1857 },
-"RAP": { city:"Rapid City", name:"Rapid City Regional Airport", lat:44.0453, lng:-103.0574 },
-"RDM": { city:"Redmond", name:"Redmond Municipal Airport", lat:44.2541, lng:-121.1500 },
-"RNO": { city:"Reno", name:"Reno–Tahoe International Airport", lat:39.4991, lng:-119.7681 },
-"FCO": { city:"Rome", name:"Leonardo da Vinci–Fiumicino Airport", lat:41.8003, lng:12.2389 },
-"ROW": { city:"Roswell", name:"Roswell Air Center", lat:33.3016, lng:-104.5306 },
-"SMF": { city:"Sacramento", name:"Sacramento International Airport", lat:38.6954, lng:-121.5908 },
-"SJT": { city:"San Angelo", name:"San Angelo Regional Airport", lat:31.3577, lng:-100.4963 },
-"SJO": { city:"San José", name:"Juan Santamaría International Airport", lat:9.9939, lng:-84.2088 },
-"BOI": { city:"Boise", name:"Boise Air Terminal (Gowen Field)", lat:43.5644, lng:-116.2228 },
-"BZN": { city:"Bozeman", name:"Bozeman Yellowstone International Airport", lat:45.7776, lng:-111.1602 },
-"BRO": { city:"Brownsville", name:"Brownsville/South Padre Island International Airport", lat:25.9068, lng:-97.4259 },
-"EZE": { city:"Buenos Aires", name:"Ministro Pistarini International Airport", lat:-34.8222, lng:-58.5358 },
-"BUR": { city:"Burbank", name:"Hollywood Burbank Airport", lat:34.2007, lng:-118.3587 },
-"CUN": { city:"Cancún", name:"Cancún International Airport", lat:21.0365, lng:-86.8771 },
-"GCM": { city:"Grand Cayman", name:"Owen Roberts International Airport", lat:19.2928, lng:-81.3577 },
-"CHA": { city:"Chattanooga", name:"Chattanooga Metropolitan Airport", lat:35.0353, lng:-85.2038 },
-"CUU": { city:"Chihuahua", name:"General Roberto Fierro Villalobos International Airport", lat:28.7029, lng:-105.9646 },
-"CLL": { city:"College Station", name:"Easterwood Airport", lat:30.5886, lng:-96.3638 },
-"COS": { city:"Colorado Springs", name:"Colorado Springs Airport", lat:38.8058, lng:-104.7005 },
-"CRP": { city:"Corpus Christi", name:"Corpus Christi International Airport", lat:27.7704, lng:-97.5012 },
-"CZM": { city:"Cozumel", name:"Cozumel International Airport", lat:20.5224, lng:-86.9256 },
-"VPS": { city:"Destin/Fort Walton Beach", name:"Destin–Fort Walton Beach Airport", lat:30.4832, lng:-86.5254 },
-"DRO": { city:"Durango", name:"Durango–La Plata County Airport", lat:37.1515, lng:-107.7538 },
-"EUG": { city:"Eugene", name:"Eugene Airport", lat:44.1233, lng:-123.2186 },
-"FLG": { city:"Flagstaff", name:"Flagstaff Pulliam Airport", lat:35.1384, lng:-111.6712 },
-"FSM": { city:"Fort Smith", name:"Fort Smith Regional Airport", lat:35.3366, lng:-94.3674 },
-"FAT": { city:"Fresno", name:"Fresno Yosemite International Airport", lat:36.7762, lng:-119.7181 },
-"GNV": { city:"Gainesville", name:"Gainesville Regional Airport", lat:29.6901, lng:-82.2718 },
-"GCK": { city:"Garden City", name:"Garden City Regional Airport", lat:37.9275, lng:-100.7244 },
-"GRI": { city:"Grand Island", name:"Central Nebraska Regional Airport", lat:40.9675, lng:-98.3096 },
-"GJT": { city:"Grand Junction", name:"Grand Junction Regional Airport", lat:39.1224, lng:-108.5267 },
-"GDL": { city:"Guadalajara", name:"Miguel Hidalgo y Costilla International Airport", lat:20.5218, lng:-103.3112 },
-"GUA": { city:"Guatemala City", name:"La Aurora International Airport", lat:14.5833, lng:-90.5275 },
-"GPT": { city:"Gulfport/Biloxi", name:"Gulfport–Biloxi International Airport", lat:30.4073, lng:-89.0701 },
-"HRL": { city:"Harlingen", name:"Valley International Airport", lat:26.2285, lng:-97.6544 },
-"HNL": { city:"Honolulu", name:"Daniel K. Inouye International Airport", lat:21.3187, lng:-157.9225 },
-"HOU": { city:"Houston", name:"William P. Hobby Airport", lat:29.6454, lng:-95.2789 },
-"IDA": { city:"Idaho Falls", name:"Idaho Falls Regional Airport", lat:43.5146, lng:-112.0702 },
-"JAN": { city:"Jackson", name:"Jackson–Medgar Wiley Evers International Airport", lat:32.3112, lng:-90.0759 },
-"JAC": { city:"Jackson Hole", name:"Jackson Hole Airport", lat:43.6073, lng:-110.7377 },
-"OGG": { city:"Kahului", name:"Kahului Airport", lat:20.8986, lng:-156.4305 },
-"GRK": { city:"Killeen", name:"Killeen–Fort Cavazos Regional Airport", lat:31.0672, lng:-97.8289 },
-"LFT": { city:"Lafayette", name:"Lafayette Regional Airport", lat:30.2053, lng:-91.9876 },
-"LCH": { city:"Lake Charles", name:"Lake Charles Regional Airport", lat:30.1261, lng:-93.2234 },
-"LRD": { city:"Laredo", name:"Laredo International Airport", lat:27.5437, lng:-99.4615 },
-"LIR": { city:"Liberia", name:"Daniel Oduber Quirós International Airport", lat:10.5933, lng:-85.5444 },
-"AGU": { city:"Aguascalientes", name:"Lic. Jesús Terán Peredo International Airport", lat:21.7056, lng:-102.3186 },
-"AEX": { city:"Alexandria", name:"Alexandria International Airport", lat:31.3274, lng:-92.5486 },
-"AMA": { city:"Amarillo", name:"Rick Husband Amarillo International Airport", lat:35.2194, lng:-101.7059 },
-"AMS": { city:"Amsterdam", name:"Amsterdam Airport Schiphol", lat:52.3086, lng:4.7639 },
-"ASE": { city:"Aspen", name:"Aspen/Pitkin County Airport", lat:39.2232, lng:-106.8690 },
-"AKL": { city:"Auckland", name:"Auckland Airport", lat:-37.0082, lng:174.7850 },
-"AGS": { city:"Augusta", name:"Augusta Regional Airport", lat:33.3699, lng:-81.9645 },
-"BFL": { city:"Bakersfield", name:"Meadows Field Airport", lat:35.4336, lng:-119.0568 },
-"BTR": { city:"Baton Rouge", name:"Baton Rouge Metropolitan Airport", lat:30.5332, lng:-91.1496 },
-"BPT": { city:"Beaumont/Port Arthur", name:"Jack Brooks Regional Airport", lat:29.9508, lng:-94.0207 },
-"BIL": { city:"Billings", name:"Billings Logan International Airport", lat:45.8077, lng:-108.5429 },
-"TRI": { city:"Blountville", name:"Tri-Cities Regional Airport", lat:36.4752, lng:-82.4074 },
-"ABI": { city:"Abilene", name:"Abilene Regional Airport", lat:32.4113, lng:-99.6819 },
-"ICT": { city:"Wichita", name:"Wichita Dwight D. Eisenhower National Airport", lat:37.6499, lng:-97.4331 },
-"HPN": { city:"White Plains", name:"Wetchester County Airport", lat:41.0683, lng:-73.70757 },
-"EVV": { city:"Evansville", name:"Evansville Regional Airport", lat:38.0369, lng:-87.5324 },
-"FAR": { city:"Fargo", name:"Hector International Airport", lat:46.9193, lng:-96.8158 },
-"FNT": { city:"Flint", name:"Flint Bishop International Airport", lat:42.9654, lng:-83.7436 },
-"FWA": { city:"Fort Wayne", name:"Fort Wayne International Airport", lat:40.9785, lng:-85.1951 },
-"FCA": { city:"Kalispell", name:"Glacier Park International Airport", lat:48.3105, lng:-114.2560 },
-"GRB": { city:"Green Bay", name:"Green Bay–Austin Straubel International Airport", lat:44.4851, lng:-88.1296 },
-"HSV": { city:"Huntsville", name:"Huntsville International Airport", lat:34.6404, lng:-86.7731 },
-"AZO": { city:"Kalamazoo", name:"Kalamazoo/Battle Creek International Airport", lat:42.2349, lng:-85.5521 },
-"LSE": { city:"La Crosse", name:"La Crosse Regional Airport", lat:43.8790, lng:-91.2567 },
-"LAN": { city:"Lansing", name:"Capital Region International Airport", lat:42.7787, lng:-84.5874 },
-"MHK": { city:"Manhattan", name:"Manhattan Regional Airport", lat:39.1410, lng:-96.6708 },
-"MQT": { city:"Marquette", name:"Sawyer International Airport", lat:46.3536, lng:-87.3954 },
-"MLI": { city:"Moline", name:"Quad City International Airport", lat:41.4485, lng:-90.5075 },
-"EWR": { city:"Newark", name:"Newark Liberty International Airport", lat:40.6895, lng:-74.1745 },
-"OKC": { city:"Oklahoma City", name:"Will Rogers World Airport", lat:35.3931, lng:-97.6007 },
-"PIA": { city:"Peoria", name:"General Wayne A. Downing Peoria International Airport", lat:40.6642, lng:-89.6931 },
-"SNA": { city:"Santa Ana", name:"John Wayne Airport", lat:33.6757, lng:-117.8678 },
-"AVP": { city:"Wilkes-Barre/Scranton", name:"Wilkes-Barre/Scranton International Airport", lat:41.3385, lng:-75.7234 },
-"FSD": { city:"Sioux Falls", name:"Sioux Falls Regional Airport", lat:43.5820, lng:-96.7419 },
-"SGF": { city:"Springfield", name:"Springfield–Branson National Airport", lat:37.2457, lng:-93.3886 },
-"TVC": { city:"Traverse City", name:"Cherry Capital Airport", lat:44.7414, lng:-85.5822 },
-"TUL": { city:"Tulsa", name:"Tulsa International Airport", lat:36.1984, lng:-95.8881 },
-"VCE": { city:"Venice", name:"Venice Marco Polo Airport", lat:45.5053, lng:12.3519 },
-"ALO": { city:"Waterloo", name:"Waterloo Regional Airport", lat:42.5571, lng:-92.4003 },
-"CWA": { city:"Wausau", name:"Central Wisconsin Airport", lat:44.7776, lng:-89.6668 },
-"PHL": { city:"Philadelphia", name:"Philadelphia International Airport", lat:39.87294, lng:-75.24399 },
-"ALB": { city:"Albany", name:"Albany International Airport", lat:42.74828, lng:-73.8017 },
-"AUA": { city:"Oranjestad", name:"Queen Beatrix International Airport", lat:12.5026, lng:-70.0086 },
-"AVL": { city:"Asheville", name:"Asheville Regional Airport", lat:35.4362, lng:-82.5418 },
-"ATL": { city:"Atlanta", name:"Hartsfield–Jackson Atlanta International Airport", lat:33.6407, lng:-84.4277 },
-"BGR": { city:"Bangor", name:"Bangor International Airport", lat:44.8074, lng:-68.8283 },
-"XNA": { city:"Fayetteville", name:"Northwest Arkansas National Airport", lat:36.2819, lng:-94.3069 },
-"BHM": { city:"Birmingham", name:"Birmingham–Shuttlesworth International Airport", lat:33.5629, lng:-86.7536 },
-"BUF": { city:"Buffalo", name:"Buffalo Niagara International Airport", lat:42.9405, lng:-78.7322 },
-"BTV": { city:"Burlington", name:"Burlington International Airport", lat:44.4754, lng:-73.1539 },
-"CHS": { city:"Charleston", name:"Charleston International Airport", lat:32.8986, lng:-80.0405 },
-"CVG": { city:"Cincinnati", name:"Cincinnati/Northern Kentucky International Airport", lat:39.0489, lng:-84.6675 },
-"CLE": { city:"Cleveland", name:"Cleveland Hopkins International Airport", lat:41.4108, lng:-81.8498 },
-"CAE": { city:"Columbia", name:"Columbia Metropolitan Airport", lat:33.938, lng:-81.1196 },
-"CMH": { city:"Columbus", name:"John Glenn Columbus International Airport", lat:39.997, lng:-82.8923 },
-"DAY": { city:"Dayton", name:"James M. Cox Dayton International Airport", lat:39.9026, lng:-84.2194 },
-"DEN": { city:"Denver", name:"Denver International Airport", lat:39.8617, lng:-104.6731 },
-"DSM": { city:"Des Moines", name:"Des Moines International Airport", lat:41.5349, lng:-93.6631 },
-"DTW": { city:"Detroit", name:"Detroit Metropolitan Airport", lat:42.2162, lng:-83.3554 },
-"DOH": { city:"Doha", name:"Hamad International Airport", lat:25.2731, lng:51.6081 },
-"FLL": { city:"Fort Lauderdale", name:"Fort Lauderdale-Hollywood International Airport", lat:26.0726, lng:-80.1527 },
-"RSW": { city:"Fort Myers", name:"Southwest Florida International Airport", lat:26.5362, lng:-81.7552 },
-"GRR": { city:"Grand Rapids", name:"Gerald R. Ford International Airport", lat:42.8806, lng:-85.5225 },
-"GSO": { city:"Greensboro", name:"Piedmont Triad International Airport", lat:36.0972, lng:-79.9372 },
-"GSP": { city:"Greenville/Spartanburg", name:"Greenville-Spartanburg International Airport", lat:34.8956, lng:-82.2185 },
-"YHZ": { city:"Halifax", name:"Halifax Stanfield International Airport", lat:44.8804, lng:-63.5070 },
-"IAH": { city:"Houston", name:"George Bush Intercontinental Airport", lat:29.9902, lng:-95.3368 },
-"IND": { city:"Indianapolis", name:"Indianapolis International Airport", lat:39.7173, lng:-86.2944 },
-"JAX": { city:"Jacksonville", name:"Jacksonville International Airport", lat:30.4941, lng:-81.6879 },
-"MCI": { city:"Kansas City", name:"Kansas City International Airport", lat:39.2976, lng:-94.7139 },
-"EYW": { city:"Key West", name:"Key West International Airport", lat:24.5561, lng:-81.7590 },
-"TYS": { city:"Knoxville", name:"McGhee Tyson Airport", lat:35.8110, lng:-83.9946 },
-"LAS": { city:"Las Vegas", name:"Harry Reid International Airport", lat:36.0831, lng:-115.1483 },
-"LEX": { city:"Lexington", name:"Blue Grass Airport", lat:38.0369, lng:-84.6058 },
-"LIS": { city:"Lisbon", name:"Humberto Delgado Airport", lat:38.7815, lng:-9.1359 },
-"SDF": { city:"Louisville", name:"Louisville Muhammad Ali International Airport", lat:38.1744, lng:-85.7361 },
-"MSN": { city:"Madison", name:"Dane County Regional Airport (MSN)", lat:43.1396, lng:-89.3372 },
-"MHT": { city:"Manchester", name:"Manchester–Boston Regional Airport", lat:42.9326, lng:-71.4355 },
-"MEM": { city:"Memphis", name:"Memphis International Airport", lat:35.0420, lng:-89.9767 },
-"MDT": { city:"Harrisburg", name:"Harrisburg International Airport", lat:40.1935, lng:-76.7634 },
-"MKE": { city:"Milwaukee", name:"General Mitchell International Airport", lat:42.9472, lng:-87.8966 },
-"MSP": { city:"Minneapolis", name:"Minneapolis–Saint Paul International Airport", lat:44.8848, lng:-93.2223 },
-"MBJ": { city:"Montego Bay", name:"Sangster International Airport", lat:18.5034, lng:-77.9130 },
-"MYR": { city:"Myrtle Beach", name:"Myrtle Beach International Airport", lat:33.6794, lng:-78.9282 },
-"BNA": { city:"Nashville", name:"Nashville International Airport", lat:36.1263, lng:-86.6774 },
-"NAS": { city:"Nassau", name:"Lynden Pindling International Airport", lat:25.0390, lng:-77.4662 },
-"MSY": { city:"New Orleans", name:"Louis Armstrong New Orleans International Airport", lat:29.9934, lng:-90.2580 },
-"ORF": { city:"Norfolk", name:"Norfolk International Airport", lat:36.8946, lng:-76.2010 },
-"OMA": { city:"Omaha", name:"Eppley Airfield", lat:41.2990, lng:-95.8941 },
-"MCO": { city:"Orlando", name:"Orlando International Airport", lat:28.4286, lng:-81.3086 },
-"PBI": { city:"West Palm Beach", name:"Palm Beach International Airport", lat:26.6832, lng:-80.0956 },
-"PHX": { city:"Phoenix", name:"Phoenix Sky Harbor International Airport", lat:33.4342, lng:-112.0116 },
-"PIT": { city:"Pittsburgh", name:"Pittsburgh International Airport", lat:40.4914, lng:-80.2329 },
-"PDX": { city:"Portland", name:"Portland International Airport", lat:45.5898, lng:-122.5951 },
-"PWM": { city:"Portland", name:"Portland International Jetport", lat:43.6462, lng:-70.3090 },
-"PVD": { city:"Providence", name:"T.F. Green State Airport", lat:41.7231, lng:-71.4203 },
-"PUJ": { city:"Punta Cana", name:"Punta Cana International Airport", lat:18.5704, lng:-68.3633 },
-"RDU": { city:"Raleigh/Durham", name:"Raleigh–Durham International Airport", lat:35.8776, lng:-78.7875 },
-"RIC": { city:"Richmond", name:"Richmond International Airport", lat:37.5052, lng:-77.3197 },
-"ROA": { city:"Roanoke", name:"Roanoke–Blacksburg Regional Airport", lat:37.3250, lng:-79.9753 },
-"ROC": { city:"Rochester", name:"Greater Rochester International Airport", lat:43.1189, lng:-77.6724 },
-"SBY": { city:"Salisbury", name:"Salisbury–Ocean City Wicomico Regional Airport", lat:38.3408, lng:-75.5103 },
-"SLC": { city:"Salt Lake City", name:"Salt Lake City International Airport", lat:40.7899, lng:-111.9791 },
-"SAT": { city:"San Antonio", name:"San Antonio International Airport", lat:29.5337, lng:-98.4698 },
-"SAN": { city:"San Diego", name:"San Diego International Airport", lat:32.7336, lng:-117.1897 },
-"SFO": { city:"San Francisco", name:"San Francisco International Airport", lat:37.6189, lng:-122.3749 },
-"SJU": { city:"San Juan", name:"Luis Muñoz Marín International Airport", lat:18.4394, lng:-66.0018 },
-"SRQ": { city:"Sarasota/Bradenton", name:"Sarasota–Bradenton International Airport", lat:27.3954, lng:-82.5540 },
-"SAV": { city:"Savannah", name:"Savannah/Hilton Head International Airport", lat:32.1276, lng:-81.2024 },
-"SEA": { city:"Seattle", name:"Seattle–Tacoma International Airport", lat:47.4490, lng:-122.3094 },
-"STL": { city:"St. Louis", name:"St. Louis Lambert International Airport", lat:38.7487, lng:-90.3700 },
-"STT": { city:"St. Thomas", name:"Cyril E. King Airport", lat:18.3384, lng:-64.9721 },
-"SYR": { city:"Syracuse", name:"Syracuse Hancock International Airport", lat:43.1112, lng:-76.1063 },
-"TPA": { city:"Tampa", name:"Tampa International Airport", lat:27.9755, lng:-82.5332 },
-"YYZ": { city:"Toronto", name:"Toronto Pearson International Airport", lat:43.6777, lng:-79.6248 },
-"DCA": { city:"Washington", name:"Ronald Reagan Washington National Airport", lat:38.8521, lng:-77.0377 },
-"AUS": { city:"Austin", name:"Austin–Bergstrom International Airport", lat:30.1975, lng:-97.6664 },
-"ORD": { city:"Chicago", name:"O'Hare International Airport", lat:41.9742, lng:-87.9073 },
-"DFW": { city:"Dallas/Fort Worth", name:"Dallas/Fort Worth International Airport", lat:32.8998, lng:-97.0403 },
-"LAX": { city:"Los Angeles", name:"Los Angeles International Airport", lat:33.9416, lng:-118.4085 },
-"MIA": { city:"Miami", name:"Miami International Airport", lat:25.7959, lng:-80.2871 },
-"JFK": { city:"New York", name:"John F. Kennedy International Airport", lat:40.6413, lng:-73.7781 },
-"BOS": { city:"Boston", name:"Logan International Airport", lat:42.3656, lng:-71.0096 },
-"CLT": { city:"Charlotte", name:"Charlotte Douglas International Airport", lat:35.214, lng:-80.9431 },
-"CMH": { city:"Columbus", name:"John Glenn Columbus International Airport", lat:39.997, lng:-82.8923 },
-"IND": { city:"Indianapolis", name:"Indianapolis International Airport", lat:39.7173, lng:-86.2944 },
-"LHR": { city:"London", name:"London Heathrow Airport", lat:51.4700, lng:-0.4543 },
-"LGA": { city:"New York", name:"LaGuardia Airport", lat:40.7769, lng:-73.8740 },
-"PHX": { city:"Phoenix", name:"Phoenix Sky Harbor International Airport", lat:33.4342, lng:-112.0116 },
-"FRA": { city:"Frankfurt", name:"Frankfurt Airport", lat:50.0379, lng:8.5622 },
-"IAD": { city:"Washington", name:"Washington Dulles International Airport", lat:38.9531, lng:-77.4565 },
-"ALB": { city:"Albany", name:"Albany International Airport", lat:42.7483, lng:-73.8017 },
-"ABQ": { city:"Albuquerque", name:"Albuquerque International Sunport", lat:35.0402, lng:-106.6090 },
-"ANC": { city:"Anchorage", name:"Ted Stevens Anchorage International Airport", lat:61.1743, lng:-149.9982 },
-"ATW": { city:"Appleton", name:"Appleton International Airport", lat:44.2574, lng:-88.5070 },
-"ATH": { city:"Athens", name:"Athens International Airport Eleftherios Venizelos", lat:37.9364, lng:23.9445 },
-"BWI": { city:"Baltimore", name:"Baltimore/Washington International Thurgood Marshall Airport", lat:39.1754, lng:-76.6684 },
-"BIS": { city:"Bismarck", name:"Bismarck Municipal Airport", lat:46.7741, lng:-100.7467 },
-"BMI": { city:"Bloomington", name:"Central Illinois Regional Airport", lat:40.4771, lng:-88.9159 },
-"YYC": { city:"Calgary", name:"Calgary International Airport", lat:51.1139, lng:-114.0203 },
-"CID": { city:"Cedar Rapids", name:"The Eastern Iowa Airport", lat:41.8847, lng:-91.7108 },
-"CMI": { city:"Champaign", name:"University of Illinois Willard Airport", lat:40.0392, lng:-88.2781 },
-"COU": { city:"Columbia", name:"Columbia Regional Airport", lat:38.8181, lng:-92.2196 },
-"EGE": { city:"Eagle", name:"Eagle County Regional Airport", lat:39.6426, lng:-106.9177 },
-"ELP": { city:"El Paso", name:"El Paso International Airport", lat:31.8072, lng:-106.3776 },
-"EAT": { city:"Wenatchee", name:"Pangborn Memorial Airport", lat:47.39895, lng:-120.20650 },  
-"FCA": { city:"Kalispell", name:"Glacier Park International Airport", lat:48.3108, lng:-114.2560 },
-"SIT": { city:"Sitka", name:"Sitka Rocky Gutierrez Airport", lat:57.0478, lng:-135.3616 },  
-"KTN": { city:"Ketchikan", name:"Ketchikan International Airport", lat:55.3556, lng:-131.7131 }, 
-"JNU": { city:"Juneau", name:"Juneau International Airport", lat:58.3549, lng:-134.5766 },
-"KOA": { city:"Kailua-Kona", name:"Ellison Onizuka Kona International Airporte", lat:19.7388, lng:-156.0456 },
-"ALW": { city:"Walla Walla", name:"Walla Walla Regional Airport", lat:46.0935, lng:-118.2888 }, 
-"AKN": { city:"King Salmon", name:"King Salmon Airport", lat:58.6766, lng:-156.6491 }, 
-"FAI": { city:"Fairbanks", name:"Fairbanks International Airport", lat:64.8151, lng:-147.8560 }, 
-"PAE": { city:"Everett", name:"Paine Field / Snohomish County Airport", lat:47.9063, lng:-122.2819 }, 
-"BZA": { city:"Below", name:"Zacatecas International Airport", lat:22.9069, lng:-102.6541 }, 
-"MFR": { city:"Medford", name:"Rogue Valley International–Medford Airport", lat:42.3743, lng:-122.8730 }, 
-"PSC": { city:"Pasco", name:"Tri-Cities Airport", lat:46.2647, lng:-119.1190 },
-"OAK": { city:"Oakland", name:"Oakland International Airport", lat:37.7126, lng:-122.2197 }, 
-"SUN": { city:"Sun Valley", name:"Friedman Memorial Airport", lat:43.5043, lng:-114.2960 }, 
-"PUW": { city:"Pullman", name:"Pullman–Moscow Regional Airport", lat:46.7432, lng:-117.1109 }, 
-"STS": { city:"Santa Rosa", name:"Charles M. Schulz–Sonoma County Airport", lat:38.5084, lng:-122.8132 }, 
-"YYJ": { city:"Victoria", name:"Victoria International Airport", lat:48.6465, lng:-123.4266 },
-"YKM": { city:"Yakima", name:"Yakima Air Terminal (McAllister Field)", lat:46.5686, lng:-120.5430 },
-"BNX": { city:"Banja Luka", name:"Banja Luka International Airport", lat:44.9414, lng:17.2975 },
-"HAJ": { city:"Hanover", name:"Hanover Airport", lat:52.4611, lng:9.6851 },
-"LJU": { city:"Ljubljana", name:"Ljubljana Jože Pučnik Airport", lat:46.2237, lng:14.4576 },
-"INI": { city:"Niš", name:"Niš Constantine the Great Airport", lat:43.3373, lng:21.8537 },
-"NUE": { city:"Nuremberg", name:"Nuremberg Airport", lat:49.4987, lng:11.0669 },
-"TGD": { city:"Podgorica", name:"Podgorica Airport", lat:42.3594, lng:19.2519 },
-"SZG": { city:"Salzburg", name:"Salzburg Airport", lat:47.7933, lng:13.0033 },
-"SJJ": { city:"Sarajevo", name:"Sarajevo International Airport", lat:43.8246, lng:18.3315 },
-"STR": { city:"Stuttgart", name:"Stuttgart Airport", lat:48.6899, lng:9.2219 },
-"TIV": { city:"Tivat", name:"Tivat Airport", lat:42.4047, lng:18.7233 },
-"PRI": { city:"Praslin Island", name:"Praslin Island Airport", lat:-4.31929, lng:55.69143 },
-"LED": { city:"Saint Petersburg", name:"Pulkovo Airport", lat:59.8003, lng:30.2625 },
-"NQZ": { city:"Astana", name:"Nursultan Nazarbayev International Airport", lat:51.0222, lng:71.4669 },
-"UGC": { city:"Urgench", name:"Urgench International Airport", lat:41.5843, lng:60.6417 },
-"SKD": { city:"Samarkand", name:"Samarkand International Airport", lat:39.7005, lng:66.9831 },
-"DYU": { city:"Dushanbe", name:"Dushanbe International Airport", lat:38.5433, lng:68.825 },
-"FRU": { city:"Bishkek", name:"Manas International Airport", lat:43.0613, lng:74.4776 },
-"SCO": { city:"Aktau", name:"Aktau Airport", lat:43.8601, lng:51.091 },
-"ALP": { city:"Aleppo", name:"Aleppo International Airport", lat:36.1807, lng:37.2244 },
-"RMO": { city:"Chișinău", name:"Chișinău International Airport", lat:46.9278, lng:28.9308 },
-"MSQ": { city:"Minsk", name:"Minsk National Airport", lat:53.8825, lng:28.0307 },
-"USM": { city:"Koh Samui", name:"Samui International Airport", lat:9.5478, lng:100.0623 },
-"TDX": { city:"Trat", name:"Trat Airport", lat:12.2746, lng:102.319 },
-"PNH": { city:"Phnom Penh", name:"Phnom Penh International Airport", lat:11.5466, lng:104.844 },
-"THS": { city:"Sukhothai", name:"Sukhothai Airport", lat:17.238, lng:99.8182 },
-"LPT": { city:"Lampang", name:"Lampang Airport", lat:18.2709, lng:99.5042 },
-"CNX": { city:"Chiang Mai", name:"Chiang Mai International Airport", lat:18.7668, lng:98.9626 },
-"LPQ": { city:"Luang Prabang", name:"Luang Prabang International Airport", lat:19.8973, lng:102.161 },
-"SIN": { city:"Singapore", name:"Singapore Changi Airport", lat:1.3502, lng:103.994 },
-"KBV": { city:"Krabi", name:"Krabi International Airport", lat:8.09597, lng:98.9888 },
-"HKG": { city:"Hong Kong", name:"Hong Kong International Airport", lat:22.308, lng:113.9185 },
-"HDY": { city:"Hat Yai", name:"Hat Yai International Airport", lat:6.93321, lng:100.3929 },
-"UTP": { city:"U-Tapao", name:"U-Tapao–Rayong–Pattaya International Airport", lat:12.6799, lng:101.004 },
-"BLL": { city:"Billund", name:"Billund Airport", lat:55.7403, lng:9.15178 },
-"BLQ": { city:"Bologna", name:"Bologna Guglielmo Marconi Airport", lat:44.5354, lng:11.2887 },
-"GOT": { city:"Gothenburg", name:"Göteborg Landvetter Airport", lat:57.6628, lng:12.2798 },
-"HAM": { city:"Hamburg", name:"Hamburg Airport", lat:53.6304, lng:9.9882 },
-"INV": { city:"Inverness", name:"Inverness Airport", lat:57.5425, lng:-4.0475 },
-"JER": { city:"Jersey", name:"Jersey Airport", lat:49.2079, lng:-2.1955 },
-"NCL": { city:"Newcastle upon Tyne", name:"Newcastle International Airport", lat:55.0375, lng:-1.6917 },
-"TFS": { city:"Tenerife", name:"Tenerife South Airport", lat:28.0445, lng:-16.5725 },
-"TLS": { city:"Toulouse", name:"Toulouse-Blagnac Airport", lat:43.6291, lng:1.36382 },
-"GIB": { city:"Gibraltar", name:"Gibraltar International Airport", lat:36.1512, lng:-5.34966 },
-"AGP": { city:"Málaga", name:"Málaga-Costa del Sol Airport", lat:36.6749, lng:-4.49911 },
-"KEF": { city:"Reykjavík", name:"Keflavík International Airport", lat:63.985, lng:-22.6056 },
-"CGN": { city:"Cologne", name:"Cologne Bonn Airport", lat:50.8659, lng:7.14274 },
-"LUX": { city:"Luxembourg City", name:"Luxembourg Airport", lat:49.6233, lng:6.20444 },
-"IBZ": { city:"Ibiza", name:"Ibiza Airport", lat:38.8729, lng:1.37312 },
-"FLR": { city:"Florence", name:"Florence Peretola Airport", lat:43.8099, lng:11.2051 },
-"NAN": { city:"Nadi", name:"Nadi International Airport", lat:-17.7554, lng:177.4434 },
-"HIR": { city:"Honiara", name:"Honiara International Airport", lat:-9.4280, lng:160.0548 },
-"CNS": { city:"Cairns", name:"Cairns Airport", lat:-16.8858, lng:145.7553 },
-"CBR": { city:"Canberra", name:"Canberra Airport", lat:-35.3069, lng:149.1950 },
-"WLG": { city:"Wellington", name:"Wellington International Airport", lat:-41.3272, lng:174.8053 },
-"CHC": { city:"Christchurch", name:"Christchurch International Airport", lat:-43.4894, lng:172.5322 },
-"VLI": { city:"Port Vila", name:"Bauerfield International Airport", lat:-17.6993, lng:168.3198 },
-"APW": { city:"Apia", name:"Faleolo International Airport", lat:-13.8290, lng:-172.0083 },
-"VAR": { city:"Varna", name:"Varna Airport", lat:43.2321, lng:27.8251 },
-"BOJ": { city:"Burgas", name:"Burgas Airport", lat:42.5696, lng:27.5152 },
-"SOF": { city:"Sofia", name:"Sofia Airport", lat:42.6967, lng:23.4114 },
-"SCQ": { city:"Santiago de Compostela", name:"Santiago de Compostela Airport", lat:42.8963, lng:-8.4151 },
-"LCG": { city:"A Coruña", name:"A Coruña Airport", lat:43.3021, lng:-8.3773 },
-"LEI": { city:"Almería", name:"Almería Airport", lat:36.8439, lng:-2.3701 },
-"OVD": { city:"Asturias", name:"Asturias Airport", lat:43.5636, lng:-6.0346 },
-"BIO": { city:"Bilbao", name:"Bilbao Airport", lat:43.3011, lng:-2.9106 },
-"GOA": { city:"Genoa", name:"Genoa Cristoforo Colombo Airport", lat:44.4142, lng:8.8476 },
-"XRY": { city:"Jerez de la Frontera", name:"Jerez Airport", lat:36.7446, lng:-6.0601 },
-"SPC": { city:"Santa Cruz de La Palma", name:"La Palma Airport", lat:28.6265, lng:-17.7556 },
-"MAH": { city:"Menorca", name:"Menorca Airport", lat:39.8626, lng:4.2186 },
-"PMO": { city:"Palermo", name:"Falcone–Borsellino Airport", lat:38.1759, lng:13.0910 },
-"ORY": { city:"Paris", name:"Paris Orly Airport", lat:48.7262, lng:2.3652 },
-"EAS": { city:"San Sebastián", name:"San Sebastián Airport", lat:43.3565, lng:-1.7906 },
-"SDR": { city:"Santander", name:"Santander Airport", lat:43.4271, lng:-3.8200 },
-"SVQ": { city:"Seville", name:"Seville Airport", lat:37.4179, lng:-5.8931 },
-"TNG": { city:"Tangier", name:"Tangier Ibn Battouta Airport", lat:35.7269, lng:-5.9169 },
-"TFN": { city:"Tenerife", name:"Tenerife North–Ciudad de La Laguna Airport", lat:28.4827, lng:-16.3415 },
-"VGO": { city:"Vigo", name:"Vigo–Peinador Airport", lat:42.2318, lng:-8.6268 },
-"SPU": { city:"Split", name:"Split Airport", lat:43.5389, lng:16.2980 },
-"BGO": { city:"Bergen", name:"Bergen Airport, Flesland", lat:60.2934, lng:5.2181 },
-"GZP": { city:"Gazipaşa", name:"Gazipaşa–Alanya Airport", lat:36.2992, lng:32.3006 },
-"INN": { city:"Innsbruck", name:"Innsbruck Airport", lat:47.2602, lng:11.3439 },
-"IVL": { city:"Ivalo", name:"Ivalo Airport", lat:68.6073, lng:27.4053 },
-"KKN": { city:"Kirkenes", name:"Kirkenes Airport, Høybuktmoen", lat:69.7258, lng:29.8913 },
-"KEM": { city:"Kemi", name:"Kemi-Tornio Airport", lat:65.7787, lng:24.5821 },
-"KTT": { city:"Kittilä", name:"Kittilä Airport", lat:67.7010, lng:24.8468 },
-"HEL": { city:"Helsinki", name:"Helsinki-Vantaa Airport", lat:60.3172, lng:24.9633 },
-"KRK": { city:"Kraków", name:"Kraków John Paul II International Airport", lat:50.0777, lng:19.7848 },
-"KUO": { city:"Kuopio", name:"Kuopio Airport", lat:63.0071, lng:27.7978 },
-"KAO": { city:"Kuusamo", name:"Kuusamo Airport", lat:65.9876, lng:29.2394 },
-"MHQ": { city:"Mariehamn", name:"Mariehamn Airport", lat:60.1222, lng:19.8982 },
-"LIN": { city:"Milan", name:"Milan Linate Airport", lat:45.4451, lng:9.2767 },
-"NGO": { city:"Nagoya", name:"Chubu Centrair International Airport", lat:34.8584, lng:136.8044 },
-"OUL": { city:"Oulu", name:"Oulu Airport", lat:64.9301, lng:25.3546 },
-"RVN": { city:"Rovaniemi", name:"Rovaniemi Airport", lat:66.5648, lng:25.8304 },
-"TAY": { city:"Tartu", name:"Tartu Airport", lat:58.3075, lng:26.6904 },
-"TOS": { city:"Tromsø", name:"Tromsø Airport, Langnes", lat:69.6833, lng:18.9189 },
-"TRD": { city:"Trondheim", name:"Trondheim Airport, Værnes", lat:63.4578, lng:10.9230 },
-"VAA": { city:"Vaasa", name:"Vaasa Airport", lat:63.0506, lng:21.7622 },
-"VRN": { city:"Verona", name:"Verona Villafranca Airport", lat:45.3957, lng:10.8885 },
-"VBY": { city:"Visby", name:"Visby Airport", lat:57.6628, lng:18.3462 },
-"JTR": { city:"Santorini (Thira)", name:"Santorini International Airport", lat:36.3992, lng:25.4793 },
-"SDQ": { city:"Santo Domingo", name:"Las Américas International Airport", lat:18.4297, lng:-69.6689 },
-"BQN": { city:"Aguadilla", name:"Rafael Hernández International Airport", lat:18.4949, lng:-67.1294 },
-"HYA": { city:"Hyannis", name:"Barnstable Municipal Airport", lat:41.6693, lng:-70.2804 },
-"MVY": { city:"Martha's Vineyard", name:"Martha's Vineyard Airport", lat:41.3931, lng:-70.6143 },
-"ACK": { city:"Nantucket", name:"Nantucket Memorial Airport", lat:41.2531, lng:-70.0602 },
-"PSE": { city:"Ponce", name:"Mercedita International Airport", lat:18.0083, lng:-66.5630 },
-"FAE": { city:"Vágar", name:"Vágar Airport", lat:62.0636, lng:-7.2772 },
-"FRO": { city:"Florø", name:"Florø Airport", lat:61.5836, lng:5.0247 },
-"BOO": { city:"Bodø", name:"Bodø Airport", lat:67.2692, lng:14.3653 },
-"HVG": { city:"Honningsvåg", name:"Honningsvåg Airport, Valan", lat:71.0097, lng:25.9836 },
-"SVJ": { city:"Svolvær", name:"Svolvær Airport, Helle", lat:68.2433, lng:14.6692 },
-"EVE": { city:"Harstad/Narvik", name:"Harstad/Narvik Airport, Evenes", lat:68.4913, lng:16.6781 },
-"BTS": { city:"Bratislava", name:"M. R. Štefánik Airport", lat:48.1702, lng:17.2127 },
-"SVG": { city:"Stavanger", name:"Stavanger Airport, Sola", lat:58.8767, lng:5.6378 },
-"HER": { city:"Heraklion", name:"Heraklion International Airport", lat:35.3397, lng:25.1803 },
-"BIA": { city:"Bastia", name:"Bastia – Poretta Airport", lat:42.5527, lng:9.4837 },
-"HRG": { city:"Hurghada", name:"Hurghada International Airport", lat:27.1800, lng:33.8000 },
-"PRN": { city:"Pristina", name:"Pristina International Airport", lat:42.5728, lng:21.0358 },
-"LLA": { city:"Luleå", name:"Luleå Airport", lat:65.5438, lng:22.1210 },
-"DWC": { city:"Dubai", name:"Al Maktoum International Airport", lat:24.8963, lng:55.1614 },
-"LYR": { city:"Longyearbyen", name:"Svalbard Airport, Longyear", lat:78.2461, lng:15.4656 },
-"AJA": { city:"Ajaccio", name:"Ajaccio Napoleon Bonaparte Airport", lat:41.9236, lng:8.8029 },
-"TIA": { city:"Tirana", name:"Tirana International Airport", lat:41.4147, lng:19.7206 },
-"KRN": { city:"Gällivare", name:"Gällivare Lapland Airport", lat:67.8219, lng:20.3367 },
-"SKP": { city:"Skopje", name:"Skopje International Airport", lat:41.9616, lng:21.6214 },
-"HSR": { city:"Hisar", name:"Hisar Airport", lat:29.1794, lng:75.7553 },
-"SXR": { city:"Srinagar", name:"Sheikh ul-Alam International Airport", lat:33.9871, lng:74.7743 },
-"IXJ": { city:"Jammu", name:"Jammu Airport", lat:32.6890, lng:74.8374 },
-"AGR": { city:"Agra", name:"Agra Airport", lat:27.1558, lng:77.9609 },
-"GAU": { city:"Guwahati", name:"Lokpriya Gopinath Bordoloi International Airport", lat:26.1061, lng:91.5859 },
-"IXZ": { city:"Port Blair", name:"Veer Savarkar International Airport", lat:11.6412, lng:92.7297 },
-"IXB": { city:"Bagdogra", name:"Bagdogra International Airport", lat:26.6812, lng:88.3286 },
-"BBI": { city:"Bhubaneswar", name:"Biju Patnaik International Airport", lat:20.2444, lng:85.8178 },
-"IXM": { city:"Madurai", name:"Madurai Airport", lat:9.8345, lng:78.0934 },
-"VGA": { city:"Vijayawada", name:"Vijayawada International Airport", lat:16.5304, lng:80.7968 },
-"IXE": { city:"Mangaluru", name:"Mangaluru International Airport", lat:12.9613, lng:74.8901 },
-"HBX": { city:"Hubballi", name:"Hubballi Airport", lat:15.3617, lng:75.0858 },
-"JLR": { city:"Jabalpur", name:"Jabalpur Airport", lat:23.1778, lng:80.0520 },
-"RDP": { city:"Durgapur", name:"Kazi Nazrul Islam Airport", lat:23.6225, lng:87.2430 },
-"RPR": { city:"Raipur", name:"Swami Vivekananda Airport", lat:21.1804, lng:81.7388 },
-"IXR": { city:"Ranchi", name:"Birsa Munda Airport", lat:23.3157, lng:85.3217 },
-"IXU": { city:"Aurangabad", name:"Aurangabad Airport", lat:19.8627, lng:75.3981 },
-"BEK": { city:"Bareilly", name:"Bareilly Airport", lat:28.4221, lng:79.4508 },
-"JDH": { city:"Jodhpur", name:"Jodhpur Airport", lat:26.2511, lng:73.0489 },
-"CNN": { city:"Kannur", name:"Kannur International Airport", lat:11.9186, lng:75.5472 },
-"AQJ": { city:"Aqaba", name:"King Hussein International Airport", lat:29.6116, lng:35.0181 },
-"BEN": { city:"Benghazi", name:"Benina International Airport", lat:32.0968, lng:20.2695 },
-"MJI": { city:"Tripoli", name:"Mitiga International Airport", lat:32.8941, lng:13.2760 },
-"POM": { city:"Port Moresby", name:"Jacksons International Airport", lat:-9.4434, lng:147.2200 },
-"JJN": { city:"Quanzhou", name:"Quanzhou Jinjiang International Airport", lat:24.7964, lng:118.5899 },
-"USN": { city:"Ulsan", name:"Ulsan Airport", lat:35.5936, lng:129.3520 },
-"GES": { city:"General Santos", name:"General Santos International Airport", lat:6.1064, lng:125.2360 },
-"TAC": { city:"Tacloban", name:"Daniel Z. Romualdez Airport", lat:11.2276, lng:125.0278 },
-"PPS": { city:"Puerto Princesa", name:"Puerto Princesa International Airport", lat:9.7421, lng:118.7590 },
-"PEK": { city:"Beijing", name:"Beijing Capital International Airport", lat:40.0799, lng:116.6031 },
-"SYX": { city:"Sanya", name:"Sanya Phoenix International Airport", lat:18.3029, lng:109.4123 },
-"DLC": { city:"Dalian", name:"Dalian Zhoushuizi International Airport", lat:38.9657, lng:121.5390 },
-"SHA": { city:"Shanghai", name:"Shanghai Hongqiao International Airport", lat:31.1979, lng:121.3363 },
-"AAT": { city:"Altay", name:"Altay Airport", lat:47.7500, lng:88.0833 },
-"KWL": { city:"Guilin", name:"Guilin Liangjiang International Airport", lat:25.2181, lng:110.0390 },
-"IKT": { city:"Irkutsk", name:"Irkutsk International Airport", lat:52.2680, lng:104.3890 },
-"HAK": { city:"Haikou", name:"Haikou Meilan International Airport", lat:19.9349, lng:110.4580 },
-"HGH": { city:"Hangzhou", name:"Hangzhou Xiaoshan International Airport", lat:30.2360, lng:120.4330 },
-"MFM": { city:"Macau", name:"Macau International Airport", lat:22.1496, lng:113.5910 },
-"KHN": { city:"Nanchang", name:"Nanchang Changbei International Airport", lat:28.8640, lng:115.9000 },
-"BFS": { city:"Belfast", name:"Belfast International Airport", lat:54.6575, lng:-6.2158 },
-"ZTH": { city:"Zakynthos", name:"Zakynthos International Airport", lat:37.7510, lng:20.8843 },
-"GNB": { city:"Grenoble", name:"Grenoble Alpes–Isère Airport", lat:45.3629, lng:5.3294 },
-"BOH": { city:"Bournemouth", name:"Bournemouth Airport", lat:50.7790, lng:-1.8425 },
-"REU": { city:"Reus", name:"Reus Airport", lat:41.1474, lng:1.1672 },
-"EMA": { city:"East Midlands", name:"East Midlands Airport", lat:52.8311, lng:-1.3281 },
-"JSI": { city:"Skiathos", name:"Skiathos Alexandros Papadiamantis Airport", lat:39.1771, lng:23.5037 },
-"KGS": { city:"Kos", name:"Kos Island International Airport", lat:36.7933, lng:27.0917 },
-"SKG": { city:"Thessaloniki", name:"Thessaloniki Airport", lat:40.5197, lng:22.9709 },
-"CHQ": { city:"Chania", name:"Chania International Airport", lat:35.5317, lng:24.1497 },
-"SMI": { city:"Samos", name:"Samos International Airport", lat:37.689999, lng:26.911667 },
-"ASU": { city:"Asunción", name:"Silvio Pettirossi International Airport", lat:-25.2399, lng:-57.52 },
-"VVI": { city:"Santa Cruz", name:"Viru Viru International Airport", lat:-17.6448, lng:-63.1354 },
-"CNF": { city:"Belo Horizonte", name:"Tancredo Neves International Airport", lat:-19.6244, lng:-43.9719 },
-"MDZ": { city:"Mendoza", name:"Governor Francisco Gabrielli International Airport", lat:-32.8317, lng:-68.7929 },
-"ROS": { city:"Rosario", name:"Rosario – Islas Malvinas International Airport", lat:-32.9036, lng:-60.785 },
-"ADZ": { city:"San Andrés", name:"Gustavo Rojas Pinilla International Airport", lat:12.5836, lng:-81.7112 },
-"MAR": { city:"Maracaibo", name:"La Chinita International Airport", lat:10.5582, lng:-71.7279 },
-"MGA": { city:"Managua", name:"Augusto C. Sandino International Airport", lat:12.1415, lng:-86.1682 },
-"YYJ": { city:"Victoria", name:"Victoria International Airport", lat:48.6469, lng:-123.426 },
-"YEG": { city:"Edmonton", name:"Edmonton International Airport", lat:53.3097, lng:-113.58 },
-"YWG": { city:"Winnipeg", name:"Winnipeg James Armstrong Richardson International Airport", lat:49.9099, lng:-97.2399 },
-"YLW": { city:"Kelowna", name:"Kelowna International Airport", lat:49.9561, lng:-119.3779 },
-"YQT": { city:"Thunder Bay", name:"Thunder Bay International Airport", lat:48.3719, lng:-89.3239 },
-"BZE": { city:"Belize City", name:"Philip S. W. Goldson International Airport", lat:17.5391, lng:-88.3082 },
-"FMM": { city:"Memmingen", name:"Memmingen Airport", lat:47.9888, lng:10.2395 },
-"AYQ": { city:"Yulara", name:"Ayers Rock Airport", lat:-25.1861, lng:130.9756 },
-"WLG": { city:"Wellington", name:"Wellington International Airport", lat:-41.3272, lng:174.8053 },
-"ZQN": { city:"Queenstown", name:"Queenstown Airport", lat:-45.0211, lng:168.7390 },
-"ASP": { city:"Alice Springs", name:"Alice Springs Airport", lat:-23.8067, lng:133.9020 },
-"OOL": { city:"Gold Coast", name:"Gold Coast Airport", lat:-28.1644, lng:153.5047 },
-"CBR": { city:"Canberra", name:"Canberra Airport", lat:-35.3069, lng:149.1950 },
-"PHE": { city:"Port Hedland", name:"Port Hedland International Airport", lat:-20.3778, lng:118.6260 },
-"CNS": { city:"Cairns", name:"Cairns Airport", lat:-16.8858, lng:145.7553 },
-"HID": { city:"Horn Island", name:"Horn Island Airport", lat:-10.5864, lng:142.2900 },
-"DRW": { city:"Darwin", name:"Darwin International Airport", lat:-12.4147, lng:130.8767 },
-"NOU": { city:"Nouméa", name:"La Tontouta International Airport", lat:-22.0146, lng:166.2120 },
-"CHC": { city:"Christchurch", name:"Christchurch International Airport", lat:-43.4894, lng:172.5322 },
-"NTL": { city:"Newcastle", name:"Newcastle Airport", lat:-32.7944, lng:151.8353 },
-"KHI": { city:"Karachi", name:"Jinnah International Airport", lat:24.9065, lng:67.1608 },
-"KHS": { city:"Khasab", name:"Khasab Airport", lat:26.1706, lng:56.2406 },
-"SLL": { city:"Salalah", name:"Salalah International Airport", lat:17.0387, lng:54.0913 },
-"KME": { city:"Kamembe", name:"Kamembe Airport", lat:-2.4622, lng:28.9079 },
-"AKJ": { city:"Asahikawa", name:"Asahikawa Airport", lat:43.6708, lng:142.4475 },
-"HND": { city:"Tokyo", name:"Haneda Airport", lat:35.5494, lng:139.7798 },
-"AXT": { city:"Akita", name:"Akita Airport", lat:39.6156, lng:140.2183 },
-"ITM": { city:"Osaka", name:"Osaka Itami Airport", lat:34.7855, lng:135.4382 },
-"CTS": { city:"Sapporo", name:"New Chitose Airport", lat:42.7752, lng:141.6923 },
-"KKJ": { city:"Kitakyushu", name:"Kitakyushu Airport", lat:33.8459, lng:131.0346 },
-"KOJ": { city:"Kagoshima", name:"Kagoshima Airport", lat:31.8034, lng:130.7194 },
-"HKD": { city:"Hakodate", name:"Hakodate Airport", lat:41.7700, lng:140.8220 },
-"FUK": { city:"Fukuoka", name:"Fukuoka Airport", lat:33.5859, lng:130.4510 },
-"IZO": { city:"Izumo", name:"Izumo Airport", lat:35.4136, lng:132.8894 },
-"MYJ": { city:"Matsuyama", name:"Matsuyama Airport", lat:33.8272, lng:132.6994 },
-"NGS": { city:"Nagasaki", name:"Nagasaki Airport", lat:32.9169, lng:129.9140 },
-"KMQ": { city:"Komatsu", name:"Komatsu Airport", lat:36.3946, lng:136.4069 },
-"UBJ": { city:"Ube", name:"Yamaguchi Ube Airport", lat:33.9300, lng:131.2786 },
-"TAK": { city:"Takamatsu", name:"Takamatsu Airport", lat:34.2142, lng:134.0167 },
-"OKA": { city:"Okinawa", name:"Naha Airport", lat:26.1958, lng:127.6460 },
-"OKJ": { city:"Okayama", name:"Okayama Airport", lat:34.7569, lng:133.8553 },
-"AOJ": { city:"Aomori", name:"Aomori Airport", lat:40.7347, lng:140.6908 },
-"HIJ": { city:"Hiroshima", name:"Hiroshima Airport", lat:34.4361, lng:132.9194 },
-"KCZ": { city:"Kochi", name:"Kōchi Ryōma Airport", lat:33.5461, lng:133.6694 },
-"KMJ": { city:"Kumamoto", name:"Kumamoto Airport", lat:32.8372, lng:130.8550 },
-"KUH": { city:"Kushiro", name:"Kushiro Airport", lat:43.0410, lng:144.1920 },
-"MMB": { city:"Memanbetsu", name:"Memanbetsu Airport", lat:43.8806, lng:144.1640 },
-"KMI": { city:"Miyazaki", name:"Miyazaki Airport", lat:31.8772, lng:131.4490 },
-"OBO": { city:"Obihiro", name:"Tokachi-Obihiro Airport", lat:42.7333, lng:143.2172 },
-"OIT": { city:"Oita", name:"Oita Airport", lat:33.4794, lng:131.7372 },
-"GMP": { city:"Seoul", name:"Gimpo International Airport", lat:37.5583, lng:126.7906 },
-"TKS": { city:"Tokushima", name:"Tokushima Awaodori Airport", lat:34.1328, lng:134.6069 },
-"GUM": { city:"Guam", name:"Antonio B. Won Pat International Airport", lat:13.4834, lng:144.7958 },
-"LEU": { city:"La Seu d'Urgell", name:"Pirineus–La Seu d'Urgell Airport", lat:42.3386, lng:1.4092 },
-"BJZ": { city:"Badajoz", name:"Badajoz Airport", lat:38.8913, lng:-6.8213 },
-"CCS": { city:"Caracas", name:"Simón Bolívar International Airport", lat:10.6012, lng:-66.9912 },
-"CDT": { city:"Castellón de la Plana", name:"Castellón–Costa Azahar Airport", lat:40.2139, lng:0.0733 },
-"GRX": { city:"Granada", name:"Federico García Lorca Granada–Jaén Airport", lat:37.1887, lng:-3.7774 },
-"GYE": { city:"Guayaquil", name:"José Joaquín de Olmedo International Airport", lat:-2.1574, lng:-79.8836 },
-"MLN": { city:"Melilla", name:"Melilla Airport", lat:35.2798, lng:-2.9563 },
-"PNA": { city:"Pamplona", name:"Pamplona Airport", lat:42.7700, lng:-1.6463 },
-"LEN": { city:"León", name:"León Airport", lat:42.5890, lng:-5.6556 },
-"JHG": { city:"Jinghong", name:"Xishuangbanna Gasa International Airport", lat:21.9739, lng:100.7605 },
-"XIY": { city:"Xi'an", name:"Xi'an Xianyang International Airport", lat:34.4471, lng:108.7516 },
-"HSN": { city:"Zhoushan", name:"Zhoushan Putuoshan Airport", lat:29.9342, lng:122.3624 },
-"TAO": { city:"Qingdao", name:"Qingdao Jiaodong International Airport", lat:36.2650, lng:120.3740 },
-"XNN": { city:"Xining", name:"Xining Caojiabao International Airport", lat:36.5286, lng:102.0426 },
-"LZH": { city:"Liuzhou", name:"Liuzhou Bailian Airport", lat:24.2075, lng:109.3900 },
-"SHS": { city:"Shashi", name:"Shashi Shashi Airport (Jingzhou Shashi)", lat:30.2925, lng:112.2806 },
-"CGQ": { city:"Changchun", name:"Changchun Longjia International Airport", lat:43.9962, lng:125.6844 },
-"TYN": { city:"Taiyuan", name:"Taiyuan Wusu International Airport", lat:37.7469, lng:112.6284 },
-"XMN": { city:"Xiamen", name:"Xiamen Gaoqi International Airport", lat:24.5440, lng:118.1278 },
-"AAT": { city:"Altay", name:"Altay Airport", lat:47.7499, lng:88.0858 },
-"URC": { city:"Ürümqi", name:"Ürümqi Diwopu International Airport", lat:43.9071, lng:87.4742 },
-"HLD": { city:"Hailar", name:"Hulunbuir Hailar Airport", lat:49.2050, lng:119.8240 },
-"KMG": { city:"Kunming", name:"Kunming Changshui International Airport", lat:25.1019, lng:102.9292 },
-"WUH": { city:"Wuhan", name:"Wuhan Tianhe International Airport", lat:30.7838, lng:114.2081 },
-"PKX": { city:"Beijing", name:"Beijing Daxing International Airport", lat:39.5099, lng:116.4108 },
-"PVG": { city:"Shanghai", name:"Shanghai Pudong International Airport", lat:31.1434, lng:121.8052 },
-"HGH": { city:"Hangzhou", name:"Hangzhou Xiaoshan International Airport", lat:30.2361, lng:120.4324 },
-"HFE": { city:"Hefei", name:"Hefei Xinqiao International Airport", lat:31.9878, lng:116.9780 },
-"XNT": { city:"Xingtai", name:"Xingtai Dalian Airport", lat:37.3593, lng:114.2190 },
-"INC": { city:"Yinchuan", name:"Yinchuan Hedong International Airport", lat:38.3215, lng:106.3932 },
-"KHG": { city:"Kashgar", name:"Kashgar Airport", lat:39.5429, lng:76.0217 },
-"SHE": { city:"Shenyang", name:"Shenyang Taoxian International Airport", lat:41.6398, lng:123.4830 },
-"NNY": { city:"Nanyang", name:"Nanyang Jiangying Airport", lat:32.9808, lng:112.6150 },
-"HTN": { city:"Hotan", name:"Hotan Airport", lat:37.0385, lng:79.8649 },
-"AKU": { city:"Aksu", name:"Aksu Airport", lat:41.2625, lng:80.2917 },
-"TCG": { city:"Tacheng", name:"Tacheng Airport", lat:46.6725, lng:83.3408 },
-"LHW": { city:"Lanzhou", name:"Lanzhou Zhongchuan International Airport", lat:36.5152, lng:103.6208 },
-"CTU": { city:"Chengdu", name:"Chengdu Shuangliu International Airport", lat:30.5785, lng:103.9471 },
-"YIW": { city:"Yiwu", name:"Yiwu Airport", lat:29.3447, lng:120.0310 },
-"KWE": { city:"Guiyang", name:"Guiyang Longdongbao International Airport", lat:26.5385, lng:106.8010 },
-"DDG": { city:"Dandong", name:"Dandong Langtou Airport", lat:40.0247, lng:124.2867 },
-"CSX": { city:"Changsha", name:"Changsha Huanghua International Airport", lat:28.1892, lng:113.2200 },
-"AKA": { city:"Ankang", name:"Ankang Fuqiang Airport", lat:32.7081, lng:108.9310 },
-"MIG": { city:"Mianyang", name:"Mianyang Nanjiao Airport", lat:31.4281, lng:104.7400 },
-"PZI": { city:"Panzhihua", name:"Panzhihua Bao'anying Airport", lat:26.5417, lng:101.7990 },
-"DLU": { city:"Dali", name:"Dali Airport", lat:25.6494, lng:100.3194 },         
-"GAN": { city:"Gan", name:"Gan International Airport", lat:-0.693, lng:73.156 },
-"FVM": { city:"Fuvahmulah", name:"Fuvahmulah Airport", lat:-0.3097, lng:73.435 },  
-"KDM": { city:"Kaadedhdhoo", name:"Kaadedhdhoo Airport", lat:0.488, lng:72.997 },               
-"GKK": { city:"Kooddoo", name:"Kooddoo Airport", lat:0.732, lng:73.434 },                     
-"KDO": { city:"Kadhdhoo", name:"Kadhdhoo Airport", lat:1.8577, lng:73.5187 },                     
-"TMF": { city:"Thimarafushi", name:"Thimarafushi Airport", lat:2.21, lng:73.15 },                       
-"DRV": { city:"Dharavandhoo", name:"Dharavandhoo Airport", lat:5.1569, lng:73.1302 },                             
-"IFU": { city:"Ifuru", name:"Ifuru Airport", lat:5.708, lng:73.025 },                                              
-"HDK": { city:"Kulhudhuffushi", name:"Kulhudhuffushi Airport", lat:6.6312, lng:73.0676 },         
-"HAQ": { city:"Hanimaadhoo", name:"Hanimaadhoo International Airport", lat:6.7474, lng:73.1689 },      
-"ASP": { city:"Alice Springs", name:"Alice Springs Airport", lat:-23.8067, lng:133.9022 },
-"MKY": { city:"Mackay", name:"Mackay Airport", lat:-21.1717, lng:149.1797 },
-"ROK": { city:"Rockhampton", name:"Rockhampton Airport", lat:-23.3819, lng:150.475 },
-"TSV": { city:"Townsville", name:"Townsville Airport", lat:-19.2525, lng:146.7653 },
-"AYQ": { city:"Ayers Rock", name:"Ayers Rock Airport", lat:-25.1861, lng:130.9756 },
-"NTL": { city:"Newcastle", name:"Newcastle Airport", lat:-32.7944, lng:151.8353 },
-"CCK": { city:"Cocos (Keeling) Islands", name:"Cocos (Keeling) Islands Airport", lat:-12.1883, lng:96.8339 },
-"KGI": { city:"Kalgoorlie", name:"Kalgoorlie-Boulder Airport", lat:-30.7894, lng:121.4617 },
-"KTA": { city:"Karratha", name:"Karratha Airport", lat:-20.7122, lng:116.7731 },
-"KNX": { city:"Kununurra", name:"East Kimberley Regional Airport", lat:-15.7781, lng:128.7075 },
-"ZNE": { city:"Newman", name:"Newman Airport", lat:-23.4181, lng:119.8031 },
-"PHE": { city:"Port Hedland", name:"Port Hedland International Airport", lat:-20.3778, lng:118.626 },
-"BNK": { city:"Ballina", name:"Ballina Byron Gateway Airport", lat:-28.8339, lng:153.5625 },
-"OOL": { city:"Gold Coast", name:"Gold Coast Airport", lat:-28.1644, lng:153.5047 },
-"HTI": { city:"Hamilton Island", name:"Hamilton Island Airport", lat:-20.3581, lng:148.9519 },
-"HBA": { city:"Hobart", name:"Hobart International Airport", lat:-42.8361, lng:147.5103 },
-"LST": { city:"Launceston", name:"Launceston Airport", lat:-41.5453, lng:147.2142 },
-"MCY": { city:"Sunshine Coast", name:"Sunshine Coast Airport", lat:-26.6033, lng:153.0911 },
-"EXT": { city:"Exeter", name:"Exeter International Airport", lat:50.7344, lng:-3.4139 },
-"RSI": { city:"Red Sea", name:"The Red Sea International Airport", lat:24.8670, lng:36.9660 },
-"ROB": { city:"Monrovia", name:"Roberts International Airport", lat:6.2338, lng:-10.3623 },
-"JUB": { city:"Juba", name:"Juba International Airport", lat:4.8720, lng:31.6011 },
-"LDH": { city:"Lord Howe Island", name:"Lord Howe Island Airport", lat:-31.5383, lng:159.0770 },
-"BWT": { city:"Burnie", name:"Burnie Airport", lat:-40.9989, lng:145.7310 },
-"NLK": { city:"Norfolk Island", name:"Norfolk Island Airport", lat:-29.0416, lng:167.9390 },
-"BME": { city:"Broome", name:"Broome International Airport", lat:-17.9447, lng:122.2320 },
-"MQL": { city:"Mildura", name:"Mildura Airport", lat:-34.2292, lng:142.0860 },
-"WGA": { city:"Wagga Wagga", name:"Wagga Wagga Airport", lat:-35.1653, lng:147.4660 },
-"ROR": { city:"Koror", name:"Roman Tmetuchl International Airport", lat:7.3673, lng:134.5443 },
+    <div id="routeInfo" class="text-center mt-2 text-sm text-gray-600"></div>
 
+    <style>
+      #map {
+        height: 70vh;
+        width: 100%;
+        margin-top: 1rem;
+      }
 
+      .leaflet-popup-content {
+        font-size: 14px;
+      }
 
-  }; // end airports
+      .leaflet-popup-content strong {
+        font-weight: bold;
+      }
+    </style>
 
-  // ---------------------------
-  // Routes — all as strings "FROM-TO"
-  // Keep routes in original lists and add new ones.
-  // ---------------------------
-  const routes = [
-    /* QATAR AIRWAYS */
-    "DOH-ADD","DOH-GRU","DOH-MIA","DOH-IAH","DOH-DFW","DOH-LAX","DOH-SFO","DOH-SEA","DOH-ORD",
-    "DOH-YYZ","DOH-YUL","DOH-JFK","DOH-ATL","DOH-IAD","DOH-BOS","DOH-ABJ","ACC-ABJ",
-    "DOH-ACC","DOH-LOS","DOH-ABV","ABV-KAN","ABV-PHC","DOH-FIH","FIH-LAD","LAD-DOH",
-    "DOH-CPT","DOH-MPM","MPM-DUR","DOH-JNB","DOH-LUN","LUN-HRE","DOH-SEZ","DOH-EBB",
-    "DOH-KGL","DOH-NBO","DOH-JRO","JRO-DAR","DOH-DAR","DOH-ZNZ","DOH-JIB","JIB-MGQ",
-    "DOH-CAI","DOH-HBE","DOH-CMN","CMN-RAK","DOH-ALG","DOH-TUN","DOH-MLA","DOH-AGP",
-    "DOH-LIS","DOH-MAD","DOH-BCN","DOH-NCE","DOH-FCO","DOH-MXP","DOH-GVA","DOH-VCE",
-    "DOH-ZRH","DOH-CDG","DOH-LGW","DOH-LHR","DOH-BHX","DOH-MAN","DOH-DUB","DOH-EDI",
-    "DOH-FRA","DOH-DUS","DOH-BRU","DOH-AMS","DOH-HAM","DOH-CPH","DOH-BER","DOH-MUC",
-    "DOH-OSL","DOH-ARN","DOH-WAW","DOH-PRG","DOH-VIE","DOH-BUD","DOH-ZAG","DOH-BEG",
-    "DOH-SJJ","DOH-OTP","DOH-SFO","DOH-SVO","DOH-ATH","DOH-JMK","DOH-BJV","DOH-AYT",
-    "DOH-IST","DOH-SAW","DOH-ESB","DOH-TZX","DOH-TBS","DOH-EVN","DOH-GYD","DOH-LCA",
-    "DOH-BEY","DOH-DAM","DOH-AMM","DOH-TUU","DOH-NUM","DOH-ULH","DOH-YNB","DOH-MED",
-    "DOH-JED","DOH-TIF","DOH-AHB","DOH-ELQ","DOH-RUH","DOH-SLL","DOH-EBL","DOH-ISU",
-    "DOH-BGW","DOH-NJF","DOH-BSR","DOH-KWI","DOH-IKA","DOH-MHD","DOH-SYZ","DOH-DMM",
-    "DOH-BAH","DOH-AUH","DOH-DXB","DOH-SHJ","DOH-MCT","DOH-TAS","DOH-ALA","DOH-PEW",
-    "DOH-ISB","DOH-SKT","DOH-ATQ","DOH-LHE","DOH-MUX","DOH-KHI","DOH-AMD","DOH-DEL",
-    "DOH-KTM","DOH-DAC","DOH-CCU","DOH-NAG","DOH-BOM","DOH-GOX","DOH-HYD","DOH-BLR",
-    "DOH-MAA","DOH-CCJ","DOH-COK","DOH-TRV","DOH-CMB","DOH-MLE","DOH-AKL","DOH-BNE",
-    "DOH-SYD","DOH-MEL","MEL-ADL","DOH-ADL","DOH-PER","DOH-DPS","DOH-CGK","DOH-SIN",
-    "DOH-KUL","DOH-HKT","HKT-PEN","DOH-BKK","DOH-SGN","SGN-PNH","DOH-CEB","CEB-DVO",
-    "DOH-DVO","DOH-MNL","DOH-CRK","DOH-HAN","DOH-HKT","DOH-CAN","DOH-TFU","DOH-CKG",
-    "DOH-PKX","DOH-HGH","DOH-PVG","DOH-ICN","DOH-KIX","DOH-NRT","DOH-HKG","DOH-ALP",
-    "DOH-RSI",
+    <div id="map"></div>
 
-  /* LATAM */
-    "GRU-AJU","GRU-BCN","GRU-BEL","GRU-CNF","GRU-BSB","GRU-AEP","GRU-EZE","GRU-CGR",
-    "GRU-CAC","GRU-CXJ","GRU-XAP","GRU-CGB","GRU-CWB","GRU-FEN","GRU-FLN","GRU-FOR",
-    "GRU-IGU","GRU-GYN","GRU-IOS","GRU-IMP","GRU-JJG","GRU-JJD","GRU-JPA","GRU-JOI",
-    "GRU-JDO","GRU-LIM","GRU-LIS","GRU-LHR","GRU-LDB","GRU-MCZ","GRU-MAD","GRU-MAO",
-    "GRU-MGF","GRU-MDZ","GRU-MEX","GRU-MOC","GRU-MVD","GRU-NAT","GRU-NVT","GRU-PMW",
-    "GRU-PNZ","GRU-POA","GRU-BPS","GRU-PVH","GRU-REC","GRU-RBR","GRU-GIG","GRU-SDU",
-    "GRU-SSA","GRU-SJP","GRU-SLZ","GRU-OPS","GRU-THE","GRU-UDI","GRU-VIX","GRU-VDC",
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      client:load
+    ></script>
+    <script
+      src="https://unpkg.com/leaflet-arc/bin/leaflet-arc.min.js"
+      client:load
+    ></script>
 
-  /* AER LINGUS */
-    "DUB-ABZ","DUB-AMS","DUB-BOD","DUB-BES","DUB-BRS","DUB-BRU","DUB-CFN","DUB-EDI",
-    "BHD-EDI","DUB-GLA","DUB-LBA","DUB-LPL","ORK-LHR","DUB-LHR","NOC-LHR","SNN-LHR",
-    "DUB-LYS","BHD-MAN","DUB-MAN","DUB-NTE","DUB-NQY","DUB-PGF","DUB-RNS","DUB-SOU",
-"BHD-BHX","DUB-BHX","DUB-BOD","DUB-BOS","DUB-CLE","DUB-EXT","DUB-IND","DUB-MSP","DUB-BNA","DUB-EWR","DUB-NCL","DUB-MCO","DUB-CDG",
-"DUB-PHL","DUB-IAD","DUB-BDL",
+    <script client:load define:vars={{ allRoutes, csvText, airlines }}>
+      const map = L.map("map", {
+        worldCopyJump: false,
+      }).setView([20, 10], 2);
 
- /* ROYAL AIR MAROC */
-"CMN-OUD","CMN-VIL","CMN-AGP","CMN-EUN","CMN-ABJ","CMN-AGA","CMN-DSS","CMN-NDR","CMN-LBV","CMN-SSG","CMN-LOS","CMN-ERH","CMN-TTU","TTU-AHU","CMN-VLC","CMN-OZZ","CMN-ACC","CMN-NKC","CMN-BJL","CMN-CKY","CMN-NSI","CMN-OUA","CMN-BKO","CMN-NIM",
+      L.tileLayer(
+        "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        {
+          attribution: '&copy; OpenMapTiles &copy; OpenStreetMap contributors',
+          noWrap: false,
+        }
+      ).addTo(map);
 
- /* AER LINK */
-"JNB-WVB","JNB-TET","JNB-FBM","JNB-BEW","JNB-LLW","JNB-LVI","JNB-VNX","JNB-LUN","JNB-POL","JNB-VFA","JNB-BBK","JNB-MUB","JNB-HDS","JNB-SZK","JNB-BUQ","JNB-WDH","JNB-GBE","JNB-UTN","JNB-PTG","CPT-PLZ","CPT-JNB","JNB-MQP","JNB-LAD","CPT-VFA","JNB-NLA","JNB-APL","CPT-GBE","JNB-BLZ","CPT-WVB","CPT-UTN","JNB-PLZ","JNB-UTT","CPT-KIM","CPT-HRE","JNB-PZB","CPT-BFN","JNB-ELS","CPT-WDH","JNB-TNR","JNB-BFN","JNB-MSU","JNB-RCB","JNB-KIM","WVB-HLE","CPT-HDS","CPT-SZK", 
+      let currentColor = "#ff0000";
+      let airportData = {};
+      let currentRoutes = [];
+      let connections = {};
+      let markers = {};
+      let drawn = [];
+      let currentPrefix = "";
+      let currentRegion = "ALL";
 
- /* AEROMEXICO */
-"MEX-AMS", "MEX-AUS", "MEX-BOG", "MEX-EZE", "MEX-CME", "MEX-DEN", "MEX-GDL", "MEX-GUA", "MEX-LAS", "MEX-LIM", "MEX-LHR", "MEX-LAS", "MEX-MAD", "MEX-JFK", "MEX-MCO", "MEX-PVR", "MEX-UIO", "MEX-SJO", "MEX-SJD", "MEX-SCL", "MEX-GRU", "MEX-SEA", "MEX-ICN", "MEX-TIJ", "MEX-YYZ", 
+      const airlineSelect = document.getElementById("airlineSelect");
+      const regionSelect = document.getElementById("regionSelect");
+      const showLinesToggle = document.getElementById("showLinesToggle");
+      const routeInfo = document.getElementById("routeInfo");
+      const searchInput = document.getElementById("airportSearch");
 
- /* MALAYSIA AIRLINES */
-"KUL-AOR", "KUL-AKL", "KUL-BKK", "KUL-BTU", "KUL-CNX", "KUL-DAD", "KUL-DPS", "KUL-DOH", "KUL-HAN", "KUL-SGN", "KUL-HKG", "KUL-CGK", "KUL-JHB", "KUL-KTM", "KUL-KBR", "KUL-BKI", "KUL-TGG", "KUL-KUA", "KUL-KCH", "KUL-LBU", "KUL-LGK", "KUL-LHR", "KUL-KNO", "KUL-MYY", "KUL-KIX", "KUL-CDG", "KUL-PEN", "KUL-PER", "KUL-PNH", "KUL-HKT", "KUL-SDK", "KUL-ICN", "KUL-SBW", "KUL-SIN", "KUL-SUB", "KUL-TWU", "KUL-NRT", "KUL-RGN", "KUL-DAC", "KUL-ADL",
+      function parseCSV(csvText) {
+        const airports = {};
+        const lines = csvText.split("\n");
 
- /* GARUDA INDONESIA */
-"CGK-XCH", "CGK-BTJ", "CGK-DTB", "CGK-DJJ", "CGK-LBJ", "CGK-MDC", "CGK-MLG", "CGK-GTO", "CGK-TIM", "CGK-MEL", "CGK-DOH", "CGK-DPS", "CGK-JED", "CGK-MED", "UPG-JED", "DPS-HKG", "DPS-PER", "DPS-AMQ", 
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line) continue;
 
- /* VIETNAM AIRLINES */
-"HAN-LPQ", "SGN-BKK", "SGN-PKX", "SGN-DAD", "SGN-DEL", "HAN-FRA", "SGN-FRA", "SGN-CGK", "SGN-KUL", "HAN-LHR", "SGN-LHR", "HAN-MXP", "HAN-SVO", "SGN-BOM", "SGN-MUC", "SGN-DPS", "SGN-HAN", "SGN-CDG", "SGN-SFO", "SGN-ICN", "SGN-PVG", "SGN-SIN", "SGN-SYD", "SGN-TPE", "SGN-NRT",
+          let parts = [];
+          let current = "";
+          let inQuotes = false;
 
- /* RYANAIR */
-"LIS-FNC", "MXP-FNC", "BRI-MST", "PSA-RAK", "MLA-NAP", "PRG-BVA", "CRL-PDL", "MLA-OPO", "PSA-REG", "VIE-JSI", "BUD-TFS", "OPO-TER", "KTW-TPS", "MLA-TRS", "TLL-BCN", "DUB-BIQ", "EMA-LIG", "TRN-CFU", "TRN-QSR", "TRN-VNO", "POZ-PUY", "LTN-LUZ", "GDN-PFO", "GDN-BGY", "BGY-RVN", "RIX-TSF", "RIX-GRO", "WAW-PMI", "WAW-MAN", "OTP-PEG", "OTP-BVA", "OTP-MAD", "RHO-CTA", "RHO-FMM", "GOT-EDI", "GOT-DBV", "STN-GOT", "BRE-ZAD", "NUE-CAG", "NUE-FAO", "HAM-ALC", "MRS-ZAG", "WRO-TGD", "VIE-KLX", "VIE-FCO", "ZAG-CRL", "ZAG-HHN", "JMK-PFO", "DUB-FUE", "NTE-AGA",
-
- /* AIR TRANSAT */
-"YUL-ATH", "YUL-BSL", "YUL-BRU", "YUL-FDF", "YYZ-GLA", "YYZ-SUF", "YYZ-LIR", "YUL-LIM", "YUL-LGW", "YUL-AGP", "YUL-RAK", "YQB-CDG", "YYZ-OPO", "YQB-PUJ", "YUL-SJO", "YUL-TLS", "YUL-VLC", "YUL-CTG", "YQB-PTP", "YYZ-CCC", "YYZ-PVR", "YUL-ACA", "YUL-CZM", "YUL-MBJ", "YUL-MCO", "YUL-YYZ", "YUL-RIH", "YHZ-FLL", "YYZ-VRA", "YYZ-DUB", "YYZ-MAN", "YYZ-FAO", "YYZ-ZAG", "YYZ-BER", "YUL-NTE",
-
- /* KENYA AIRWAYS */
-"NBO-ADD", "NBO-AMS", "NBO-TNR", "NBO-BKK", "BKK-CAN", "NBO-BJM", "NBO-CPT", "NBO-DZA", "NBO-JNB", "NBO-JRO", "NBO-KIS", "NBO-LHR", "NBO-MRU", "NBO-MBA", "NBO-HAH", "NBO-JFK", "NBO-CDG", "NBO-SEZ", "NBO-ZNZ", "NBO-DLA","NBO-BOM","NBO-DXB","NBO-LOS","NBO-JUB","NBO-VFA","VFA-CPT","NBO-EBB","NBO-KGL","NBO-LGW","NBO-DAR","NBO-ACC","ACC-ROB",
-
-"BGI-ANU", "POS-ANU", "ANU-EIS", "BGI-SKB", "POS-BGI", "BGI-EIS", "EIS-SJU", "POS-DOM", "POS-FLL", "BGI-OGL", "POS-OGL", "BGI-GND", "POS-HAV", "SXM-KIN", "GEO-JFK", "KIN-JFK", "POS-KIN", "NAS-KIN", "TAB-JFK", "POS-MCO", "BGI-TAB", "POS-SXM", "KIN-YYZ", "POS-YYZ", "GEO-YYZ",
-
-"BOM-SFO", "BOM-EWR", "BOM-FRA", "BOM-AUH", "BOM-SIN", "BOM-DEL", "BOM-IXR", "BOM-JAI", "BOM-LHR", "DEL-YVR", "DEL-NBO", "DEL-HKG", "DEL-DXB", "DEL-HYD", "DEL-IXL",
-
-"ICN-SFO","ICN-LHR","ICN-BKK","ICN-FCO","ICN-UBN",
-
-"DFW-ABI", "DFW-AGU", "DFW-ALB", "DFW-ABQ", "DFW-AEX", "DFW-AMA", "DFW-AMS", "DFW-ANC", "DFW-ATW", "DFW-AUA", "DFW-AVL", "DFW-ASE", "DFW-ATL", "DFW-AKL", "DFW-AGS", "DFW-BFL", "DFW-BTR", "DFW-BPT", "DFW-XNA", "DFW-BIL", "DFW-BHM", "DFW-BIS", "DFW-BMI", "DFW-TRI", "DFW-BOI", "DFW-BZN", "DFW-BRO", "DFW-EZE", "DFW-BUF", "DFW-BUR", "DFW-YYC", "DFW-CUN", "DFW-GCM", "DFW-CID", "DFW-CMI", "DFW-CHS", "DFW-CHA", "DFW-CUU", "DFW-CVG", "DFW-CLE", "DFW-CLL", "DFW-COS", "DFW-CAE", "DFW-COU", "DFW-CMH", "DFW-CRP", "DFW-CZM", "DFW-DAY", "DFW-DEN", "DFW-DSM", "DFW-VPS", "DFW-DTW", "DFW-DRO", "DFW-EGE", "DFW-ELP", "DFW-EUG", "DFW-EVV", "DFW-FAR", "DFW-FLG", "DFW-FLL", "DFW-RSW", "DFW-FSM", "DFW-FWA", "DFW-FAT", "DFW-GNV", "DFW-GCK", "DFW-GRI", "DFW-GJT", "DFW-GRR", "DFW-GSO", "DFW-GSP", "DFW-GDL", "DFW-GUA", "DFW-GPT", "DFW-HRL", "DFW-HNL", "DFW-HOU", "DFW-IAH", "DFW-HSV", "DFW-IDA", "DFW-IND", "DFW-JAN", "DFW-JAC", "DFW-JAX", "DFW-OGG", "DFW-MCI", "DFW-EYW", "DFW-GRK", "DFW-TYS", "DFW-LFT", "DFW-LCH", "DFW-LRD", "DFW-LAS", "DFW-LEX", "DFW-LIR", "DFW-LIT", "DFW-LHR", "DFW-GGG", "DFW-LAX", "DFW-SDF", "DFW-LBB", "DFW-MSN", "DFW-MHK", "DFW-MFE", "DFW-MEM", "DFW-MID", "DFW-MEX", "DFW-MIA", "DFW-MDT", "DFW-MAF", "DFW-MKE", "DFW-MSP", "DFW-MSO", "DFW-MOB", "DFW-MLI", "DFW-MLU", "DFW-MRY", "DFW-MTY", "DFW-MTJ", "DFW-MYR", "DFW-BNA", "DFW-NAS", "DFW-MSY", "DFW-JFK", "DFW-ORF", "DFW-OAX", "DFW-OKC", "DFW-OMA", "DFW-ONT", "DFW-MCO", "DFW-PBI", "DFW-PSP", "DFW-ECP", "DFW-PNS", "DFW-PIA", "DFW-PHL", "DFW-PHX", "DFW-PIT", "DFW-PDX", "DFW-PVU", "DFW-PVR", "DFW-QRO", "DFW-RDU", "DFW-RAP", "DFW-RDM", "DFW-RNO", "DFW-RIC", "DFW-FCO", "DFW-ROW", "DFW-SMF", "DFW-SLC", "DFW-SJT", "DFW-SAT", "DFW-SAN", "DFW-SFO", "DFW-SJO", "DFW-SJD", "DFW-SJC", "DFW-SJU", "DFW-SBP", "DFW-SLP", "DFW-SAL", "DFW-SNA", "DFW-SBA", "DFW-SAF", "DFW-SCL", "DFW-SRQ", "DFW-SAV", "DFW-SEA", "DFW-ICN", "DFW-PVG", "DFW-SHV", "DFW-BJX", "DFW-FSD", "DFW-SBN", "DFW-GEG", "DFW-SGF", "DFW-SGU", "DFW-STL", "DFW-SWO", "DFW-SYR", "DFW-TLH", "DFW-TPA", "DFW-TXK", "DFW-NRT", "DFW-YYZ", "DFW-TRC", "DFW-TUS", "DFW-TUL", "DFW-TYR", "DFW-YVR", "DFW-ACT", "DFW-IAD", "DFW-SPS", "DFW-ILM", "DFW-YUM",
-"LAX-ABQ", "LAX-ATL", "LAX-DEN", "LAX-ELP", "LAX-HNL", "LAX-IAH", "LAX-OGG", "LAX-LAS", "LAX-LIH", "LAX-LHR", "LAX-MIA", "LAX-OKC", "LAX-OMA", "LAX-PHL", "LAX-PHX", "LAX-PDX", "LAX-PVR", "LAX-SMF", "LAX-SLC", "LAX-SAT", "LAX-SFO", "LAX-SJD", "LAX-SEA", "LAX-STL", "LAX-SYD", "LAX-TUS", "LAX-TUL", "LAX-YVR",
-"MIA-ANU", "MIA-AUA", "MIA-ATL", "MIA-BWI", "MIA-XNA", "MIA-BDA", "MIA-BHM", "MIA-BON", "MIA-BGI", "MIA-CUN", "MIA-GCM", "MIA-CHS", "MIA-CVG", "MIA-CLE", "MIA-CMH", "MIA-CZM", "MIA-CUR", "MIA-DEN", "MIA-DSM", "MIA-DTW", "MIA-EGE", "MIA-FPO", "MIA-GNV", "MIA-GGT", "MIA-GEO", "MIA-GHB", "MIA-GSO", "MIA-GSP", "MIA-GUA", "MIA-IAH", "MIA-HSV", "MIA-IND", "MIA-JAX", "MIA-MCI", "MIA-EYW", "MIA-KIN", "MIA-TYS", "MIA-LRM", "MIA-LAS", "MIA-LIR", "MIA-LIT", "MIA-SDF", "MIA-MHH", "MIA-MEM", "MIA-MID", "MIA-MEX", "MIA-MSP", "MIA-MBJ", "MIA-MTY", "MIA-MVD", "MIA-YUL", "MIA-BNA", "MIA-NAS", "MIA-MSY", "MIA-JFK", "MIA-ORF", "MIA-ELH", "MIA-OKC", "MIA-MCO", "MIA-PTY", "MIA-PNS", "MIA-PHL", "MIA-PHX", "MIA-PIT", "MIA-POS", "MIA-PLS", "MIA-PUJ", "MIA-RDU", "MIA-RIC", "MIA-GIG", "MIA-SAT", "MIA-SAN", "MIA-SFO", "MIA-SJO", "MIA-SJU", "MIA-SAL", "MIA-STI", "MIA-SDQ", "MIA-GRU", "MIA-SAV", "MIA-SEA", "MIA-SXM", "MIA-XSC", "MIA-STX", "MIA-SKB", "MIA-STL", "MIA-UVF", "MIA-STT", "MIA-TLH", "MIA-TPA", "MIA-YYZ", "MIA-TUL", "MIA-DCA", "MIA-ICT", "MIA-ILM", "MIA-BDL",
-"JFK-ANU", "JFK-BDA", "JFK-BGI", "JFK-CUN", "JFK-CVG", "JFK-CLE", "JFK-CMH", "JFK-DEL", "JFK-EGE", "JFK-GEO", "JFK-IND", "JFK-LAS", "JFK-LAX", "JFK-LHR", "JFK-MEX", "JFK-MXP", "JFK-MBJ", "JFK-BNA", "JFK-ORF", "JFK-PHX", "JFK-PIT", "JFK-PUJ", "JFK-RDU", "JFK-SFO", "JFK-SNA", "JFK-TIST", "JFK-YYZ", "JFK-DCA", "JFK-ORH",
-"PHL-ALB", "PHL-AUA", "PHL-AVL", "PHL-ATL", "PHL-BGR", "PHL-XNA", "PHL-BHM", "PHL-BUF", "PHL-BTV", "PHL-CHS", "PHL-CVG", "PHL-CLE", "PHL-CAE", "PHL-CMH", "PHL-DAY", "PHL-DEN", "PHL-DSM", "PHL-DTW", "PHL-DOH", "PHL-FLL", "PHL-RSW", "PHL-GRR", "PHL-GSO", "PHL-GSP", "PHL-YHZ", "PHL-IAH", "PHL-IND", "PHL-JAX", "PHL-MCI", "PHL-EYW", "PHL-TYS", "PHL-LAS", "PHL-LEX", "PHL-LIS", "PHL-SDF", "PHL-MSN", "PHL-MHT", "PHL-MEM", "PHL-MDT", "PHL-MKE", "PHL-MSP", "PHL-MBJ", "PHL-YUL", "PHL-MYR", "PHL-BNA", "PHL-NAS", "PHL-MSY", "PHL-ORF", "PHL-OMA", "PHL-MCO", "PHL-PBI", "PHL-PHX", "PHL-PIT", "PHL-PDX", "PHL-PWM", "PHL-PVD", "PHL-PUJ", "PHL-RDU", "PHL-RIC", "PHL-ROA", "PHL-ROC", "PHL-SBY", "PHL-SLC", "PHL-SAT", "PHL-SAN", "PHL-SFO", "PHL-SJU", "PHL-SRQ", "PHL-SAV", "PHL-SEA", "PHL-STL", "PHL-STT", "PHL-SYR", "PHL-TPA", "PHL-YYZ", "PHL-DCA", "PHL-ART", "PHL-ILM", "PHL-BDL",
-"PHX-ATL", "PHX-IAH", "PHX-SFO",
-"DCA-ATL",
-"AUS-ORD", "AUS-DFW", "AUS-LAX", "AUS-MIA", "AUS-JFK", "AUS-PHL",
-"BOS-CLT", "BOS-ORD", "BOS-CMH", "BOS-DFW", "BOS-IND", "BOS-LHR", "BOS-LAX", "BOS-MIA", "BOS-MDT", "BOS-JFK", "BOS-LGA", "BOS-PHL", "BOS-PHX", "BOS-STL", "BOS-DCA",
-"CLT-ATL", "CLT-ORD", "CLT-DFW", "CLT-FRA", "CLT-IAH", "CLT-MIA", "CLT-JFK", "CLT-PHL", "CLT-IAD",
-"ORD-ALB", "ORD-ABQ", "ORD-ANC", "ORD-ATW", "ORD-ATH", "ORD-ATL", "ORD-BWI", "ORD-XNA", "ORD-BHM", "ORD-BIS", "ORD-BMI", "ORD-BUF", "ORD-YYC", "ORD-CID", "ORD-CMI", "ORD-CHS", "ORD-CVG", "ORD-CLE", "ORD-COU", "ORD-CMH", "ORD-DFW", "ORD-DAY", "ORD-DEN", "ORD-DSM", "ORD-DTW", "ORD-DUB", "ORD-EGE", "ORD-ELP", "ORD-EVV", "ORD-FAR", "ORD-FNT", "ORD-FWA", "ORD-GRR", "ORD-FCA", "ORD-GRB", "ORD-GSO", "ORD-GSP", "ORD-IAH", "ORD-HSV", "ORD-IND", "ORD-JAX", "ORD-AZO", "ORD-MCI", "ORD-TYS", "ORD-LSE", "ORD-LAN", "ORD-LAS", "ORD-LEX", "ORD-LHR", "ORD-LAX", "ORD-SDF", "ORD-MSN", "ORD-MHK", "ORD-MQT", "ORD-MEM", "ORD-MIA", "ORD-MDT", "ORD-MKE", "ORD-MSP", "ORD-MLI", "ORD-NAP", "ORD-BNA", "ORD-MSY", "ORD-JFK", "ORD-LGA", "ORD-EWR", "ORD-ORF", "ORD-OKC", "ORD-OMA", "ORD-MCO", "ORD-CDG", "ORD-PIA", "ORD-PHL", "ORD-PHX", "ORD-PIT", "ORD-PDX", "ORD-PVD", "ORD-YQB", "ORD-RDU", "ORD-RIC", "ORD-ROC", "ORD-RST", "ORD-SAT", "ORD-SAN", "ORD-SFO", "ORD-SNA", "ORD-AVP", "ORD-SEA", "ORD-FSD", "ORD-SGF", "ORD-STL", "ORD-SYR", "ORD-TPA", "ORD-TVC", "ORD-YYZ", "ORD-TYS", "ORD-TUL", "ORD-VCE", "ORD-DCA", "ORD-ALO", "ORD-CWA", "ORD-HPN", "ORD-ICT", "ORD-BDL",
-
-"ABQ-SEA", "AKN-ANC", "ALW-SEA", "ANC-DEN", "ANC-FAI", "ANC-JNU", "ANC-LAX", "ANC-MSP", "ANC-ORD", "ANC-SAN", "ANC-SEA", "ATL-PDX", "ATL-SEA", "AUS-SEA", "AUS-SFO", "BIL-SEA", "BLI-SEA", "BOI-GEG", "BOI-LAX", "BOI-SEA", "BOI-SFO", "BOS-PDX", "BOS-SAN", "BOS-SEA", "BOS-SFO", "BUR-PDX", "BUR-SEA", "BUR-SFO", "BZA-LAX", "BZN-SEA", "CMH-SEA", "DEN-SEA", "DFW-PDX", "DFW-SEA", "EAT-SEA", "EUG-SEA", "FAI-SEA", "FAT-SEA", "FCA-SEA", "GEG-LAX", "GEG-PDX", "GEG-SEA", "HNL-SEA", "IAD-LAX", "IAD-SAN", "IAD-SEA", "IAD-SFO", "IAH-PDX", "IAH-SEA", "IDA-SEA", "JAC-SEA", "JAC-SFO", "JFK-PDX", "JFK-SAN", "JFK-SEA", "JFK-SFO", "JNU-KTN", "JNU-SEA", "JNU-SIT", "KOA-LAX", "KOA-SEA", "KOA-SFO", "KTN-SEA", "KTN-SIT", "LAS-LAX", "LAS-PAE", "LAS-SEA", "LAS-SFO", "LAX-MFR", "LAX-NAS", "LAX-PDX", "LAX-PSC", "LAX-PVR", "LAX-RDM", "LAX-RNO", "LAX-SEA", "LAX-SFO", "LAX-SJC", "LAX-SJD", "LAX-STS", "LIH-SEA", "LIH-SFO", "MCI-SEA", "MCO-SFO", "MFR-SEA", "MKE-SEA", "MRY-SEA", "MSO-SEA", "MSP-SEA", "MSY-SEA", "OAK-PDX", "OAK-SEA", "OGG-PDX", "OGG-SEA", "OKC-SEA", "OMA-SEA", "ONT-SEA", "ORD-PDX", "ORD-SEA", "ORD-SFO", "PAE-PHX", "PAE-SFO", "PDX-PVR", "PDX-SEA", "PDX-SFO", "PDX-SMF", "PHX-SEA", "PSC-SEA", "PSP-SEA", "PSP-SFO", "PUW-SEA", "PVR-SEA", "PVR-SFO", "RDM-SEA", "RNO-SEA", "SAN-SEA", "SAN-SFO", "SAN-SJC", "SAT-SEA", "SBA-SEA", "SBP-SEA", "SEA-SFO", "SEA-SIT", "SEA-SJC", "SEA-SLC", "SEA-SMF", "SEA-SNA", "SEA-STL", "SEA-STS", "SEA-SUN", "SEA-TUS", "SEA-YKM", "SEA-YVR", "SEA-YYC", "SEA-YYJ", "SEA-YYZ", "SFO-SJD", "SFO-SNA",
-
-"MLA-BER","MLA-LHR", "MLA-MUC", "MLA-CDG", "MLA-FCO", "MLA-VIE", "MLA-ZRH",
-
-"BEG-BNX","BEG-DUS","BEG-HAJ","BEG-LJU","BEG-INI","BEG-NUE","BEG-TGD","BEG-SZG","BEG-SJJ","BEG-STR","BEG-TIV","BEG-VCE",
-
-"SEZ-PRI",
-
-"GYD-LHR","GYD-RMO","GYD-MSQ","GYD-LED","GYD-NQZ","GYD-UGC","GYD-SKD","GYD-DYU","GYD-FRU","GYD-SCO",
-
-"BKK-MLE", "BKK-HKT", "BKK-USM", "BKK-TDX", "BKK-PNH", "BKK-THS", "BKK-LPT", "BKK-CNX", "BKK-LPQ", "USM-CNX", "USM-SIN", "BKK-KBV", "USM-HKT", "USM-HKG", "CNX-HKT", "HKT-HDY", "HKT-UTP",
-
-"LHR-ABZ", "LHR-AMS", "LGW-ANU", "LHR-BSL", "LHR-BHD", "LHR-BER", "LHR-BDA", "LHR-BLL", "LHR-BLQ", "LHR-BGI", "LHR-BRU", "LHR-CPT", "LHR-DOH", "LHR-DUB", "LHR-DUS", "LHR-EDI", "LHR-FAO", "LHR-FRA", "LHR-FNC", "LHR-GVA", "LHR-GLA", "LHR-GOT", "LHR-HAM", "LHR-HAJ", "LHR-INV", "LHR-JER", "LHR-JNB", "LHR-LIS", "LHR-LYS", "LHR-AGP", "LHR-MAN", "LHR-MRS", "LHR-MXP", "LHR-YUL", "LHR-MUC", "LHR-NAS", "NAS-PLS", "LHR-NCL", "LHR-NCE", "LHR-OSL", "LHR-PMI", "LHR-CDG", "LHR-POS", "LHR-FCO", "LGW-UVF", "UVF-GEO", "UVF-TAB", "UVF-GND", "LHR-ARN", "LHR-STR", "LGW-TFS", "LHR-YYZ", "LHR-TLS", "LHR-VLC", "LHR-WAW", "LHR-ZRH", "LGW-KIN", "LHR-GIB", "LGW-AGP", "LHR-KEF", "LHR-CGN", "LHR-LUX", "LHR-IBZ", "LHR-NAP", "LHR-FLR",
-
-"NAN-DFW", "NAN-LAX", "NAN-SFO", "NAN-YVR", "NAN-HNL", "NAN-NRT", "NAN-HKG", "NAN-SIN", "NAN-HIR", "NAN-ADL", "NAN-CNS", "NAN-BNE", "NAN-MEL", "NAN-CBR", "NAN-SYD", "NAN-AKL", "NAN-WLG", "NAN-CHC", "NAN-VLI", "NAN-APW",
-
-"SOF-ATH", "SOF-BER", "SOF-BOJ", "SOF-FRA", "SOF-MXP", "SOF-PRG", "SOF-FCO", "SOF-VAR", "SOF-ZRH",
-
-"AMS-ALC", "AMS-AGP", "AMS-PMI", "AMS-SCQ", "AMS-VLC",
-"BCN-LCG", "BCN-ALG", "BCN-ALC", "BCN-LEI", "BCN-AMS",
-"BCN-OVD", "BCN-BJL", "BCN-BRI", "BCN-BSL", "BCN-BER",
-"BCN-BIO", "BCN-BLL", "BCN-BLQ", "BCN-BOD", "BCN-CAG",
-"BCN-CTA", "BCN-CPH", "BCN-DUS", "BCN-FAO", "BCN-FLR",
-"BCN-FUE", "BCN-GVA", "BCN-GOA", "BCN-LPA", "BCN-GRX",
-"BCN-HAM", "BCN-HAJ", "BCN-IBZ", "BCN-XRY", "BCN-KEF",
-"BCN-SPC", "BCN-ACE", "BCN-LIS", "BCN-LYS", "BCN-MAD",
-"BCN-AGP", "BCN-MLA", "BCN-RAK", "BCN-MRS", "BCN-MAH",
-"BCN-MXP", "BCN-MUC", "BCN-NTE", "BCN-NAP", "BCN-NCE",
-"BCN-NUE", "BCN-OLB", "BCN-PMO", "BCN-PMI", "BCN-CDG",
-"BCN-ORY", "BCN-OPO", "BCN-FCO", "BCN-EAS", "BCN-SDR",
-"BCN-SCQ", "BCN-SVQ", "BCN-ARN", "BCN-STR", "BCN-TNG",
-"BCN-TFN", "BCN-TUN", "BCN-TRN", "BCN-VCE", "BCN-VGO",
-"BCN-ZRH",
-"BIO-AMS", "BIO-LIS", "BIO-FCO",
-"FLR-MAD",
-"IBZ-AMS", "IBZ-LIS", "IBZ-AGP", "IBZ-FCO",
-"AGP-BIO", "AGP-FUE", "AGP-LPA", "AGP-ACE", "AGP-PMI",
-"AGP-ORY", "AGP-SCQ", "AGP-TFN",
-"FCO-DBV", "FCO-AGP", "FCO-ORY", "FCO-SPU", "FCO-VLC",
-
-"HEL-AMS",
-"HEL-BKK",
-"HEL-BGO",
-"HEL-BLL",
-"HEL-CPH",
-"HEL-DFW",
-"HEL-DOH",
-"HEL-FRA",
-"HEL-FNC",
-"HEL-GZP",
-"HEL-GDN",
-"HEL-GOT",
-"HEL-LPA",
-"HEL-INN",
-"HEL-IVL",
-"IVL-KKN",
-"HEL-KEF",
-"HEL-KEM",
-"HEL-KTT",
-"HEL-KRK",
-"HEL-KUO",
-"HEL-KAO",
-"HEL-LIS",
-"HEL-LHR",
-"HEL-LAX",
-"HEL-MAD",
-"HEL-MHQ",
-"HEL-LIN",
-"HEL-NGO",
-"HEL-JFK",
-"HEL-NCE",
-"HEL-OSL",
-"HEL-OUL",
-"HEL-RIX",
-"HEL-RVN",
-"HEL-SEA",
-"HEL-SIN",
-"HEL-ARN",
-"HEL-TLL",
-"HEL-TAY",
-"HEL-TOS",
-"HEL-HND",
-"HEL-TRD",
-"HEL-VAA",
-"HEL-VRN",
-"HEL-VIE",
-"HEL-VNO",
-"HEL-VBY",
-"HEL-HKG",
-"HEL-PVG",
-"HEL-ICN",
-"HEL-ORD",
-"HEL-CDG",
-"HEL-DBV",
-"HEL-BUD",
-"HEL-JTR",
-"HEL-PRG",
-"HEL-EDI",
-"HEL-ZRH",
-"HEL-ACE",
-"BOS-ATL",
-"BOS-BZN",
-"BOS-BUF",
-"BOS-CHS",
-"BOS-ORD",
-"BOS-CLE",
-"BOS-DFW",
-"BOS-DEN",
-"BOS-DTW",
-"BOS-FLL",
-"BOS-RSW",
-"BOS-IAH",
-"BOS-JAX",
-"BOS-MIA",
-"BOS-BNA",
-"BOS-MSY",
-"BOS-LGA",
-"BOS-MCO",
-"BOS-CDG",
-"BOS-PHL",
-"BOS-PIT",
-"BOS-RDU",
-"BOS-RIC",
-"BOS-SLC",
-"BOS-SJU",
-"SJU-STT",
-"BOS-STI",
-"BOS-SDQ",
-"BOS-SYR",
-"BOS-TPA",
-"BOS-DCA",
-"BOS-PBI",
-"JFK-BQN",
-"JFK-ABQ",
-"JFK-AMS",
-"JFK-ATL",
-"JFK-AUS",
-"JFK-BDA",
-"JFK-BOS",
-"JFK-BGI",
-"JFK-BUF",
-"JFK-CUN",
-"JFK-GCM",
-"JFK-CHS",
-"JFK-ORD",
-"JFK-CUR",
-"JFK-DEN",
-"JFK-DTW",
-"JFK-EDI",
-"JFK-FLL",
-"JFK-RSW",
-"JFK-GEO",
-"JFK-GND",
-"JFK-IAH",
-"JFK-HYA",
-"JFK-JAX",
-"JFK-MVY",
-"JFK-MIA",
-"JFK-ACK",
-"JFK-NAS",
-"JFK-MSY",
-"JFK-AUA",
-"JFK-MCO",
-"JFK-PSE",
-"JFK-POS",
-"JFK-PWM",
-"JFK-PLS",
-"JFK-POP",
-"JFK-PUJ",
-"JFK-RDU",
-"JFK-ROC",
-"JFK-SLC",
-"JFK-SJU",
-"JFK-STI",
-"JFK-SDQ",
-"JFK-SRQ",
-"JFK-SAV",
-"JFK-SXM",
-"JFK-SYR",
-"JFK-TPA",
-"JFK-UVF",
-"JFK-DCA",
-"JFK-PBI",
-"CPH-TFS",
-"CPH-PMI",
-"CPH-LJU",
-"CPH-NCL",
-"CPH-RIX",
-"CPH-BIO",
-"CPH-BTS",
-"CPH-BGO",
-"CPH-SVG",
-"CPH-HER",
-"HEL-TIV",
-"HEL-ARN",
-"HEL-BOJ",
-"HEL-LPA",
-"ARN-OSL",
-"ARN-BIA",
-"ARN-HRG",
-"ARN-PRN",
-"ARN-AYT",
-"ARN-LLA",
-"OSL-TLL",
-"OSL-DWC",
-"OSL-LYR",
-"OSL-AJA",
-"OSL-TIA",
-"OSL-VNO",
-"OSL-KKN",
-"TOS-LGW",
-"TOS-OSL",
-"ARN-KRN",
-"RVN-LGW",
-"ARN-OPO",
-"OSL-SKP",
-"ARN-ATH",
-"BGO-FAE",
-"BGO-FRO",
-"BGO-BOO",
-"TOS-HVG",
-"TOS-SVJ",
-"TOS-EVE",
-"BLR-DOH",
-"MAA-DOH",
-"COK-DOH",
-"DEL-DOH",
-"HYD-DOH",
-"BOM-DOH",
-"BOM-HSR",
-"BOM-SXR",
-"BOM-IXJ",
-"BOM-DEL",
-"BOM-AGR",
-"BOM-KTM",
-"BOM-GAU",
-"BOM-IXZ",
-"BOM-IXB",
-"BOM-BBI",
-"BOM-MLE",
-"BOM-CMB",
-"BOM-IXM",
-"BOM-VGA",
-"BOM-IXE",
-"BOM-HBX",
-"BOM-JLR",
-"BOM-RDP",
-"BOM-RPR",
-"BOM-IXR",
-"BOM-IXU",
-"BOM-BEK",
-"BOM-JDH",
-"CNN-DOH",
-"PEK-EDI",
-"PEK-BER",
-"PEK-DUB",
-"PEK-MAN",
-"PEK-SYX",
-"PEK-DLC",
-"PEK-SHA",
-"PEK-PVG",
-"PEK-AAT",
-"PEK-BRU",
-"PEK-KWL",
-"PEK-IKT",
-"PEK-TPE",
-"HAK-HKG",
-"HAK-AUH",
-"HAK-SGN",
-"HAK-AKL",
-"HAK-HGH",
-"HAK-MFM",
-"HAK-KHN",
-"MNL-JFK",
-"MNL-YYZ",
-"MNL-SFO",
-"MNL-HNL",
-"MNL-YVR",
-"MNL-MEL",
-"MNL-POM",
-"MNL-HKG",
-"MNL-JJN",
-"MNL-USN",
-"MNL-HND",
-"MNL-GES",
-"MNL-ICN",
-"MNL-SIN",
-"MNL-TAC",
-"MNL-CEB",
-"MNL-PPS",
-"MNL-LHR",
-"CEB-LAX",
-"BFS-MAH",
-"BFS-ZTH",
-"BHX-GNB",
-"BHX-AGA",
-"BHX-FUE",
-"BOH-KEF",
-"BOH-REU",
-"BRS-LCA",
-"BRS-INN",
-"EMA-CFU",
-"EDI-FCO",
-"EDI-PFO",
-"GLA-MLA",
-"GLA-BJV",
-"LBA-DBV",
-"LBA-JSI",
-"LPL-RHO",
-"LPL-ACE",
-"STN-IBZ",
-"STN-KGS",
-"MAN-BGO",
-"MAN-SKG",
-"MAN-LPA",
-"MAN-GVA",
-"NCL-CHQ",
-"AMM-AQJ",
-"AMM-BEN",
-"AMM-DOH",
-"AMM-MJI",
-"BAH-MAN",
-"BAH-LGW",
-"BAH-LHR",
-"BAH-MXP",
-"BAH-NCE",
-"BAH-CAN",
-"BAH-SIN",
-"BAH-PVG",
-"BAH-TRV",
-"BAH-GOI",
-"BAH-GYD",
-"GYD-TBS",
-"BAH-IST",
-"BAH-ATH",
-"BAH-MUC",
-"BAH-DAC",
-"BAH-BLR",
-"BAH-DOH",
-"BAH-AUH",
-"BAH-DXB",
-"BAH-MED",
-"FRA-PUJ",
-"FRA-CUN",
-"FRA-PHL",
-"FRA-LAS",
-"FRA-ANC",
-"FRA-MCO",
-"FRA-WDH",
-"FRA-MRU",
-"FRA-MLE",
-"FRA-SLC",
-"FRA-SPU",
-"FRA-JSI",
-"FRA-KTT",
-"MUC-RAK",
-"MUC-MAH",
-"MUC-FNC",
-"MUC-RHO",
-"MUC-BJV",
-"MUC-SMI",
-"PTY-BSB",
-"PTY-ASU",
-"PTY-VVI",
-"PTY-CNF",
-"PTY-MDZ",
-"PTY-ROS",
-"PTY-SJO",
-"PTY-ADZ",
-"PTY-MAR",
-"PTY-BZE",
-"PTY-MGA",
-"PTY-TPA",
-"PTY-IAD",
-"PTY-ORD",
-"PTY-DEN",
-"YYC-CUN",
-"YYC-LAS",
-"YYC-YYZ",
-"YYC-YYJ",
-"YEG-YWG",
-"YEG-PHX",
-"YEG-YLW",
-"YYZ-PUJ",
-"YYZ-JFK",
-"YYZ-YHZ",
-"YYZ-MCO",
-"YYZ-YQT",
-"YVR-YYC",
-"YVR-PSP",
-"YVR-GDL",
-"MCT-DOH",
-"MCT-KHI",
-"MCT-KHS",
-"MCT-SLL",
-"MCT-ZNZ",
-"ZNZ-DAR",
-"DAR-MCT",
-"KGL-BJM",
-"KGL-KME",
-"KGL-DOH",
-"KGL-LHR",
-"BEY-CAI",
-"BEY-DOH",
-"BEY-LCA",
-
-/* QANTAS */
-"BNE-AKL","BNE-CHC","BNE-NOU","BNE-SIN","CNS-HID","MEL-HKG","SYD-AKL","SYD-DPS","SYD-HNL","SYD-NAN","SYD-WLG","SYD-LDH","MEL-LAX","SYD-JNB","SYD-SCL","SYD-SIN","MEL-BWT","BNE-NLK","MEL-NRT","SYD-SFO","PER-BME","MEL-HBA","MEL-MQL","MEL-WGA","BNE-ROR","SYD-BKK",
-
-"HND-AKJ",
-"HND-AXT",
-"HND-ITM",
-"HND-CTS",
-"HND-KKJ",
-"HND-KIX",
-"HND-KOJ",
-"HND-HKD",
-"HND-NGO",
-"HND-FUK",
-"HND-IZO",
-"HND-MYJ",
-"HND-NGS",
-"HND-KMQ",
-"HND-UBJ",
-"HND-TAK",
-"HND-OKA",
-"HND-OKJ",
-"HND-AOJ",
-"HND-DOH",
-"HND-HIJ",
-"HND-KCZ",
-"HND-KMJ",
-"HND-KUH",
-"HND-LHR",
-"HND-LAX",
-"HND-MMB",
-"HND-KMI",
-"HND-JFK",
-"HND-OBO",
-"HND-OIT",
-"HND-CDG",
-"HND-GMP",
-"HND-SYD",
-"HND-TKS",
-"NRT-GUM",
-"NRT-SEA",
-"MAD-LCG",
-"MAD-ALC",
-"MAD-LEI",
-"MAD-LEU",
-"MAD-OVD",
-"MAD-BJZ",
-"MAD-BCN",
-"MAD-BIO",
-"MAD-BOG",
-"MAD-BLQ",
-"MAD-BOD",
-"MAD-BOS",
-"MAD-EZE",
-"MAD-CCS",
-"MAD-CMN",
-"MAD-CDT",
-"MAD-ORD",
-"MAD-DSS",
-"MAD-DFW",
-"MAD-DOH",
-"MAD-FUE",
-"MAD-GRX",
-"MAD-GUA",
-"GUA-SAL",
-"SAL-MAD",
-"MAD-GYE",
-"MAD-HAV",
-"MAD-IBZ",
-"MAD-XRY",
-"MAD-SPC",
-"MAD-ACE",
-"MAD-LPA",
-"MAD-LIM",
-"MAD-LIS",
-"MAD-LAX",
-"MAD-LYS",
-"MAD-AGP",
-"MAD-RAK",
-"MAD-MRS",
-"MAD-MLN",
-"MAD-MAH",
-"MAD-MEX",
-"MAD-MIA",
-"MAD-LIN",
-"MAD-MXP",
-"MAD-MVD",
-"MAD-NTE",
-"MAD-NAP",
-"MAD-JFK",
-"MAD-NCE",
-"MAD-PMI",
-"MAD-PNA",
-"MAD-PTY",
-"MAD-ORY",
-"MAD-OPO",
-"MAD-UIO",
-"MAD-GIG",
-"MAD-FCO",
-"MAD-SFO",
-"MAD-SJO",
-"MAD-SJU",
-"MAD-EAS",
-"MAD-SDR",
-"MAD-SCL",
-"MAD-SCQ",
-"MAD-SDQ",
-"MAD-GRU",
-"MAD-SVQ",
-"MAD-SXB",
-"MAD-TNG",
-"MAD-TFN",
-"MAD-TFS",
-"MAD-TLS",
-"MAD-TRN",
-"MAD-VLC",
-"MAD-VCE",
-"MAD-VGO",
-"MAD-IAD",
-"BCN-BOS",
-"BCN-EZE",
-"BCN-LEN",
-"BCN-LAX",
-"BCN-MLN",
-"BCN-MIA",
-"BCN-JFK",
-"BCN-SFO",
-"BCN-SCL",
-"HKG-AKL",
-"HKG-BKK",
-"HKG-BOS",
-"HKG-DFW",
-"HKG-DPS",
-"HKG-FUK",
-"HKG-HAN",
-"HKG-SGN",
-"HKG-CGK",
-"HKG-JNB",
-"HKG-KUL",
-"HKG-LHR",
-"HKG-NGO",
-"HKG-JFK",
-"HKG-KIX",
-"HKG-PEN",
-"HKG-PNH",
-"HKG-HKT",
-"HKG-CTS",
-"HKG-ICN",
-"HKG-SIN",
-"HKG-SUB",
-"HKG-HND",
-"HKG-NRT",
-"HKG-ZRH",
-"XMN-JHG",
-"XMN-XIY",
-"XMN-HSN",
-"XMN-TAO",
-"XMN-XNN",
-"XMN-LZH",
-"XMN-SHS",
-"XMN-CGQ",
-"XMN-TYN",
-"XMN-DOH",
-"XMN-AMS",
-"CAN-JFK",
-"CAN-CHC",
-"CAN-IST",
-"CAN-LHR",
-"CAN-AMS",
-"CAN-DOH",
-"CAN-AAT",
-"CAN-URC",
-"CAN-HLD",
-"CAN-KMG",
-"CAN-WUH",
-"CAN-PKX",
-"CAN-PVG",
-"CAN-HGH",
-"CAN-HFE",
-"CAN-XNT",
-"CAN-INC",
-"CAN-KHG",
-"CAN-SHE",
-"CAN-NNY",
-"URC-HTN",
-"URC-AKU",
-"URC-TCG",
-"PKX-LHW",
-"PKX-CTU",
-"PKX-YIW",
-"PKX-HND",
-"PKX-HKG",
-"PKX-SZX",
-"PKX-KWE",
-"CAN-SFO",
-"PVG-DDG",
-"PVG-CSX",
-"CAN-AKA",
-"CAN-ADL",
-"CAN-MIG",
-"CAN-PZI",
-"CAN-DLU",
-"CMB-CDG", "CMB-FRA", "CMB-DOH", "CMB-MLE", "CMB-MEL",
-"MLE-GAN",
-"MLE-FVM",
-"MLE-DRV",
-"MLE-IFU",
-"MLE-KDM",
-"MLE-GKK",
-"MLE-HDK",
-"MLE-HAQ",
-"MLE-TMF",
-"IFU-HAQ",
-"KDM-GKK",  
-"BNE-ADL",
-"BNE-ASP",
-"BNE-AYQ",
-"BNE-CNS",
-"BNE-CBR",
-"BNE-DRW",
-"BNE-DOH",
-"BNE-MKY",
-"BNE-MEL",
-"BNE-ROK",
-"BNE-SYD",
-"BNE-TSV",
-"MEL-ADL",
-"MEL-AYQ",
-"MEL-CBR",
-"MEL-DRW",
-"MEL-DOH",
-"MEL-OOL",
-"MEL-HTI",
-"MEL-HBA",
-"MEL-LST",
-"MEL-NTL",
-"MEL-PER",
-"MEL-MCY",
-"MEL-ZQN",
-"PER-ADL",
-"PER-BNE",
-"PER-CCK",
-"PER-DRW",
-"PER-DOH",
-"PER-KGI",
-"PER-KTA",
-"PER-KNX",
-"PER-ZNE",
-"PER-PHE",
-"SYD-ADL",
-"SYD-BNK",
-"SYD-CNS",
-"SYD-CBR",
-"SYD-DOH",
-"SYD-OOL",
-"SYD-HTI",
-"SYD-HBA",
-"SYD-LST",
-"SYD-MEL",
-"SYD-PER",
-"SYD-MCY",
-"SYD-ZQN",
-
-
-
-  ];
-
-  // ---------------------------
-  // Convert routes into unique bidirectional pairs
-  // ---------------------------
-  const routePairs = [];
-  const seen = new Set();
-  function addPair(a,b) {
-    if (!a || !b) return;
-    const key = `${a}|${b}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      routePairs.push([a,b]);
-    }
-  }
-
-  routes.forEach(r => {
-    if (!r) return;
-    // r like "A-B"
-    if (typeof r === 'string' && r.indexOf('-') !== -1) {
-      const [aRaw,bRaw] = r.split('-');
-      const a = aRaw.trim();
-      const b = bRaw.trim();
-      addPair(a,b);
-      addPair(b,a);
-    }
-  });
-
-  // ---------------------------
-  // Create markers and click behavior
-  // ---------------------------
-  const markerMap = {};
-  let drawnArcs = [];
-
-  Object.entries(airports).forEach(([code, info]) => {
-    // make sure lat/lng are numbers
-    const lat = Number(info.lat);
-    const lng = Number(info.lng);
-    if (isNaN(lat) || isNaN(lng)) return;
-
-    const marker = L.circleMarker([lat, lng], {
-      radius: 5,
-      fillColor: "#0077cc",
-      color: "#ffffff",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.95
-    }).addTo(map);
-
-    const link = airportLinks[code] || "#";
-    const popupHtml =
-      `<div><b>${info.city} – ${info.name} (${code})</b></div>` +
-      `<div><a class="popup-link" href="${link}" target="_blank" rel="noopener noreferrer">View Airport Page</a></div>`;
-
-    marker.bindPopup(popupHtml);
-
-    marker.on('click', () => {
-      // Clear previously drawn arcs
-      drawnArcs.forEach(a => map.removeLayer(a));
-      drawnArcs = [];
-
-      // Draw arcs for this airport
-      routePairs.forEach(([from, to]) => {
-        if (from === code && airports[to]) {
-          const fromCoords = [airports[from].lat, airports[from].lng];
-          const toCoords   = [airports[to].lat, airports[to].lng];
-
-          try {
-            const arc = new L.Polyline.Arc(fromCoords, toCoords, {
-              color: '#e11',
-              weight: 2,
-              opacity: 0.85,
-              vertices: 200
-            }).addTo(map);
-            drawnArcs.push(arc);
-          } catch (err) {
-            // fallback straight line if arc plugin fails
-            const line = L.polyline([fromCoords, toCoords], { color:'#e11', weight:2, opacity:0.8 }).addTo(map);
-            drawnArcs.push(line);
+          for (let c of line) {
+            if (c === '"') {
+              inQuotes = !inQuotes;
+            } else if (c === "," && !inQuotes) {
+              parts.push(current);
+              current = "";
+            } else {
+              current += c;
+            }
           }
+          parts.push(current);
+
+          if (parts.length >= 8) {
+            const icao = parts[1]?.trim();
+            const name = parts[3]?.trim();
+            const lat = parseFloat(parts[4]);
+            const lng = parseFloat(parts[5]);
+            const continent = parts[7]?.trim() || "NA";
+
+            if (icao && !isNaN(lat) && !isNaN(lng)) {
+              airports[icao] = { name, icao, lat, lng, continent };
+            }
+          }
+        }
+
+        return airports;
+      }
+
+      function clearRoutes() {
+        drawn.forEach((layer) => map.removeLayer(layer));
+        drawn = [];
+      }
+
+      function clearMarkers() {
+        Object.values(markers).forEach((group) => {
+          group.forEach((marker) => map.removeLayer(marker));
+        });
+        markers = {};
+      }
+
+      function interpolateLat(lat1, lon1, lat2, lon2, targetLon) {
+        const t = (targetLon - lon1) / (lon2 - lon1);
+        return lat1 + (lat2 - lat1) * t;
+      }
+
+      function makePopupHtml(route) {
+        if (!route) return "";
+        const aircraftList =
+          route.aircraft.length > 0
+            ? "<ul>" +
+              route.aircraft
+                .map((a) => `<li>${a.liveryname} ${a.name}</li>`)
+                .join("") +
+              "</ul>"
+            : "No aircraft assigned";
+
+        return `<strong>${route.fltnum}</strong><br>${route.dep} → ${route.arr}<br><strong>Aircraft:</strong><br>${aircraftList}`;
+      }
+
+      function makeBezierSegment(start, control, end, routeColor, weight, opacity, popupHtml) {
+        const [lat1, lon1] = start;
+        const [cLat, cLon] = control;
+        const [lat2, lon2] = end;
+
+        const points = [];
+        const steps = 60;
+
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const oneMinusT = 1 - t;
+
+          const lat =
+            oneMinusT * oneMinusT * lat1 +
+            2 * oneMinusT * t * cLat +
+            t * t * lat2;
+
+          const lon =
+            oneMinusT * oneMinusT * lon1 +
+            2 * oneMinusT * t * cLon +
+            t * t * lon2;
+
+          points.push([lat, lon]);
+        }
+
+        const layer = L.polyline(points, {
+          color: routeColor,
+          weight,
+          opacity,
+          smoothFactor: 1,
+          lineCap: "round",
+          lineJoin: "round",
+        });
+
+        if (popupHtml) layer.bindPopup(popupHtml);
+        layer.addTo(map);
+        drawn.push(layer);
+      }
+
+      function makeNormalArc(start, end, routeColor, weight, opacity, popupHtml) {
+        let layer;
+        try {
+          layer = new L.Polyline.Arc(start, end, {
+            color: routeColor,
+            weight,
+            opacity,
+            vertices: 120,
+          });
+        } catch {
+          layer = L.polyline([start, end], {
+            color: routeColor,
+            weight,
+            opacity,
+          });
+        }
+
+        if (popupHtml) layer.bindPopup(popupHtml);
+        layer.addTo(map);
+        drawn.push(layer);
+      }
+
+      function drawArc(fromCode, toCode) {
+        const A = airportData[fromCode];
+        const B = airportData[toCode];
+        if (!A || !B) return;
+
+        const route = currentRoutes.find(
+          (r) =>
+            (r.dep === fromCode && r.arr === toCode) ||
+            (r.dep === toCode && r.arr === fromCode)
+        );
+
+        let routeColor = currentColor;
+        if (currentPrefix === "ALL" && route) {
+          const airline = airlines.find((a) => route.fltnum.startsWith(a.prefix));
+          if (airline) routeColor = airline.color;
+        }
+
+        const weight = currentPrefix === "ALL" ? 1 : 2;
+        const opacity = currentPrefix === "ALL" ? 0.5 : 1;
+        const popupHtml = makePopupHtml(route);
+
+        [-360, 0, 360].forEach((offset) => {
+          let lon1 = A.lng + offset;
+          let lon2 = B.lng + offset;
+          const lat1 = A.lat;
+          const lat2 = B.lat;
+
+          const diff = Math.abs(lon2 - lon1);
+
+          if (diff <= 180) {
+            makeNormalArc(
+              [lat1, lon1],
+              [lat2, lon2],
+              routeColor,
+              weight,
+              opacity,
+              popupHtml
+            );
+            return;
+          }
+
+          if (lon1 < lon2) {
+            lon1 += 360;
+          } else {
+            lon2 += 360;
+          }
+
+          const distance = Math.sqrt((lon2 - lon1) ** 2 + (lat2 - lat1) ** 2);
+          const curveAmount = Math.max(6, Math.min(16, distance * 0.08));
+
+          const seamGap = 0.8;
+
+          const seamOuterLon = 180 + offset;
+          const seamLeftLon = seamOuterLon - seamGap;
+          const seamRightLon = -180 + offset + seamGap;
+
+          let seamLat = interpolateLat(lat1, lon1, lat2, lon2, seamOuterLon);
+
+// spread routes apart (THIS fixes everything)
+const spread = Math.min(8, distance * 0.08);
+
+// use route identity to keep it consistent (no flicker)
+const hash = (fromCode.charCodeAt(0) + toCode.charCodeAt(0)) % 10;
+
+// distribute around seam
+seamLat += (hash - 5) * spread * 0.2;
+
+          const seamLeft = [seamLat, seamLeftLon];
+          const seamRight = [seamLat, seamRightLon];
+
+          const leftMidLat = (lat1 + seamLat) / 2;
+          const leftMidLon = (lon1 + seamLeftLon) / 2;
+
+          const rightEndLon = lon2 - 360;
+          const rightMidLat = (seamLat + lat2) / 2;
+          const rightMidLon = (seamRightLon + rightEndLon) / 2;
+
+          const horizontalBend = Math.min(12, distance * 0.12);
+
+          const leftControl = [
+            leftMidLat + curveAmount,
+            leftMidLon - horizontalBend
+          ];
+
+          const rightControl = [
+            rightMidLat + curveAmount,
+            rightMidLon + horizontalBend
+          ];
+
+          makeBezierSegment(
+            [lat1, lon1],
+            leftControl,
+            seamLeft,
+            routeColor,
+            weight,
+            opacity,
+            popupHtml
+          );
+
+          makeBezierSegment(
+            seamRight,
+            rightControl,
+            [lat2, rightEndLon],
+            routeColor,
+            weight,
+            opacity,
+            popupHtml
+          );
+        });
+      }
+
+      function highlightAirport(code) {
+        if (!airportData[code] || !markers[code]) return;
+
+        clearRoutes();
+        const connectedSet = connections[code] || new Set();
+
+        Object.entries(markers).forEach(([otherCode, markerCopies]) => {
+          markerCopies.forEach((marker) => {
+            if (otherCode === code) {
+              marker.setStyle({ fillOpacity: 1, opacity: 1, radius: 10 });
+              marker.bringToFront();
+            } else if (connectedSet.has(otherCode)) {
+              marker.setStyle({ fillOpacity: 0.9, opacity: 1, radius: 8 });
+            } else {
+              marker.setStyle({ fillOpacity: 0.2, opacity: 0.3, radius: 6 });
+            }
+          });
+        });
+
+        connectedSet.forEach((dest) => drawArc(code, dest));
+
+        const ap = airportData[code];
+        map.flyTo([ap.lat, ap.lng], 4, { duration: 0.7 });
+
+        if (markers[code][1]) {
+          markers[code][1].openPopup();
+        } else if (markers[code][0]) {
+          markers[code][0].openPopup();
+        }
+      }
+
+      function displayRoutesForAirline(prefix) {
+        currentPrefix = prefix;
+        clearRoutes();
+        clearMarkers();
+        connections = {};
+
+        if (!prefix) {
+          routeInfo.textContent = "Select an airline to view routes.";
+          return;
+        }
+
+        currentRoutes =
+          prefix === "ALL"
+            ? allRoutes
+            : allRoutes.filter((route) => route.fltnum.startsWith(prefix));
+
+        if (currentRegion !== "ALL") {
+          currentRoutes = currentRoutes.filter((route) => {
+            const depAp = airportData[route.dep];
+            const arrAp = airportData[route.arr];
+            const depRegion = depAp ? depAp.continent : "OTHER";
+            const arrRegion = arrAp ? arrAp.continent : "OTHER";
+            return depRegion === currentRegion || arrRegion === currentRegion;
+          });
+        }
+
+        const neededICAOs = new Set();
+        currentRoutes.forEach((route) => {
+          neededICAOs.add(route.dep);
+          neededICAOs.add(route.arr);
+        });
+
+        const routeAirports = {};
+        neededICAOs.forEach((icao) => {
+          if (airportData[icao]) {
+            routeAirports[icao] = airportData[icao];
+            connections[icao] = new Set();
+          }
+        });
+
+        currentRoutes.forEach((route) => {
+          if (routeAirports[route.dep] && routeAirports[route.arr]) {
+            connections[route.dep].add(route.arr);
+            connections[route.arr].add(route.dep);
+          }
+        });
+
+        Object.entries(routeAirports).forEach(([code, airport]) => {
+          const airportRoutes = currentRoutes.filter(
+            (r) => r.dep === code || r.arr === code
+          );
+
+          const aircraftSet = new Set();
+          airportRoutes.forEach((route) => {
+            const otherIcao = route.dep === code ? route.arr : route.dep;
+            route.aircraft.forEach((aircraft) => {
+              aircraftSet.add(
+                `${aircraft.liveryname} ${aircraft.name} - <strong>${otherIcao}</strong>`
+              );
+            });
+          });
+
+          const aircraftList =
+            aircraftSet.size > 0
+              ? "<ul>" +
+                Array.from(aircraftSet)
+                  .map((a) => `<li>${a}</li>`)
+                  .join("") +
+                "</ul>"
+              : "No aircraft";
+
+          const markerCopies = [];
+
+          [-360, 0, 360].forEach((offset) => {
+            const marker = L.circleMarker([airport.lat, airport.lng + offset], {
+              radius: currentPrefix === "ALL" ? 6 : 8,
+              fillColor: currentColor,
+              color: "#ffffff",
+              weight: currentPrefix === "ALL" ? 1 : 2,
+              fillOpacity: 0.9,
+            }).addTo(map);
+
+            marker.bindPopup(
+              `<strong>${airport.name}</strong><br>${airport.icao}<br><strong>Aircraft:</strong><br>${aircraftList}`
+            );
+
+            marker.on("click", () => highlightAirport(code));
+            markerCopies.push(marker);
+          });
+
+          markers[code] = markerCopies;
+        });
+
+        routeInfo.textContent = `${currentRoutes.length} routes, ${Object.keys(routeAirports).length} airports`;
+
+        if (showLinesToggle.checked) {
+          const drawnPairs = new Set();
+
+          currentRoutes.forEach((route) => {
+            const pair = [route.dep, route.arr].sort().join("-");
+            if (!drawnPairs.has(pair)) {
+              drawArc(route.dep, route.arr);
+              drawnPairs.add(pair);
+            }
+          });
+        }
+
+        if (Object.keys(routeAirports).length > 0) {
+          const bounds = Object.values(routeAirports).map((a) => [a.lat, a.lng]);
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 3 });
+        }
+      }
+
+      airlineSelect.addEventListener("change", (e) => {
+        currentColor = e.target.selectedOptions[0]?.dataset.color || "#ff0000";
+        displayRoutesForAirline(e.target.value);
+      });
+
+      regionSelect.addEventListener("change", (e) => {
+        currentRegion = e.target.value;
+        displayRoutesForAirline(currentPrefix);
+      });
+
+      showLinesToggle.addEventListener("change", () => {
+        displayRoutesForAirline(currentPrefix);
+      });
+
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.trim().toLowerCase();
+
+        if (!q) {
+          displayRoutesForAirline(currentPrefix);
+          return;
+        }
+
+        const found = Object.entries(airportData).find(
+          ([code, ap]) =>
+            code.toLowerCase().includes(q) ||
+            ap.name.toLowerCase().includes(q) ||
+            ap.icao.toLowerCase().includes(q)
+        );
+
+        if (found && markers[found[0]]) {
+          highlightAirport(found[0]);
         }
       });
 
-      // Open popup so user can click the "View Airport Page" link
-      marker.openPopup();
-    });
+      airportData = parseCSV(csvText);
+      routeInfo.textContent = "Select an airline to view routes.";
 
-    markerMap[code] = marker;
-  });
+      const urlParams = new URLSearchParams(window.location.search);
+      const airlineParam = urlParams.get("airline");
 
-  // Fit to bounds to show all markers on load (limited maxZoom)
-  (function fitToAll() {
-    const latlngs = Object.values(airports).map(a => [a.lat, a.lng]).filter(p => !isNaN(p[0]) && !isNaN(p[1]));
-    if (latlngs.length) {
-      try { map.fitBounds(latlngs, { padding: [40,40], maxZoom: 3 }); }
-      catch(e){ /* ignore */ }
-    }
-  })();
+      if (airlineParam) {
+        airlineSelect.value = airlineParam;
+        const selectedOption = airlineSelect.querySelector(
+          `option[value="${airlineParam}"]`
+        );
 
-  // Optional: expose functions for debugging in console
-  window._map_data = { airports, routes, routePairs, markerMap };
-
-  </script>
-  </body>
-</html>
+        if (selectedOption) {
+          currentColor = selectedOption.dataset.color || "#ff0000";
+          displayRoutesForAirline(airlineParam);
+        }
+      }
+    </script>
+  </section>
+</Layout>
