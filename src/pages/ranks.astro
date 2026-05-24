@@ -16,23 +16,60 @@ const allRanks = [
 ];
 
 const ranks = [
-  { name: 'Cadet', hours: '0h', color: '#ad596f', aircraft: ['Airbus A319', 'Airbus A320', 'Airbus A321', 'Boeing 737-700/800/900', 'Boeing 737 MAX 8', 'CRJ Family', 'Dash 8-Q400', 'ERJ Family'], range: '0–10' },
-  { name: 'Second Officer', hours: '10h', color: '#b04460', aircraft: ['Airbus A220', 'Airbus A330', 'Boeing 787 Dreamliner Family'], range: '10–25' },
-  { name: 'First Officer', hours: '25h', color: '#b03958', aircraft: ['Airbus A350', 'Boeing 767'], range: '25–100' },
-  { name: 'Captain', hours: '100h', color: '#b03958', aircraft: ['Boeing 777-200LR/ER', 'Boeing 777-300ER', 'B77F (Codeshares)'], range: '100–250', extra: 'Apply to Qatari Cargo!' },
-  { name: 'Senior Captain', hours: '250h', color: '#b4294d', aircraft: ['Airbus A340', 'Airbus A380', 'Boeing 747-400/8'], range: '250–500' },
+  { name: 'Cadet', hours: '0h', color: '#ad596f', aircraft: [
+    { label: 'Airbus A319', href: '/fleet#fleet-amiri-a319' },
+    { label: 'Airbus A320', href: '/fleet#fleet-a320' },
+    { label: 'Airbus A321', href: '/fleet#fleet-a321' },
+    { label: 'Boeing 737-700/800/900', href: '/fleet' },
+    { label: 'Boeing 737 MAX 8', href: '/fleet#fleet-b737-max-8' },
+    { label: 'CRJ Family', href: '/fleet' },
+    { label: 'Dash 8-Q400', href: '/fleet' },
+    { label: 'ERJ Family', href: '/fleet' },
+  ], range: '0–10' },
+  { name: 'Second Officer', hours: '10h', color: '#b04460', aircraft: [
+    { label: 'Airbus A220', href: '/fleet' },
+    { label: 'Airbus A330', href: '/fleet#fleet-a330' },
+    { label: 'Boeing 787 Dreamliner Family', href: '/fleet#fleet-b787-8' },
+  ], range: '10–25' },
+  { name: 'First Officer', hours: '25h', color: '#b03958', aircraft: [
+    { label: 'Airbus A350', href: '/fleet#fleet-a350' },
+    { label: 'Boeing 767', href: '/fleet' },
+  ], range: '25–100' },
+  { name: 'Captain', hours: '100h', color: '#b03958', aircraft: [
+    { label: 'Boeing 777-200LR/ER', href: '/fleet#fleet-b777-200lr' },
+    { label: 'Boeing 777-300ER', href: '/fleet#fleet-b777-300er' },
+    { label: 'B77F (Codeshares)', href: '/fleet' },
+  ], range: '100–250', extra: 'Apply to Qatari Cargo!' },
+  { name: 'Senior Captain', hours: '250h', color: '#b4294d', aircraft: [
+    { label: 'Airbus A340', href: '/fleet#fleet-amiri-a340' },
+    { label: 'Airbus A380', href: '/fleet#fleet-a380' },
+    { label: 'Boeing 747-400/8', href: '/fleet#fleet-amiri-b747' },
+  ], range: '250–500' },
 ];
 
 const awards = [
-  { name: 'Ruby Award', hours: '500h', color: '#9624ab', bonuses: ['Qatar Amiri A319', 'Callsign change (unlocks 40–100 range)', 'Access to the Qatari Staff Discord server'] },
-  { name: 'Sapphire Award', hours: '1,000h', color: '#196292', bonuses: ['Qatari Amiri B747, A340', 'Callsign change (unlocks 30–40 range)'] },
-  { name: 'Emerald Award', hours: '2,500h', color: '#209320', bonuses: ['Qatari Classic Route Database (WIP)'] },
-  { name: 'OneWorld Discover', hours: '3,000h', color: '#5250a4', bonuses: ['Access to all oneworld airline routes, approximately 5,000 new routes'] },
-  { name: 'The Oryx Award', hours: '5,000h', color: '#b0802d', bonuses: ['Qatari Executive C350, A318, B737'] },
+  { name: 'Ruby Award', hours: '500h', color: '#9624ab', bonuses: [
+    { label: 'Qatar Amiri A319', href: '/fleet#fleet-amiri-a319' },
+    { label: 'Callsign change (unlocks 40–100 range)' },
+    { label: 'Access to the Qatari Staff Discord server' },
+  ] },
+  { name: 'Sapphire Award', hours: '1,000h', color: '#196292', bonuses: [
+    { label: 'Qatari Amiri B747, A340', href: '/fleet#fleet-amiri-b747' },
+    { label: 'Callsign change (unlocks 30–40 range)' },
+  ] },
+  { name: 'Emerald Award', hours: '2,500h', color: '#209320', bonuses: [
+    { label: 'Qatari Classic Route Database (WIP)' },
+  ] },
+  { name: 'OneWorld Discover', hours: '3,000h', color: '#5250a4', bonuses: [
+    { label: 'Access to all oneworld airline routes, approximately 5,000 new routes' },
+  ] },
+  { name: 'The Oryx Award', hours: '5,000h', color: '#b0802d', bonuses: [
+    { label: 'Qatari Executive C350, A318, B737', href: '/fleet#fleet-challenger-350' },
+  ] },
 ];
 ---
 
-<Layout title="Ranks and Progression">
+<Layout title="Ranks and Progression" description="Learn how Qatari Virtual ranks unlock aircraft and awards as you log hours in Infinite Flight.">
 <section class="px-6 py-8 min-h-screen">
   <div class="max-w-5xl mx-auto">
     <div class="flex justify-between items-start gap-4 mb-3">
@@ -94,7 +131,11 @@ const awards = [
               {rank.aircraft.map((ac) => (
                 <li class="flex items-center gap-2 text-sm text-gray-700">
                   <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style={`background: ${rank.color}`}></span>
-                  {ac}
+                  {ac.href ? (
+                    <a href={ac.href} class="font-semibold text-[#8B1538] hover:underline">{ac.label}</a>
+                  ) : (
+                    <span>{ac.label}</span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -128,7 +169,11 @@ const awards = [
               {award.bonuses.map((bonus) => (
                 <li class="flex items-start gap-2 text-sm text-gray-700">
                   <span class="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={`background: ${award.color}`}></span>
-                  {bonus}
+                  {bonus.href ? (
+                    <a href={bonus.href} class="font-semibold text-[#8B1538] hover:underline">{bonus.label}</a>
+                  ) : (
+                    <span>{bonus.label}</span>
+                  )}
                 </li>
               ))}
             </ul>

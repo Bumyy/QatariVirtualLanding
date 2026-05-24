@@ -1,11 +1,193 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+interface Aircraft {
+  name: string; img?: string; desc: string; pax: string; range: string; speed: string;
+  ceiling: string; mfr: string; role: string; wingspan: string; cat: string;
+  firstFlight: string; mtow: string; mlw: string; mmo: string; engines: string;
+}
+
+interface FleetGroup {
+  title: string; desc?: string; badge?: string; badgeColor?: string;
+  aircraft: (Aircraft & { rank: string; rankRange: string; rankColor: string; rankUrl: string })[];
+}
+
+const fleet: FleetGroup[] = [
+  {
+    title: 'Mainline Fleet',
+    desc: 'Our core fleet operating passenger and cargo routes across the globe.',
+    aircraft: [
+      { name: 'A320',    img: '/images/QA_A320.webp',    desc: 'The backbone of short and medium-haul operations across the Middle East.', pax: '140–186', range: '3,300 nm', speed: 'Mach 0.78', ceiling: 'FL410', mfr: 'Airbus', role: 'Narrow-body jet airliner', wingspan: '117 ft 5 in / 35.8 m', cat: 'C', firstFlight: 'Feb 22, 1987', mtow: '171,961 lb / 78,000 kg', mlw: '146,607 lb / 66,500 kg', mmo: 'Mach 0.82', engines: '2× CFM56-5B / IAE V2500', rank: 'Cadet', rankRange: '0–10h', rankColor: '#ad596f', rankUrl: '/ranks#rank-structure' },
+      { name: 'A321',    img: '/images/QA_A321.webp',    desc: 'Extended-range narrow-body handling high-density regional routes with ease.', pax: '185–244', range: '4,000 nm', speed: 'Mach 0.78', ceiling: 'FL410', mfr: 'Airbus', role: 'Narrow-body jet airliner', wingspan: '117 ft 5 in / 35.8 m', cat: 'C', firstFlight: 'Mar 11, 1993', mtow: '206,794 lb / 93,800 kg', mlw: '171,520 lb / 77,800 kg', mmo: 'Mach 0.82', engines: '2× CFM56-5B / IAE V2500', rank: 'Cadet', rankRange: '0–10h', rankColor: '#ad596f', rankUrl: '/ranks#rank-structure' },
+      { name: 'A330',    img: '/images/QA_A330.webp',    desc: 'Reliable twin-aisle for medium to long-haul routes, balancing capacity and range.', pax: '250–440', range: '7,250 nm', speed: 'Mach 0.82', ceiling: 'FL420', mfr: 'Airbus', role: 'Wide-body jet airliner', wingspan: '197 ft 10 in / 60.3 m', cat: 'E', firstFlight: 'Nov 2, 1992', mtow: '533,519 lb / 242,000 kg', mlw: '407,855 lb / 185,000 kg', mmo: 'Mach 0.86', engines: '2× PW4000 / Trent 700', rank: 'Second Officer', rankRange: '10–25h', rankColor: '#b04460', rankUrl: '/ranks#rank-structure' },
+      { name: 'A350',    img: '/images/QA_A350.webp',    desc: 'Modern ultra-efficient long-range twin. Smooth, quiet, and advanced flight deck.', pax: '300–440', range: '8,100 nm', speed: 'Mach 0.85', ceiling: 'FL431', mfr: 'Airbus', role: 'Wide-body jet airliner', wingspan: '212 ft 5 in / 64.75 m', cat: 'E', firstFlight: 'Jun 14, 2013', mtow: '617,294 lb / 280,000 kg', mlw: '456,357 lb / 207,000 kg', mmo: 'Mach 0.89', engines: '2× Rolls-Royce Trent XWB', rank: 'First Officer', rankRange: '25–100h', rankColor: '#b03958', rankUrl: '/ranks#rank-structure' },
+      { name: 'A380',    img: '/images/QA_A380.webp',    desc: 'Iconic double-decker. The largest passenger aircraft in the world.', pax: '525–853', range: '8,000 nm', speed: 'Mach 0.85', ceiling: 'FL430', mfr: 'Airbus', role: 'Wide-body / double-deck', wingspan: '261 ft 8 in / 79.75 m', cat: 'F', firstFlight: 'Apr 27, 2005', mtow: '1,234,589 lb / 560,000 kg', mlw: '850,984 lb / 386,000 kg', mmo: 'Mach 0.89', engines: '4× GP7000 / Trent 900', rank: 'Senior Captain', rankRange: '250–500h', rankColor: '#b4294d', rankUrl: '/ranks#rank-structure' },
+      { name: 'B737 MAX 8', img: '/images/QA_B38M.webp', desc: 'Next-gen narrow-body with better fuel efficiency and quieter engines.', pax: '162–210', range: '3,510 nm', speed: 'Mach 0.79', ceiling: 'FL410', mfr: 'Boeing', role: 'Narrow-body jet airliner', wingspan: '117 ft 10 in / 35.92 m', cat: 'C', firstFlight: 'Jan 29, 2016', mtow: '182,200 lb / 82,600 kg', mlw: '152,800 lb / 69,309 kg', mmo: 'Mach 0.82', engines: '2× CFM LEAP-1B', rank: 'Cadet', rankRange: '0–10h', rankColor: '#ad596f', rankUrl: '/ranks#rank-structure' },
+      { name: 'B777-200LR', img: '/images/QA_B77L.webp', desc: 'World\'s longest-range twinjet connecting Doha to the furthest corners.', pax: '259–317', range: '8,555 nm', speed: 'Mach 0.84', ceiling: 'FL431', mfr: 'Boeing', role: 'Wide-body jet airliner', wingspan: '212 ft 7 in / 64.80 m', cat: 'E', firstFlight: 'Jul 14, 2008', mtow: '766,106 lb / 347,500 kg', mlw: '492,001 lb / 223,168 kg', mmo: 'Mach 0.87', engines: '2× GE90-110B/-115B', rank: 'Captain', rankRange: '100–250h', rankColor: '#b03958', rankUrl: '/ranks#rank-structure' },
+      { name: 'B777-300ER', img: '/images/QA_B77W.webp', desc: 'High-capacity long-haul icon. The workhorse of our intercontinental fleet.', pax: '354–416', range: '7,370 nm', speed: 'Mach 0.84', ceiling: 'FL431', mfr: 'Boeing', role: 'Wide-body jet airliner', wingspan: '212 ft 7 in / 64.80 m', cat: 'E', firstFlight: 'Feb 24, 2003', mtow: '774,925 lb / 351,500 kg', mlw: '554,000 lb / 251,290 kg', mmo: 'Mach 0.89', engines: '2× GE90-115B', rank: 'Captain', rankRange: '100–250h', rankColor: '#b03958', rankUrl: '/ranks#rank-structure' },
+      { name: 'B787-8',   img: '/images/QA_B788.webp',   desc: 'Dreamliner efficiency with lower fuel burn, bigger windows, and a smoother ride.', pax: '242–359', range: '7,350 nm', speed: 'Mach 0.85', ceiling: 'FL430', mfr: 'Boeing', role: 'Wide-body jet airliner', wingspan: '197 ft 3 in / 60.12 m', cat: 'E', firstFlight: 'Dec 15, 2009', mtow: '505,500 lb / 227,930 kg', mlw: '380,000 lb / 172,365 kg', mmo: 'Mach 0.90', engines: '2× GEnx-1B / Trent 1000', rank: 'Second Officer', rankRange: '10–25h', rankColor: '#b04460', rankUrl: '/ranks#rank-structure' },
+      { name: 'B77W Retro', img: '/images/QA_B77W_Retro_Livery.webp', desc: 'A tribute to our heritage. Same 777-300ER performance in a classic livery.', pax: '354–416', range: '7,370 nm', speed: 'Mach 0.84', ceiling: 'FL431', mfr: 'Boeing', role: 'Wide-body jet airliner', wingspan: '212 ft 7 in / 64.80 m', cat: 'E', firstFlight: 'Feb 24, 2003', mtow: '774,925 lb / 351,500 kg', mlw: '554,000 lb / 251,290 kg', mmo: 'Mach 0.89', engines: '2× GE90-115B', rank: 'Captain', rankRange: '100–250h', rankColor: '#b03958', rankUrl: '/ranks#rank-structure' },
+    ] 
+  },
+  {
+    title: 'Qatari Cargo',
+    desc: 'A separate training track and collaborative community mode delivering cargo worldwide.',
+    badge: 'Cargo Captain', badgeColor: '#c87d06',
+    aircraft: [
+      { name: 'B777-200LRF', img: '/images/QA_B77L.webp', desc: 'Dedicated freighter connecting Doha to global cargo hubs. Part of the Qatari Cargo program.', pax: 'Cargo', range: '8,555 nm', speed: 'Mach 0.84', ceiling: 'FL431', mfr: 'Boeing', role: 'Freighter', wingspan: '212 ft 7 in / 64.80 m', cat: 'E', firstFlight: 'Jul 14, 2008', mtow: '766,106 lb / 347,500 kg', mlw: '492,001 lb / 223,168 kg', mmo: 'Mach 0.87', engines: '2× GE90-110B/-115B', rank: 'Captain', rankRange: '100–250h', rankColor: '#c87d06', rankUrl: '/ranks#rank-structure' },
+    ]
+  },
+  {
+    title: 'Qatari Amiri Fleet',
+    desc: 'Exclusive aircraft reserved for our most dedicated pilots. Unlocked through awards.',
+    badge: 'Awards', badgeColor: '#b0802d',
+    aircraft: [
+      { name: 'Amiri A319', img: '/images/QA_A319.webp', desc: 'VIP-configured A319 for our Ruby Award pilots. A symbol of excellence.', pax: 'VIP', range: '3,747 nm', speed: 'Mach 0.78', ceiling: 'FL410', mfr: 'Airbus', role: 'Narrow-body / VIP', wingspan: '117 ft 5 in / 35.8 m', cat: 'C', firstFlight: 'Aug 25, 1995', mtow: '166,449 lb / 75,500 kg', mlw: '137,789 lb / 62,500 kg', mmo: 'Mach 0.82', engines: '2× CFM56-5B / IAE V2500', rank: 'Ruby Award', rankRange: '500h', rankColor: '#9624ab', rankUrl: '/ranks#awards' },
+      { name: 'Amiri A340', img: '/images/QA_A340.webp', desc: 'Four-engine VIP flagship for Sapphire pilots. Ultra-long-range prestige.', pax: 'VIP', range: '8,700 nm', speed: 'Mach 0.82', ceiling: 'FL410', mfr: 'Airbus', role: 'Wide-body / VIP', wingspan: '208 ft 2 in / 63.45 m', cat: 'E', firstFlight: 'Oct 25, 1991', mtow: '811,301 lb / 368,000 kg', mlw: '559,974 lb / 254,000 kg', mmo: 'Mach 0.86', engines: '4× Rolls-Royce Trent 500', rank: 'Sapphire', rankRange: '1,000h', rankColor: '#196292', rankUrl: '/ranks#awards' },
+      { name: 'Amiri B747', img: '/images/QA_B748.webp', desc: 'Queen of the Skies in Amiri livery. Reserved for Sapphire pilots.', pax: 'VIP', range: '7,730 nm', speed: 'Mach 0.86', ceiling: 'FL431', mfr: 'Boeing', role: 'Wide-body / VIP', wingspan: '224 ft 7 in / 68.5 m', cat: 'F', firstFlight: 'Feb 8, 2010', mtow: '987,001 lb / 447,696 kg', mlw: '687,842 lb / 312,000 kg', mmo: 'Mach 0.92', engines: '4× General Electric GEnx-2B67', rank: 'Sapphire', rankRange: '1,000h', rankColor: '#196292', rankUrl: '/ranks#awards' },
+    ]
+  },
+  {
+    title: 'Qatari Executive',
+    desc: 'Premium business jets for our highest-ranking Oryx Award pilots.',
+    badge: 'Oryx', badgeColor: '#b0802d',
+    aircraft: [
+      { name: 'Challenger 350', img: '/images/QAE_C350.webp', desc: 'Premium business jet. Fast, luxurious, and available exclusively to Oryx pilots.', pax: '9', range: '3,200 nm', speed: 'Mach 0.80', ceiling: 'FL450', mfr: 'Bombardier', role: 'Business jet', wingspan: '69 ft / 21.0 m', cat: 'B', firstFlight: 'Mar 2, 2013', mtow: '40,600 lb / 18,416 kg', mlw: '34,150 lb / 15,490 kg', mmo: 'Mach 0.83', engines: '2× Honeywell HTF7350', rank: 'The Oryx Award', rankRange: '5,000h', rankColor: '#b0802d', rankUrl: '/ranks#awards' },
+    ]
+  },
+];
+
+const slugify = (value: string) => value
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)+/g, '');
 ---
 
-<Layout>
+<Layout title="Our Fleet" description="Explore the Qatari Virtual fleet, including Airbus and Boeing aircraft for passenger, cargo, and executive operations in Infinite Flight.">
 <section class="px-6 py-8 min-h-screen">
-  <h1 class="text-3xl font-bold text-center">Our Fleet</h1>
-  <p class="mt-4 text-center">
-    Discover the diverse and modern fleet of Qatari Virtual Landing.
-  </p>
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-start gap-4 mb-3">
+      <h1 class="text-5xl font-bold text-[#8B1538]">Our Fleet</h1>
+      <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
+        <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Fleet
+      </p>
+    </div>
+    <p class="max-w-3xl text-lg text-gray-600 leading-relaxed mb-10">
+      Our fleet comprises a range of narrow-body and wide-body Airbus and Boeing variants, operating short, medium, long-haul, and ultra-long-haul routes for both passengers and cargo.
+    </p>
+
+    {fleet.map((group) => (
+      <div class="mb-12">
+        <div class="flex flex-wrap items-center gap-3 mb-2">
+          <h2 class="text-3xl font-bold text-[#8B1538]">{group.title}</h2>
+          {group.badge && <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white" style={`background: ${group.badgeColor}`}>{group.badge}</span>}
+        </div>
+        {group.desc && <p class="text-gray-500 text-sm mb-5 max-w-2xl">{group.desc}</p>}
+
+        <div class="grid grid-cols-1 gap-5">
+          {group.aircraft.map((ac) => (
+            <div id={`fleet-${slugify(ac.name)}`} class="fleet-card reveal-card rounded-2xl border border-[#ead9df] bg-white shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+              <button class="fleet-toggle w-full text-left" data-fleet-toggle aria-expanded="false">
+                <div class="flex flex-col md:flex-row">
+                  <div class="fleet-img-stage w-full md:w-2/5 flex items-center justify-center p-6 md:p-8" style="background: linear-gradient(135deg, #4a0c2b, #6e0038)">
+                    {ac.img ? (
+                      <img src={ac.img} alt={`Qatari Virtual ${ac.name}`} class="fleet-img max-h-44 md:max-h-52 w-auto object-contain" loading="lazy" />
+                    ) : (
+                      <div class="text-white/20 text-5xl font-black tracking-wider select-none">{ac.name}</div>
+                    )}
+                  </div>
+                  <div class="flex-1 p-5 md:p-7 flex flex-col justify-center">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">{ac.name}</h3>
+                    <p class="text-gray-500 leading-relaxed text-sm mb-3">{ac.desc}</p>
+                    <div class="flex flex-wrap items-center gap-2.5 text-xs mb-3">
+                      <span class="bg-[#f8f1f3] text-[#8B1538] font-semibold px-3 py-1.5 rounded-full">Pax: {ac.pax}</span>
+                      <span class="bg-[#f8f1f3] text-[#8B1538] font-semibold px-3 py-1.5 rounded-full">Range: {ac.range}</span>
+                      <span class="bg-[#f8f1f3] text-[#8B1538] font-semibold px-3 py-1.5 rounded-full">{ac.speed}</span>
+                    </div>
+                    <a href={ac.rankUrl} class="inline-flex items-center gap-1.5 text-xs font-semibold hover:underline transition" style={`color: ${ac.rankColor}`}>
+                      <span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style={`background: ${ac.rankColor}`}></span>
+                      Unlocks at {ac.rank} ({ac.rankRange})
+                    </a>
+                    <div class="flex items-center gap-1.5 mt-3 text-xs text-[#8B1538]/50 font-semibold">
+                      <span>View specifications</span>
+                      <svg class="fleet-chevron w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </button>
+              <div class="fleet-specs max-h-0 overflow-hidden transition-all duration-400">
+                <div class="border-t border-[#ead9df] px-5 md:px-7 py-5 md:py-6 bg-[#fdfbfc]">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-sm">
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">Manufacturer</span><span class="font-medium text-gray-700">{ac.mfr}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">Role</span><span class="font-medium text-gray-700">{ac.role}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">Wingspan</span><span class="font-medium text-gray-700">{ac.wingspan}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">Category</span><span class="font-medium text-gray-700">{ac.cat}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">First Flight</span><span class="font-medium text-gray-700">{ac.firstFlight}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">MTOW</span><span class="font-medium text-gray-700">{ac.mtow}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">MLW</span><span class="font-medium text-gray-700">{ac.mlw}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">Ceiling</span><span class="font-medium text-gray-700">{ac.ceiling}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50"><span class="text-gray-400">MMO</span><span class="font-medium text-gray-700">{ac.mmo}</span></div>
+                    <div class="flex justify-between py-1.5 border-b border-[#ead9df]/50 sm:col-span-2"><span class="text-gray-400">Engines</span><span class="font-medium text-gray-700">{ac.engines}</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <div class="text-center mt-10 mb-6">
+      <a href="/ranks" class="text-sm text-[#8B1538] font-semibold hover:underline">View full rank structure to see when each aircraft unlocks &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fleet-card { opacity: 0; transform: translateX(80px); transition: opacity 0.55s ease, transform 0.55s ease, box-shadow 0.3s ease; }
+  .fleet-card.is-visible { opacity: 1; transform: translateX(0); }
+  .fleet-card:hover { border-color: rgba(139, 21, 56, 0.25); }
+  .fleet-img { filter: drop-shadow(0 10px 20px rgba(0,0,0,0.35)); opacity: 0; transform: translateX(60px); }
+  .fleet-card.is-visible .fleet-img { animation: fleet-fly-in 0.7s ease forwards; }
+  .fleet-card:hover .fleet-img { transform: translateX(0) scale(1.04); }
+  @keyframes fleet-fly-in { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+  .fleet-toggle[aria-expanded="true"] .fleet-chevron { transform: rotate(180deg); }
+  .fleet-toggle[aria-expanded="true"] + .fleet-specs { max-height: 800px; }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 2.5rem; }
+    .fleet-card { transform: translateY(40px); }
+    .fleet-card.is-visible { transform: translateY(0); }
+    .fleet-img { max-height: 140px; }
+    .fleet-img-stage { padding: 1.25rem; }
+    .fleet-card h3 { font-size: 1.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .fleet-card, .fleet-card.is-visible { transition: none; transform: none; opacity: 1; } .fleet-img { animation: none; transform: none; opacity: 1; } }
+</style>
+
+<script>
+  const cards = document.querySelectorAll('.fleet-card');
+
+  function revealCard(card) {
+    card.classList.add('is-visible');
+  }
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        setTimeout(function() { revealCard(entry.target); }, 30);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  cards.forEach(function(card) { observer.observe(card); });
+
+  document.querySelectorAll('[data-fleet-toggle]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+    });
+  });
+</script>
 </Layout>

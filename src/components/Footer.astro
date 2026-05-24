@@ -11,6 +11,7 @@ const links = [
 <footer class="site-footer">
   <div class="footer-grid">
     <div class="footer-brand">
+      <img src="/images/QRV-Logo1.png" alt="Qatari Virtual" class="footer-logo" />
       <p class="footer-tagline">The Home Of Excellence</p>
       <p class="footer-copy">&copy; 2026 Qatari Virtual. All rights reserved.</p>
     </div>
@@ -58,6 +59,16 @@ const links = [
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .footer-logo {
+    height: clamp(40px, 3.2vw, 60px);
+    width: auto;
+    max-width: 200px;
+    margin-bottom: 0.5rem;
+    object-fit: contain;
+    object-position: left center;
+    display: block;
   }
 
   .footer-tagline {
@@ -129,17 +140,43 @@ const links = [
 
   @media (max-width: 768px) {
     .site-footer {
-      padding: 2rem 1.25rem 1rem;
+      padding: 1.5rem 1rem 0.75rem;
     }
 
     .footer-grid {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 1rem;
       text-align: center;
+    }
+
+    .footer-logo {
+      height: 36px;
+      max-width: 160px;
+      margin: 0 auto;
+      object-position: center;
+    }
+
+    .footer-tagline {
+      font-size: 1rem;
     }
 
     .footer-links ul {
       align-items: center;
+      gap: 0.2rem;
+    }
+
+    .footer-heading {
+      margin-bottom: 0.4rem;
+    }
+
+    .footer-disclaimer {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+    }
+
+    .footer-assist-text {
+      max-width: 300px;
+      margin: 0 auto;
     }
   }
 </style>

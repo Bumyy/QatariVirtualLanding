@@ -94,7 +94,7 @@ const totalRoutes = routes.length;
                 <td class="py-2.5 px-4 font-semibold" style="color:#8B1538">{route.fltnum || '\u2014'}</td>
                 <td class="py-2.5 px-4 font-medium text-gray-700">{route.dep || '\u2014'}</td>
                 <td class="py-2.5 px-4 font-medium text-gray-700">{route.arr || '\u2014'}</td>
-                <td class="py-2.5 px-4 text-gray-500">{route.duration ? `${Math.floor(route.duration / 60)}h ${route.duration % 60}m` : '\u2014'}</td>
+                <td class="py-2.5 px-4 text-gray-500">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</td>
                 <td class="py-2.5 px-4">
                   <div class="flex flex-wrap items-center gap-1 ac-group" data-route-id={route.id}>
                     {route.aircraft?.slice(0, 3).map((ac) => (
@@ -130,7 +130,7 @@ const totalRoutes = routes.length;
         >
           <div class="flex items-center justify-between mb-2">
             <span class="font-bold text-lg" style="color:#8B1538">{route.fltnum || '\u2014'}</span>
-            <span class="text-xs text-gray-400">{route.duration ? `${Math.floor(route.duration / 60)}h ${route.duration % 60}m` : '\u2014'}</span>
+            <span class="text-xs text-gray-400">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</span>
           </div>
           <div class="flex items-center gap-3 text-sm mb-2">
             <span class="font-semibold text-gray-800">{route.dep || '\u2014'}</span>

@@ -3,6 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import Stats from '../components/Stats.astro';
 import CTA from '../components/CTA.astro';
 import airlinesData from '../assets/airlines.json';
+import MdiIcon from '@mdi/react';
+import { mdiAccountPlus, mdiSchoolOutline, mdiAirplane, mdiTrophyOutline } from '@mdi/js';
+
+const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
 
 const slides = [
   { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/7/5/9/75988cc057301e7359b670f978f21e1db9a810e9.jpeg', position: 'center' },
@@ -23,7 +27,9 @@ const testimonials = [
   { quote: 'Joining Qatari Virtual has been nothing short of life-changing. From the moment I signed up, I felt welcomed into a community that quickly became like a second family.', author: 'Mohammed', callsign: 'QRV060' },
 ];
 
-const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').slice(0, 18);
+const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways');
+const owPrefixes = ['AA','AS','AY','BA','CX','IB','JL','MH','QF','AT','RJ','UL'];
+const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includes(p.prefix) }));
 ---
 
 <Layout>
@@ -49,6 +55,13 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
     <Stats />
   </div>
 </section>
+
+<div style="margin-top: -2rem;">
+  <CTA
+    title="Ready to fly with the best?"
+    description="Join an award-winning community of pilots flying 5,000+ routes worldwide."
+  />
+</div>
 
 <!-- Rank Progression -->
 <section class="px-6 py-12">
@@ -79,10 +92,10 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
 <section class="px-6 py-12 bg-[#fdf8f9]">
   <div class="max-w-6xl mx-auto text-center">
     <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Our Codeshare Partners</h2>
-    <p class="text-gray-500 mb-8 max-w-xl mx-auto">Fly realistic routes with 20+ partner airlines across the globe.</p>
+    <p class="text-gray-500 mb-8 max-w-xl mx-auto">Fly realistic routes with 60+ partner airlines across the globe.</p>
     <div class="partner-grid">
-      {partners.map((partner) => (
-        <div class="partner-item flex items-center justify-center p-3 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+      {partnerWithFlag.map((partner) => (
+        <div class={`partner-item flex items-center justify-center p-3 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-200 ${partner.isOneWorld ? '' : 'hidden sm:flex'}`}>
           <img
             src={partner.logo}
             alt={partner.name}
@@ -96,6 +109,116 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
     <a href="/codeshares" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
       View all partners &rarr;
     </a>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="px-6 py-12 overflow-hidden">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-[#8B1538] text-center mb-2">Your Journey</h2>
+    <p class="text-gray-500 text-center mb-10 max-w-xl mx-auto">From application to experienced pilot — here's how it works.</p>
+
+    <div class="journey-flow">
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiAccountPlus} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 1</span>
+          <h3 class="journey-title">Apply</h3>
+          <p class="journey-desc">Fill out our application form. We review it within 48 hours.</p>
+        </div>
+      </div>
+
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiSchoolOutline} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 2</span>
+          <h3 class="journey-title">Train</h3>
+          <p class="journey-desc">Complete a written test and two supervised flights to qualify.</p>
+        </div>
+      </div>
+
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiAirplane} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 3</span>
+          <h3 class="journey-title">Fly</h3>
+          <p class="journey-desc">Log hours across 5,000+ routes with 60+ partner airlines worldwide.</p>
+        </div>
+      </div>
+
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiTrophyOutline} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 4</span>
+          <h3 class="journey-title">Grow</h3>
+          <p class="journey-desc">Climb 10 ranks unlocking new aircraft, routes, and awards.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-3xl font-bold text-[#8B1538] text-center mb-2">Frequently Asked Questions</h2>
+    <p class="text-gray-500 text-center mb-8 max-w-xl mx-auto">Everything you need to know about joining and flying with Qatari Virtual.</p>
+
+    <div class="faq-list space-y-3">
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>What are the minimum requirements to join?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">You must be at least 13 years old, be Grade 3 or higher in Infinite Flight, have a Discord and IFC account, communicate in English, and not be blacklisted by IFVARB.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>How long does the application process take?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">Most applications are reviewed within 48 hours. You will be notified via private message on the Infinite Flight Community Forum once a decision is made.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>Is there a training phase after acceptance?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">Yes. All new pilots (except IFATC members) must pass 1 written test and 2 practical flights before becoming official pilots.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>Do I need a specific aircraft or add-on to fly?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">No. All aircraft are available through standard Infinite Flight. As you rank up, more aircraft in our fleet become available — from the A320 to the A380 and executive jets.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>What is the Cargo Program?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">Our Cargo Program is a collaborative community mode where pilots work together to deliver cargo around the world. It has a separate training track and dedicated aircraft.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -125,9 +248,20 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
 />
 
 <style>
-    .hero {
-      min-height: calc(100vh - 68px);
-    }
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    min-height: 500px;
+    margin-top: -84px;
+    padding-top: 84px;
+    border-bottom: 7px solid #6e0038;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #000;
+  }
 
   .slide-layer {
     position: absolute;
@@ -153,18 +287,19 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
     text-align: center;
     z-index: 2;
     padding: 0 20px;
+    margin-top: -40px;
   }
 
   .small-text {
     color: #6e0038;
-    font-size: 1.6rem;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
     margin-bottom: 0.6rem;
     font-weight: 500;
   }
 
   .title {
     color: #6e0038;
-    font-size: 4rem;
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -172,8 +307,8 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
 
   .partner-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.65rem;
   }
 
   .partner-logo {
@@ -186,11 +321,119 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
 
   .partner-item:hover .partner-logo { opacity: 1; }
 
+  .journey-flow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    position: relative;
+  }
+
+  .journey-flow::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #8B1538, #b04a69 50%, #8B1538);
+    border-radius: 999px;
+    opacity: 0.25;
+  }
+
+  .journey-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.25rem 0;
+    position: relative;
+  }
+
+  .journey-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 4px white;
+  }
+
+  .journey-content {
+    padding-top: 0.45rem;
+    flex: 1;
+  }
+
+  .journey-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8B1538;
+    opacity: 0.6;
+  }
+
+  .journey-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2f2f2f;
+    margin: 0.1rem 0 0.25rem;
+  }
+
+  .journey-desc {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.55;
+    max-width: 75%;
+  }
+
+  @media (min-width: 768px) {
+    .journey-flow {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .journey-flow::before {
+      left: 0;
+      right: 0;
+      top: 25px;
+      bottom: auto;
+      width: auto;
+      height: 3px;
+      background: linear-gradient(to right, #8B1538, #b04a69 50%, #8B1538);
+      margin: 0 2rem;
+    }
+
+    .journey-step {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0;
+    }
+
+    .journey-icon {
+      margin-bottom: 0.75rem;
+    }
+
+    .journey-desc {
+      max-width: 100%;
+    }
+  }
+
+  .faq-toggle[aria-expanded="true"] .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-toggle[aria-expanded="true"] + .faq-answer {
+    max-height: 300px;
+  }
+
   @media (max-width: 768px) {
-    .title { font-size: 2.5rem; }
-    .small-text { font-size: 1.2rem; }
     .hero { margin-top: -68px; padding-top: 68px; }
-    .content { margin-top: -50px; }
+    .content { margin-top: -24px; }
 
     .partner-grid {
       grid-template-columns: repeat(3, 1fr);
@@ -211,6 +454,16 @@ const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways').s
       slides[currentIndex].classList.add('active');
     }, 5000);
   }
+
+  document.querySelectorAll('.faq-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.faq-toggle').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) btn.setAttribute('aria-expanded', 'true');
+    });
+  });
 </script>
 
 </Layout>

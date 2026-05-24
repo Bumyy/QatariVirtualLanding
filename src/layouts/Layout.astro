@@ -4,7 +4,7 @@ import MdiIcon from '@mdi/react';
 import { mdiArrowTopRightThick, mdiMenu, mdiClose } from '@mdi/js';
 import Footer from '../components/Footer.astro';
 
-const { title = 'Qatari Virtual Landing' } = Astro.props;
+const { title = 'Qatari Virtual Landing', description } = Astro.props;
 const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
 ---
 <!DOCTYPE html>
@@ -13,6 +13,8 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/png" href="/images/Logo2.png" />
 
     <style>
       .header-shell {
