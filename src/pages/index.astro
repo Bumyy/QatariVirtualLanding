@@ -1,33 +1,667 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import FeatureCard from '../components/FeatureCard.astro';
+import Stats from '../components/Stats.astro';
+import CTA from '../components/CTA.astro';
+import airlinesData from '../assets/airlines.json';
+import MdiIcon from '@mdi/react';
+import { mdiAccountPlus, mdiSchoolOutline, mdiAirplane, mdiTrophyOutline } from '@mdi/js';
+
+const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
+
+const slides = [
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/7/5/9/75988cc057301e7359b670f978f21e1db9a810e9.jpeg', position: 'center' },
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/2/5/f/25fb40344fa01bea40c2c549b6a512f173434c5a.jpeg', position: 'center' },
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/5/0/c/50ca75810f42fc8ae4ffd46caf5f68255e75de69.jpeg', position: 'center top' },
+  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/e/3/c/e3ccffd6e4772e82b0a2dafd0b539ad0f0a5610d.jpeg', position: 'center' }
+];
+
+const rankSteps = [
+  { name: 'Cadet', range: '0–10h', color: '#ad596f', craft: 'A320 Family, 737 Family' },
+  { name: 'Captain', range: '100–250h', color: '#b03958', craft: '777 Family, B77F Cargo' },
+  { name: 'Oryx', range: '5,000h', color: '#b0802d', craft: 'Executive Jets, full access' },
+];
+
+const track1 = [
+  { name: 'A350', icao: 'A359', img: '/images/QA_A350.webp', scale: 0.92, offset: '-10px' },
+  { name: 'Challenger 350', icao: 'CL35', img: '/images/QAE_C350.webp', scale: 0.6, offset: '20px' },
+  { name: 'A330', icao: 'A333', img: '/images/QA_A330.webp', scale: 0.88, offset: '-25px' },
+];
+
+const track2 = [
+  { name: 'A321', icao: 'A21N', img: '/images/QA_A321.webp', scale: 0.84, offset: '15px' },
+  { name: 'B777-300ER', icao: 'B77W', img: '/images/QA_B77W.webp', scale: 0.98, offset: '-15px' },
+  { name: 'A320', icao: 'A320', img: '/images/QA_A320.webp', scale: 0.82, offset: '30px' },
+];
+
+const track3 = [
+  { name: 'A380', icao: 'A388', img: '/images/QA_A380.webp', scale: 1.05, offset: '5px' },
+  { name: 'B787-8', icao: 'B788', img: '/images/QA_B788.webp', scale: 0.9, offset: '-30px' },
+  { name: 'B777-200LR', icao: 'B77L', img: '/images/QA_B77L.webp', scale: 0.94, offset: '25px' },
+];
+
+
+const testimonials = [
+  { quote: 'I believe that Qatar Airways Virtual Airline is one of the best, if not the best, virtual airlines out there in Infinite Flight. The immersive training, active community, and endless events make every flight meaningful.', author: 'Daniel', callsign: 'QRV012' },
+  { quote: 'Qatari Virtual is one of the very best virtual organizations in the Infinite Flight skies. Collaboration and professionalism are embedded into the culture.', author: 'Genav', callsign: 'QRV016' },
+  { quote: 'Joining Qatari Virtual has been nothing short of life-changing. From the moment I signed up, I felt welcomed into a community that quickly became like a second family.', author: 'Mohammed', callsign: 'QRV060' },
+];
+
+const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways');
+const owPrefixes = ['AA','AS','AY','BA','CX','IB','JL','MH','QF','AT','RJ','UL'];
+const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includes(p.prefix) }));
 ---
 
 <Layout>
-  <div class="p-8 max-w-7xl mx-auto">
-    <h1 class="text-4xl font-bold text-center mb-12 text-primary">Our Fleet Features</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      
-      <!-- Card 1: Standard component, no extra classes -->
-      <FeatureCard title="State-of-the-Art Avionics">
-        Our fleet is equipped with the latest technology for a realistic and safe virtual flying experience.
-      </FeatureCard>
+<section class="hero" id="hero-banner">
+  {slides.map((slide, index) => (
+    <div
+      class={`slide-layer ${index === 0 ? 'active' : ''}`}
+      style={`background-image: url('${slide.url}'); background-position: ${slide.position};`}
+    ></div>
+  ))}
+  <div class="overlay"></div>
+  <div class="content">
+    <p class="small-text">Welcome to Qatari Virtual</p>
+    <h1 class="title">YOUR JOURNEY STARTS HERE</h1>
+    <br /><br />
+    <p class="small-text">Voted Best Virtual Airline 2025</p>
+  </div>
+</section>
 
-      <!-- Card 2: Customized with extra Tailwind classes -->
-      <!-- We make this one stand out with a border and a stronger hover effect -->
-      <FeatureCard 
-        title="Luxury Virtual Cabins"
-        class="border-2 border-accent hover:scale-105 hover:shadow-2xl"
-      >
-        Experience unparalleled comfort in our meticulously recreated first-class and business cabins.
-      </FeatureCard>
+<!-- Stats -->
+<section class="px-6 py-6">
+  <div class="max-w-6xl mx-auto">
+    <Stats />
+  </div>
+</section>
 
-      <!-- Card 3: Another standard card -->
-      <FeatureCard title="Global Route Network">
-        Fly to hundreds of destinations worldwide with our extensive and regularly updated route network.
-      </FeatureCard>
+<div style="margin-top: -2rem;">
+  <CTA
+    title="Ready to fly with the best?"
+    description="Join an award-winning community of pilots flying 5,000+ routes worldwide."
+  />
+</div>
 
+<!-- Rank Progression -->
+<section class="px-6 py-12">
+  <div class="max-w-6xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Climb the Ranks</h2>
+    <p class="text-gray-500 mb-8 max-w-xl mx-auto">Every hour unlocks new aircraft and opportunities.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {rankSteps.map((rank, i) => (
+        <div class="rank-step-card rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <div class="py-4 text-white font-bold text-lg" style={`background: linear-gradient(135deg, ${rank.color}, ${rank.color}dd)`}>
+            {rank.name}
+            <div class="text-sm font-normal opacity-80 mt-0.5">{rank.range}</div>
+          </div>
+          <div class="bg-white px-4 py-5">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Aircraft unlocked</p>
+            <p class="text-sm text-gray-700 font-medium leading-relaxed">{rank.craft}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+    <a href="/ranks" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
+      View full rank structure &rarr;
+    </a>
+  </div>
+</section>
+
+<!-- Fleet -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Fleet Highlights</h2>
+      <p class="text-gray-500 mb-8 max-w-xl mx-auto">From narrow-body staples to flagship long-haul and executive jets.</p>
+    </div>
+    <div class="fleet-stack">
+      <div class="fleet-marquee" aria-hidden="true">
+        <!-- Track 1 -->
+        <div class="fleet-marquee-track track-1">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-1">
+              {track1.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <!-- Track 2 -->
+        <div class="fleet-marquee-track track-2">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-2">
+              {track2.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <!-- Track 3 -->
+        <div class="fleet-marquee-track track-3">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-3">
+              {track3.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div class="fleet-stack-footer">
+      <p class="fleet-stack-intro">ICAO tags highlight standout aircraft in our fleet.</p>
+      <a href="/fleet" class="inline-block mt-3 text-[#8B1538] font-semibold text-sm hover:underline">
+        Explore the full fleet &rarr;
+      </a>
     </div>
   </div>
+</section>
+
+<!-- Partners -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-6xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Our Codeshare Partners</h2>
+    <p class="text-gray-500 mb-8 max-w-xl mx-auto">Fly realistic routes with 60+ partner airlines across the globe.</p>
+    <div class="partner-grid">
+      {partnerWithFlag.map((partner) => (
+        <div class={`partner-item flex items-center justify-center p-3 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-200 ${partner.isOneWorld ? '' : 'hidden sm:flex'}`}>
+          <img
+            src={partner.logo}
+            alt={partner.name}
+            class="partner-logo"
+            loading="lazy"
+            onerror="this.style.display='none'"
+          />
+        </div>
+      ))}
+    </div>
+    <a href="/codeshares" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
+      View all partners &rarr;
+    </a>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="px-6 py-12 overflow-hidden">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold text-[#8B1538] text-center mb-2">Your Journey</h2>
+    <p class="text-gray-500 text-center mb-10 max-w-xl mx-auto">From application to experienced pilot — here's how it works.</p>
+
+    <div class="journey-flow">
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiAccountPlus} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 1</span>
+          <h3 class="journey-title">Apply</h3>
+          <p class="journey-desc">Fill out our application form. We review it within 48 hours.</p>
+        </div>
+      </div>
+
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiSchoolOutline} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 2</span>
+          <h3 class="journey-title">Train</h3>
+          <p class="journey-desc">Complete a written test and two supervised flights to qualify.</p>
+        </div>
+      </div>
+
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiAirplane} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 3</span>
+          <h3 class="journey-title">Fly</h3>
+          <p class="journey-desc">Log hours across 5,000+ routes with 60+ partner airlines worldwide.</p>
+        </div>
+      </div>
+
+      <div class="journey-step">
+        <div class="journey-icon" style="background: linear-gradient(135deg, #8B1538, #b04a69)">
+          <Icon path={mdiTrophyOutline} size={1.15} aria-hidden="true" />
+        </div>
+        <div class="journey-content">
+          <span class="journey-num">Step 4</span>
+          <h3 class="journey-title">Grow</h3>
+          <p class="journey-desc">Climb 10 ranks unlocking new aircraft, routes, and awards.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-3xl font-bold text-[#8B1538] text-center mb-2">Frequently Asked Questions</h2>
+    <p class="text-gray-500 text-center mb-8 max-w-xl mx-auto">Everything you need to know about joining and flying with Qatari Virtual.</p>
+
+    <div class="faq-list space-y-3">
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>What are the minimum requirements to join?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">You must be at least 13 years old, be Grade 3 or higher in Infinite Flight, have a Discord and IFC account, communicate in English, and not be blacklisted by IFVARB.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>How long does the application process take?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">Most applications are reviewed within 48 hours. You will be notified via private message on the Infinite Flight Community Forum once a decision is made.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>Is there a training phase after acceptance?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">Yes. All new pilots (except IFATC members) must pass 1 written test and 2 practical flights before becoming official pilots.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>Do I need a specific aircraft or add-on to fly?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">No. All aircraft are available through standard Infinite Flight. As you rank up, more aircraft in our fleet become available — from the A320 to the A380 and executive jets.</p>
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-[#ead9df] overflow-hidden">
+        <button class="faq-toggle flex items-center justify-between w-full px-5 py-4 text-left font-semibold text-gray-800 transition" aria-expanded="false">
+          <span>What is the Cargo Program?</span>
+          <svg class="faq-chevron w-5 h-5 text-[#8B1538] flex-shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="pb-4 text-sm text-gray-600 leading-relaxed">Our Cargo Program is a collaborative community mode where pilots work together to deliver cargo around the world. It has a separate training track and dedicated aircraft.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="px-6 py-12">
+  <div class="max-w-4xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-[#8B1538] mb-2">What Our Pilots Say</h2>
+    <p class="text-gray-500 mb-8">Hear from the community that makes Qatari Virtual special.</p>
+    <div class="testimonial-grid grid grid-cols-1 md:grid-cols-3 gap-5">
+      {testimonials.map((t) => (
+        <div class="testimonial-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-300 text-left flex flex-col">
+          <div class="text-4xl text-[#8B1538]/20 font-serif leading-none mb-2">&ldquo;</div>
+          <p class="text-sm text-gray-600 leading-relaxed flex-1 mb-4 italic">{t.quote}</p>
+          <div class="text-[#8B1538] font-bold text-sm">{t.author} <span class="text-gray-400 font-normal ml-1">{t.callsign}</span></div>
+        </div>
+      ))}
+    </div>
+    <a href="/about" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
+      Read more about us &rarr;
+    </a>
+  </div>
+</section>
+
+<CTA
+  title="Ready to fly with the best?"
+  description="Join Qatari Virtual and be part of an award-winning community of pilots."
+/>
+
+<style>
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    min-height: 500px;
+    margin-top: -84px;
+    padding-top: 84px;
+    border-bottom: 7px solid #6e0038;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #000;
+  }
+
+  .slide-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    z-index: 0;
+  }
+
+  .slide-layer.active { opacity: 1; }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.35) 35%, rgba(255,255,255,0.55) 100%);
+    z-index: 1;
+  }
+
+  .content {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    padding: 0 20px;
+    margin-top: -40px;
+  }
+
+  .small-text {
+    color: #6e0038;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+  }
+
+  .title {
+    color: #6e0038;
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.65rem;
+  }
+
+  .fleet-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .fleet-marquee {
+    position: relative;
+    height: 520px;
+    border-radius: 28px;
+    background: radial-gradient(circle at 15% 25%, rgba(255,255,255,0.12), transparent 45%),
+      linear-gradient(135deg, #4a0c2b, #6e0038);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(50, 7, 27, 0.25);
+  }
+
+  .fleet-stack-intro {
+    color: #6b6469;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .fleet-stack-footer {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .fleet-marquee-track {
+    position: absolute;
+    display: flex;
+    width: max-content;
+    align-items: center;
+    will-change: transform;
+    left: 0;
+  }
+
+  .track-1 {
+    top: 5%;
+    z-index: 1;
+    animation: scroll-marquee 45s linear infinite;
+  }
+  .track-2 {
+    top: 32%;
+    z-index: 2;
+    animation: scroll-marquee 35s linear infinite;
+  }
+  .track-3 {
+    top: 58%;
+    z-index: 3;
+    animation: scroll-marquee 25s linear infinite;
+  }
+
+  .fleet-marquee-inner {
+    display: flex;
+    align-items: center;
+    width: max-content;
+  }
+
+  .inner-1 { gap: 6rem; padding-right: 6rem; }
+  .inner-2 { gap: 4rem; padding-right: 4rem; }
+  .inner-3 { gap: 8rem; padding-right: 8rem; }
+
+  .fleet-marquee-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 260px;
+    padding: 0.75rem 0;
+    transform: translateY(var(--plane-offset, 0px));
+  }
+
+  .fleet-marquee-plane {
+    position: relative;
+    z-index: 2;
+    width: clamp(220px, 36vw, 380px);
+    height: auto;
+    transform: scale(var(--plane-scale, 1));
+    filter: drop-shadow(0 18px 35px rgba(0,0,0,0.45));
+  }
+
+  .fleet-icao-ghost {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    letter-spacing: 0.15em;
+    font-weight: 900;
+    color: rgba(255,255,255,0.12);
+    text-transform: uppercase;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes scroll-marquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
+  .partner-logo {
+    max-height: 36px;
+    max-width: 100%;
+    object-fit: contain;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .partner-item:hover .partner-logo { opacity: 1; }
+
+  .journey-flow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    position: relative;
+  }
+
+  .journey-flow::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #8B1538, #b04a69 50%, #8B1538);
+    border-radius: 999px;
+    opacity: 0.25;
+  }
+
+  .journey-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.25rem 0;
+    position: relative;
+  }
+
+  .journey-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 4px white;
+  }
+
+  .journey-content {
+    padding-top: 0.45rem;
+    flex: 1;
+  }
+
+  .journey-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8B1538;
+    opacity: 0.6;
+  }
+
+  .journey-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2f2f2f;
+    margin: 0.1rem 0 0.25rem;
+  }
+
+  .journey-desc {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.55;
+    max-width: 75%;
+  }
+
+  @media (min-width: 768px) {
+    .journey-flow {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .journey-flow::before {
+      left: 0;
+      right: 0;
+      top: 25px;
+      bottom: auto;
+      width: auto;
+      height: 3px;
+      background: linear-gradient(to right, #8B1538, #b04a69 50%, #8B1538);
+      margin: 0 2rem;
+    }
+
+    .journey-step {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0;
+    }
+
+    .journey-icon {
+      margin-bottom: 0.75rem;
+    }
+
+    .journey-desc {
+      max-width: 100%;
+    }
+  }
+
+  .faq-toggle[aria-expanded="true"] .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-toggle[aria-expanded="true"] + .faq-answer {
+    max-height: 300px;
+  }
+
+  @media (max-width: 768px) {
+    .hero { margin-top: -68px; padding-top: 68px; }
+    .content { margin-top: -24px; }
+
+    .partner-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .partner-logo { max-height: 28px; }
+
+    .fleet-marquee {
+      height: 400px;
+    }
+
+    .inner-1 { gap: 3rem; padding-right: 3rem; }
+    .inner-2 { gap: 2rem; padding-right: 2rem; }
+    .inner-3 { gap: 4rem; padding-right: 4rem; }
+
+    .fleet-marquee-plane {
+      width: clamp(190px, 70vw, 320px);
+    }
+
+    .fleet-icao-ghost {
+      font-size: 1.75rem;
+      letter-spacing: 0.1em;
+      top: 15%;
+    }
+  }
+</style>
+
+<script>
+  const slides = document.querySelectorAll('.slide-layer');
+  let currentIndex = 0;
+  if (slides.length > 0) {
+    setInterval(() => {
+      slides[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add('active');
+    }, 5000);
+  }
+
+  document.querySelectorAll('.faq-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.faq-toggle').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) btn.setAttribute('aria-expanded', 'true');
+    });
+  });
+</script>
+
 </Layout>
