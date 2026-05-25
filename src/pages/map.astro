@@ -38,10 +38,10 @@ try {
         <option value="">Select Airline...</option>
         {airlines.map((airline) => (
           <>
-            <option value={airline.prefix} data-color={airline.color}>
+            <option value={airline.suffix ? `${airline.prefix}_${airline.suffix}` : airline.prefix} data-color={airline.color}>
               {airline.name}
             </option>
-            {(airline.prefix === 'QR' || airline.name === 'Qatar Airways') && (
+            {(airline.name === 'Qatar Airways' && !airline.suffix) && (
               <option value="ALL" data-color="#8B1538">All Routes</option>
             )}
           </>
@@ -117,9 +117,9 @@ try {
       }).setView([20, 10], 2);
 
       L.tileLayer(
-        "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
         {
-          attribution: '&copy; OpenMapTiles &copy; OpenStreetMap contributors',
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
           noWrap: false,
         }
       ).addTo(map);
@@ -131,6 +131,7 @@ try {
       let markers = {};
       let drawn = [];
       let currentPrefix = "";
+      let currentFltnum = "";
       let currentRegion = "ALL";
 
       const airlineSelect = document.getElementById("airlineSelect");
@@ -284,7 +285,9 @@ try {
 
         let routeColor = currentColor;
         if (currentPrefix === "ALL" && route) {
-          const airline = airlines.find((a) => route.fltnum.startsWith(a.prefix));
+          const fltnum = route.fltnum || '';
+          const airline = airlines.find((a) => a.suffix && fltnum.includes(a.suffix) && fltnum.startsWith(a.prefix))
+                       || airlines.find((a) => !a.suffix && fltnum.startsWith(a.prefix));
           if (airline) routeColor = airline.color;
         }
 
@@ -413,21 +416,37 @@ seamLat += (hash - 5) * spread * 0.2;
         }
       }
 
-      function displayRoutesForAirline(prefix) {
-        currentPrefix = prefix;
+      function displayRoutesForAirline(prefix, isFltnum = false) {
+        if (isFltnum) {
+          currentFltnum = prefix;
+          currentPrefix = "";
+        } else {
+          currentPrefix = prefix;
+          currentFltnum = "";
+        }
+
         clearRoutes();
         clearMarkers();
         connections = {};
 
-        if (!prefix) {
+        if (!currentPrefix && !currentFltnum) {
           routeInfo.textContent = "Select an airline to view routes.";
           return;
         }
 
-        currentRoutes =
-          prefix === "ALL"
-            ? allRoutes
-            : allRoutes.filter((route) => route.fltnum.startsWith(prefix));
+        if (currentFltnum) {
+          currentRoutes = allRoutes.filter((route) => route.fltnum === currentFltnum);
+        } else {
+          currentRoutes = allRoutes.filter((route) => {
+            if (currentPrefix === "ALL") return true;
+            const fltnum = route.fltnum || '';
+            const match = airlines.find((a) => a.suffix && fltnum.includes(a.suffix) && fltnum.startsWith(a.prefix))
+                       || airlines.find((a) => !a.suffix && fltnum.startsWith(a.prefix));
+            if (!match) return false;
+            const matchId = match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix;
+            return matchId === currentPrefix;
+          });
+        }
 
         if (currentRegion !== "ALL") {
           currentRoutes = currentRoutes.filter((route) => {
@@ -506,7 +525,7 @@ seamLat += (hash - 5) * spread * 0.2;
           markers[code] = markerCopies;
         });
 
-        routeInfo.textContent = `${currentRoutes.length} routes, ${Object.keys(routeAirports).length} airports`;
+        routeInfo.textContent = `${currentRoutes.length} route${currentRoutes.length === 1 ? '' : 's'}, ${Object.keys(routeAirports).length} airport${Object.keys(routeAirports).length === 1 ? '' : 's'}`;
 
         if (showLinesToggle.checked) {
           const drawnPairs = new Set();
@@ -529,22 +548,23 @@ seamLat += (hash - 5) * spread * 0.2;
       airlineSelect.addEventListener("change", (e) => {
         currentColor = e.target.selectedOptions[0]?.dataset.color || "#ff0000";
         displayRoutesForAirline(e.target.value);
+        window.history.replaceState({}, '', window.location.pathname);
       });
 
       regionSelect.addEventListener("change", (e) => {
         currentRegion = e.target.value;
-        displayRoutesForAirline(currentPrefix);
+        displayRoutesForAirline(currentFltnum || currentPrefix, !!currentFltnum);
       });
 
       showLinesToggle.addEventListener("change", () => {
-        displayRoutesForAirline(currentPrefix);
+        displayRoutesForAirline(currentFltnum || currentPrefix, !!currentFltnum);
       });
 
       searchInput.addEventListener("input", () => {
         const q = searchInput.value.trim().toLowerCase();
 
         if (!q) {
-          displayRoutesForAirline(currentPrefix);
+          displayRoutesForAirline(currentFltnum || currentPrefix, !!currentFltnum);
           return;
         }
 
@@ -565,8 +585,18 @@ seamLat += (hash - 5) * spread * 0.2;
 
       const urlParams = new URLSearchParams(window.location.search);
       const airlineParam = urlParams.get("airline");
+      const fltnumParam = urlParams.get("fltnum");
 
-      if (airlineParam) {
+      if (fltnumParam) {
+        const matchAirline = airlines.find((a) => a.suffix && fltnumParam.includes(a.suffix) && fltnumParam.startsWith(a.prefix))
+                          || airlines.find((a) => !a.suffix && fltnumParam.startsWith(a.prefix));
+        if (matchAirline) {
+          airlineSelect.value = matchAirline.suffix ? `${matchAirline.prefix}_${matchAirline.suffix}` : matchAirline.prefix;
+          currentColor = matchAirline.color || "#ff0000";
+        }
+        showLinesToggle.checked = true; // Automatically check the show lines toggle for a single route
+        displayRoutesForAirline(fltnumParam, true);
+      } else if (airlineParam) {
         airlineSelect.value = airlineParam;
         const selectedOption = airlineSelect.querySelector(
           `option[value="${airlineParam}"]`
