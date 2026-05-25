@@ -1,9 +1,39 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import airlinesData from '../assets/airlines.json';
+import { getRoutes } from '../data/route';
 
 // We filter out Qatar Airways since this is specifically a codeshare partners page
 const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'QR');
+
+let allRoutes = [];
+try {
+  allRoutes = await getRoutes();
+} catch (error) {
+  console.error('Failed to load routes for codeshares page:', error);
+}
+
+// Calculate stats for each codeshare partner
+const codesharesWithStats = codeshares.map(airline => {
+  let short = 0, medium = 0, long = 0, ultra = 0, total = 0;
+
+  allRoutes.forEach(route => {
+    const fltnum = route.fltnum || '';
+    const match = airlinesData.airlines.find(a => a.suffix && fltnum.includes(a.suffix) && fltnum.startsWith(a.prefix))
+               || airlinesData.airlines.find(a => !a.suffix && fltnum.startsWith(a.prefix));
+    
+    if (match && match.name === airline.name) {
+      total++;
+      const hours = (route.duration || 0) / 3600;
+      if (hours < 3) short++;
+      else if (hours < 6) medium++;
+      else if (hours < 12) long++;
+      else ultra++;
+    }
+  });
+
+  return { ...airline, stats: { short, medium, long, ultra, total } };
+});
 ---
 
 <Layout>
@@ -33,14 +63,14 @@ const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'Q
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {codeshares.map((airline) => (
-        <div class="airline-card bg-white rounded-lg border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200" data-search={`${airline.name.toLowerCase()} ${airline.codeshare_code.toLowerCase()}`}>
-          <div class="h-[250px] flex items-center justify-center p-6">
+      {codesharesWithStats.map((airline) => (
+        <div class="airline-card bg-white rounded-lg border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200 cursor-pointer overflow-hidden flex flex-col" data-search={`${airline.name.toLowerCase()} ${airline.codeshare_code.toLowerCase()}`}>
+          <div class="h-[200px] flex items-center justify-center p-6 bg-white relative z-10">
             {airline.logo ? (
               <img
                 src={airline.logo}
                 alt={airline.name}
-                class="max-h-[120px] object-contain"
+                class="max-h-[100px] object-contain"
               />
             ) : (
               <p class="text-gray-400 text-sm font-medium tracking-wide uppercase">
@@ -49,16 +79,58 @@ const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'Q
             )}
           </div>
 
-          <div class="border-t bg-[#faf7f8] px-4 py-3 flex justify-between items-center">
+          <div class="border-t border-[#e5d9dd] bg-[#faf7f8] px-4 py-3 flex justify-between items-center z-10 relative">
             <span class="text-[#8B1538] font-semibold text-sm">
               {airline.name} ({airline.codeshare_code})
             </span>
-            <a href={`/map?airline=${airline.prefix}`} class="text-sm text-gray-500 hover:text-[#8B1538] hover:underline flex items-center gap-1" title={`View ${airline.name} Route Map`}>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            <div class="flex items-center gap-3">
+              <a href={`/map?airline=${airline.prefix}`} class="text-sm text-gray-500 hover:text-[#8B1538] hover:underline flex items-center gap-1" title={`View ${airline.name} Route Map`}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Map
+              </a>
+              <svg class="chevron w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
-              Map
-            </a>
+            </div>
+          </div>
+
+          <div class="expanded-content bg-white">
+            <div class="p-5 border-t border-[#e5d9dd]">
+              <div class="mb-4">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Hubs</span>
+                <div class="flex flex-wrap gap-1.5">
+                  {airline.hubs?.map(hub => <span class="bg-[#f8f1f3] text-[#8B1538] text-[11px] font-bold px-2 py-0.5 rounded border border-[#ead9df]">{hub}</span>)}
+                  {(!airline.hubs || airline.hubs.length === 0) && <span class="text-xs text-gray-500">N/A</span>}
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Routes Breakdown</span>
+                  <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{airline.stats.total} Total</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="bg-[#fcfafb] border border-[#ead9df] p-2 rounded text-center">
+                    <div class="text-[10px] text-gray-500 font-semibold mb-0.5">Short Haul</div>
+                    <div class="text-sm font-bold text-[#8B1538]">{airline.stats.short}</div>
+                  </div>
+                  <div class="bg-[#fcfafb] border border-[#ead9df] p-2 rounded text-center">
+                    <div class="text-[10px] text-gray-500 font-semibold mb-0.5">Medium Haul</div>
+                    <div class="text-sm font-bold text-[#8B1538]">{airline.stats.medium}</div>
+                  </div>
+                  <div class="bg-[#fcfafb] border border-[#ead9df] p-2 rounded text-center">
+                    <div class="text-[10px] text-gray-500 font-semibold mb-0.5">Long Haul</div>
+                    <div class="text-sm font-bold text-[#8B1538]">{airline.stats.long}</div>
+                  </div>
+                  <div class="bg-[#fcfafb] border border-[#ead9df] p-2 rounded text-center">
+                    <div class="text-[10px] text-gray-500 font-semibold mb-0.5">Ultra Long</div>
+                    <div class="text-sm font-bold text-[#8B1538]">{airline.stats.ultra}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ))}
@@ -84,5 +156,33 @@ const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'Q
         });
       });
     }
+
+    // Handle Accordion Clicks
+    cards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return; // Allow clicking the Map link without toggling accordion
+        card.classList.toggle('is-expanded');
+      });
+    });
   </script>
+
+  <style>
+    .expanded-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.2s ease;
+    }
+    .airline-card.is-expanded .expanded-content {
+      max-height: 400px;
+      opacity: 1;
+      transition: max-height 0.4s ease, opacity 0.3s ease 0.1s;
+    }
+    .chevron {
+      transition: transform 0.3s ease;
+    }
+    .airline-card.is-expanded .chevron {
+      transform: rotate(180deg);
+    }
+  </style>
 </Layout>

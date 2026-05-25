@@ -1,14 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { fetchApiData } from '../utils/api.ts';
-
-interface AircraftRef {
-  id: number;
-  name: string;
-  liveryname: string;
-  rankreq: number | null;
-  awardreq: number | null;
-}
+import airlinesData from '../assets/airlines.json';
 
 interface Route {
   id: number;
@@ -16,8 +9,8 @@ interface Route {
   dep: string;
   arr: string;
   duration: number;
-  aircraft: AircraftRef[];
   airline_id?: number;
+  aircraft?: { name: string; liveryname: string }[];
 }
 
 let routes: Route[] = [];
@@ -39,6 +32,7 @@ try {
   error = 'Route data unavailable right now.';
 }
 
+const airlines = airlinesData.airlines;
 const totalRoutes = routes.length;
 ---
 
@@ -52,7 +46,7 @@ const totalRoutes = routes.length;
       </p>
     </div>
     <p class="max-w-3xl text-base sm:text-lg text-gray-600 leading-relaxed mb-3">
-      Explore our complete route network. Search and filter by flight number, departure, arrival, or aircraft type.
+      Explore our complete route network. Search and filter by airline, departure, or arrival.
     </p>
     <a href="/map" class="inline-flex items-center gap-1 text-sm text-[#8B1538] font-semibold hover:underline mb-5">
       View Route Map &rarr;
@@ -61,10 +55,13 @@ const totalRoutes = routes.length;
     {error && (<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-3 mb-6 text-sm">{error}</div>)}
 
     <div class="flex flex-wrap items-center gap-2.5 mb-5">
-      <input id="filter-fltnum" type="text" placeholder="Flight #" class="filter-input w-[110px]" />
+      <select id="filter-airline" class="filter-input w-[180px]">
+        <option value="">All Airlines</option>
+        {airlines.map(a => <option value={a.suffix ? `${a.prefix}_${a.suffix}` : a.prefix}>{a.name}</option>)}
+      </select>
       <input id="filter-dep" type="text" placeholder="Departure" class="filter-input w-[110px]" />
       <input id="filter-arr" type="text" placeholder="Arrival" class="filter-input w-[110px]" />
-      <input id="filter-ac" type="text" placeholder="Aircraft" class="filter-input w-[130px]" />
+      <button id="filter-btn" class="bg-[#8B1538] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#6e0038] transition">Search</button>
       <span class="text-sm text-gray-500 ml-auto hidden sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
     </div>
 
@@ -74,11 +71,11 @@ const totalRoutes = routes.length;
         <table class="w-full text-sm text-left" id="route-table">
           <thead class="sticky top-0 z-10 text-white" style="background: linear-gradient(135deg, #6e0038, #8B1538)">
             <tr>
-              <th class="py-3 px-4 font-bold cursor-pointer select-none" data-sort="fltnum">Flight # <span class="sort-arrow ml-1">&#9650;</span></th>
+              <th class="py-3 px-4 font-bold">Flt Num</th>
               <th class="py-3 px-4 font-bold">Dep</th>
               <th class="py-3 px-4 font-bold">Arr</th>
+              <th class="py-3 px-4 font-bold">Aircraft &amp; Livery</th>
               <th class="py-3 px-4 font-bold cursor-pointer select-none" data-sort="duration">Duration <span class="sort-arrow ml-1">&#9650;</span></th>
-              <th class="py-3 px-4 font-bold">Aircraft</th>
             </tr>
           </thead>
           <tbody>
@@ -88,28 +85,39 @@ const totalRoutes = routes.length;
                 data-fltnum={route.fltnum || ''}
                 data-dep={route.dep || ''}
                 data-arr={route.arr || ''}
-                data-ac={route.aircraft?.map(a => a?.name).filter(Boolean).join('|') || ''}
+                data-airline={(() => {
+                  const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
+                             || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
+                  return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
+                })()}
                 data-duration={route.duration || 0}
               >
-                <td class="py-2.5 px-4 font-semibold" style="color:#8B1538">{route.fltnum || '\u2014'}</td>
+                <td class="py-2.5 px-4 font-medium text-gray-800">
+                  <div class="flex items-center gap-2">
+                    {route.fltnum || '\u2014'}
+                    <a href={`/map?fltnum=${route.fltnum}`} class="text-gray-400 hover:text-[#8B1538] transition" title="View specific route on map">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                    </a>
+                  </div>
+                </td>
                 <td class="py-2.5 px-4 font-medium text-gray-700">{route.dep || '\u2014'}</td>
                 <td class="py-2.5 px-4 font-medium text-gray-700">{route.arr || '\u2014'}</td>
-                <td class="py-2.5 px-4 text-gray-500">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</td>
                 <td class="py-2.5 px-4">
-                  <div class="flex flex-wrap items-center gap-1 ac-group" data-route-id={route.id}>
-                    {route.aircraft?.slice(0, 3).map((ac) => (
-                      ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full" style="background:#f8f1f3;color:#8B1538">{ac.name}</span>
+                  <div class="flex flex-wrap items-center gap-1 ac-group">
+                    {route.aircraft?.slice(0, 2).map((ac) => (
+                      ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df]" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
                     ))}
-                    {(route.aircraft?.length || 0) > 3 && (
+                    {(route.aircraft?.length || 0) > 2 && (
                       <>
-                        {route.aircraft?.slice(3).map((ac) => (
-                          ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full hidden" style="background:#f8f1f3;color:#8B1538">{ac.name}</span>
+                        {route.aircraft?.slice(2).map((ac) => (
+                          ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df] hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
                         ))}
-                        <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 3}</button>
+                        <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
                       </>
                     )}
                   </div>
                 </td>
+                <td class="py-2.5 px-4 text-gray-500">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</td>
               </tr>
             ))}
           </tbody>
@@ -125,11 +133,20 @@ const totalRoutes = routes.length;
           data-fltnum={route.fltnum || ''}
           data-dep={route.dep || ''}
           data-arr={route.arr || ''}
-          data-ac={route.aircraft?.map(a => a?.name).filter(Boolean).join('|') || ''}
+          data-airline={(() => {
+            const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
+                       || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
+            return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
+          })()}
           data-duration={route.duration || 0}
         >
           <div class="flex items-center justify-between mb-2">
-            <span class="font-bold text-lg" style="color:#8B1538">{route.fltnum || '\u2014'}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-lg" style="color:#8B1538">{route.fltnum || '\u2014'}</span>
+              <a href={`/map?fltnum=${route.fltnum}`} class="text-gray-400 hover:text-[#8B1538] transition p-0.5" title="View specific route on map">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+              </a>
+            </div>
             <span class="text-xs text-gray-400">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</span>
           </div>
           <div class="flex items-center gap-3 text-sm mb-2">
@@ -137,16 +154,16 @@ const totalRoutes = routes.length;
             <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"/></svg>
             <span class="font-semibold text-gray-800">{route.arr || '\u2014'}</span>
           </div>
-          <div class="flex flex-wrap items-center gap-1 ac-group" data-route-id={route.id}>
-            {route.aircraft?.slice(0, 3).map((ac) => (
-              ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full" style="background:#f8f1f3;color:#8B1538">{ac.name}</span>
+          <div class="flex flex-wrap items-center gap-1 ac-group mb-2" data-route-id={route.id}>
+            {route.aircraft?.slice(0, 2).map((ac) => (
+              ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
             ))}
-            {(route.aircraft?.length || 0) > 3 && (
+            {(route.aircraft?.length || 0) > 2 && (
               <>
-                {route.aircraft?.slice(3).map((ac) => (
-                  ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full hidden" style="background:#f8f1f3;color:#8B1538">{ac.name}</span>
+                {route.aircraft?.slice(2).map((ac) => (
+                  ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
                 ))}
-                <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 3}</button>
+                <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
               </>
             )}
           </div>
@@ -160,10 +177,10 @@ const totalRoutes = routes.length;
 </Layout>
 
 <script>
-  const filterFltnum = document.getElementById('filter-fltnum');
-  const filterDep = document.getElementById('filter-dep');
-  const filterArr = document.getElementById('filter-arr');
-  const filterAc = document.getElementById('filter-ac');
+  const filterAirline = document.getElementById('filter-airline') as HTMLSelectElement;
+  const filterFltnum = document.getElementById('filter-fltnum') as HTMLInputElement;
+  const filterDep = document.getElementById('filter-dep') as HTMLInputElement;
+  const filterArr = document.getElementById('filter-arr') as HTMLInputElement;
   const routeCount = document.getElementById('route-count');
   const noResults = document.getElementById('no-results');
   const tableRows = document.querySelectorAll('.route-row');
@@ -171,37 +188,57 @@ const totalRoutes = routes.length;
   const table = document.getElementById('route-table');
 
   function filterRows() {
+    const qAirline = filterAirline?.value || '';
     const qFlt = (filterFltnum?.value || '').toLowerCase();
     const qDep = (filterDep?.value || '').toLowerCase();
     const qArr = (filterArr?.value || '').toLowerCase();
-    const qAc = (filterAc?.value || '').toLowerCase();
 
     const items = tableRows.length ? tableRows : cards;
     let visible = 0;
 
     items.forEach(item => {
+      const airline = (item.dataset.airline || '');
       const fltnum = (item.dataset.fltnum || '').toLowerCase();
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
-      const acVal = (item.dataset.ac || '').toLowerCase();
 
-      const ok = (!qFlt || fltnum.includes(qFlt))
+      const ok = (!qAirline || airline === qAirline)
+        && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
-        && (!qArr || arrVal.includes(qArr))
-        && (!qAc || acVal.includes(qAc));
+        && (!qArr || arrVal.includes(qArr));
 
-      item.style.display = ok ? '' : 'none';
+      (item as HTMLElement).style.display = ok ? '' : 'none';
       if (ok) visible++;
     });
 
     if (routeCount) routeCount.textContent = `${visible.toLocaleString()} of ${items.length.toLocaleString()} routes`;
     if (noResults) noResults.style.display = visible === 0 ? '' : 'none';
+
+    // sync URL
+    const params = new URLSearchParams();
+    if (qAirline) params.set('airline', qAirline);
+    if (qFlt) params.set('flt', qFlt);
+    if (qDep) params.set('dep', qDep);
+    if (qArr) params.set('arr', qArr);
+    const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
   }
 
-  filterFltnum?.addEventListener('input', filterRows);
-  filterDep?.addEventListener('input', filterRows);
-  filterArr?.addEventListener('input', filterRows);
-  filterAc?.addEventListener('input', filterRows);
+  // load filters from URL on page load
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('airline') && filterAirline) filterAirline.value = params.get('airline')!;
+  if (params.get('flt') && filterFltnum) filterFltnum.value = params.get('flt')!;
+  if (params.get('dep') && filterDep) filterDep.value = params.get('dep')!;
+  if (params.get('arr') && filterArr) filterArr.value = params.get('arr')!;
+  if (params.toString()) filterRows();
+
+  const filterBtn = document.getElementById('filter-btn');
+  filterBtn?.addEventListener('click', filterRows);
+
+  // Allow pressing "Enter" inside the text boxes to trigger the search
+  const handleEnter = (e: KeyboardEvent) => { if (e.key === 'Enter') filterRows(); };
+  filterDep?.addEventListener('keypress', handleEnter);
+  filterArr?.addEventListener('keypress', handleEnter);
 
   // sort
   let currentSort = { key: null as string | null, asc: true };

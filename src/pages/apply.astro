@@ -32,6 +32,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="flex items-center gap-2 text-sm text-gray-700"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#8B1538"></span> Grade 3+ in Infinite Flight</div>
         <div class="flex items-center gap-2 text-sm text-gray-700"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#8B1538"></span> Discord &amp; IFC account</div>
         <div class="flex items-center gap-2 text-sm text-gray-700"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#8B1538"></span> Not blacklisted by IFVARB</div>
+        <div class="flex items-center gap-2 text-sm text-gray-700"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:#8B1538"></span> Max 2 Level 2/3 violations</div>
       </div>
     </div>
 
@@ -152,6 +153,9 @@ import Layout from '../layouts/Layout.astro';
               <option value="IFVARB Website">IFVARB Website</option>
               <option value="Other">Other</option>
             </select>
+            <div id="how-heard-other-wrap" class="hidden mt-3">
+              <input id="how-heard-other" type="text" placeholder="Please specify..." class="w-full border border-[#ead9df] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B1538] focus:ring-1 focus:ring-[#8B1538]/30 transition" />
+            </div>
           </div>
         </div>
       </div>
@@ -249,14 +253,11 @@ import Layout from '../layouts/Layout.astro';
 
       statsCard.classList.remove('hidden');
 
-      // quick validation hint
-      let warnings: string[] = [];
-      if (grade < 3) warnings.push('Grade below 3');
-      if (ratio > 0.3) warnings.push('High violation ratio');
-      if (totalL23Vios > 2) warnings.push('Too many L2&3 violations');
-
-      if (warnings.length) {
-        showStatus('Your profile may not meet requirements: ' + warnings.join(', '), true);
+      if (grade < 3) {
+        showStatus('Your profile may not meet requirements: Grade below 3', true);
+        submitBtn.disabled = true;
+      } else if (totalL23Vios > 2) {
+        showStatus('Your profile does not meet requirements: Max 2 Level 2/3 violations.', true);
         submitBtn.disabled = true;
       } else {
         ifcStatsFetched = true;
@@ -286,6 +287,20 @@ import Layout from '../layouts/Layout.astro';
     fetchBtn.disabled = false;
   }
 
+  // Show/hide "Other" input for how-heard
+  document.getElementById('how-heard')?.addEventListener('change', (e) => {
+    const wrap = document.getElementById('how-heard-other-wrap');
+    const input = document.getElementById('how-heard-other') as HTMLInputElement;
+    if ((e.target as HTMLSelectElement).value === 'Other') {
+      wrap?.classList.remove('hidden');
+      input.required = true;
+    } else {
+      wrap?.classList.add('hidden');
+      input.required = false;
+      input.value = '';
+    }
+  });
+
   // Form submission
   document.getElementById('apply-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -309,7 +324,9 @@ import Layout from '../layouts/Layout.astro';
       age_range: (document.getElementById('age') as HTMLSelectElement).value,
       other_va: (document.getElementById('other-va') as HTMLInputElement).value.trim(),
       why_join: (document.getElementById('why-join') as HTMLTextAreaElement).value.trim(),
-      how_heard: (document.getElementById('how-heard') as HTMLSelectElement).value,
+      how_heard: (document.getElementById('how-heard') as HTMLSelectElement).value === 'Other'
+        ? 'Other: ' + (document.getElementById('how-heard-other') as HTMLInputElement).value.trim()
+        : (document.getElementById('how-heard') as HTMLSelectElement).value,
     };
 
     submitBtn.disabled = true;

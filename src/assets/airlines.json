@@ -9,6 +9,15 @@
       "codeshare_code": "QTR/QR"
     },
     {
+      "name": "Qatar Airways Classic",
+      "prefix": "QR",
+      "suffix": "Classic",
+      "hubs": ["OTHH", "OTBD"],
+      "color": "#5A1024",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Qatar_Airways_Logo.svg/1024px-Qatar_Airways_Logo.svg.png",
+      "codeshare_code": "QTR/QR"
+    },
+    {
       "name": "Aegean",
       "prefix": "A3",
       "hubs": ["LGAV"],
@@ -29,7 +38,7 @@
       "prefix": "SU",
       "hubs": ["UUEE"],
       "color": "#043484",
-      "logo": "https://logos-world.net/wp-content/uploads/2023/01/Aeroflot-Logo-2003.png",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Aeroflot_Logo_en.svg",
       "codeshare_code": "AFL/SU"
     },
     {
@@ -93,7 +102,7 @@
       "prefix": "HM",
       "hubs": ["FSIA"],
       "color": "#A6CE42",
-      "logo": "https://logos-world.net/wp-content/uploads/2023/01/Air-Seychelles-Logo.png",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Air_Seychelles_logo.svg",
       "codeshare_code": "SEY/HM"
     },
     {
@@ -237,7 +246,7 @@
       "prefix": "GF",
       "hubs": ["OBBI"],
       "color": "#A29061",
-      "logo": "https://logos-world.net/wp-content/uploads/2023/01/Gulf-Air-Logo.png",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Gulf_Air_Logo_2018.svg",
       "codeshare_code": "GFA/GF"
     },
     {
@@ -261,7 +270,7 @@
       "prefix": "IB",
       "hubs": ["LEMD"],
       "color": "#D7192D",
-      "logo": "https://logos-world.net/wp-content/uploads/2020/12/Iberia-Logo.png",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Logotipo_de_Iberia.svg",
       "codeshare_code": "IBE/IB"
     },
     {
@@ -337,12 +346,20 @@
       "codeshare_code": "MEA/ME"
     },
     {
-      "name": "Norwegian",
-      "prefix": "NOS",
-      "hubs": ["ENGM"],
-      "color": "#BA0C2F",
-      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png?_=20241221162114",
-      "codeshare_code": "NOS/DY"
+      "name": "Norwegian Air Shuttle",
+      "prefix": "NOZ",
+      "hubs": ["ENGM", "EFHK", "ESSA", "EKCH", "ENBR", "LEAL", "LEMG", "LEBL", "EVRA", "ENZV", "ENVA", "GCLP", "LEPA"],
+      "color": "#E6222E",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png",
+      "codeshare_code": "NOZ/DY"
+    },
+    {
+      "name": "Norwegian Air Sweden",
+      "prefix": "NSZ",
+      "hubs": ["ENGM", "EFHK", "ESSA", "EKCH", "ENBR", "LEAL", "LEMG", "LEBL", "EVRA", "ENZV", "ENVA", "GCLP", "LEPA"],
+      "color": "#E6222E",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png",
+      "codeshare_code": "NSZ/LE"
     },
     {
       "name": "Oman Air",
@@ -405,7 +422,7 @@
       "prefix": "FR",
       "hubs": ["EIDW"],
       "color": "#073590",
-      "logo": "https://logos-world.net/wp-content/uploads/2020/06/Ryanair-Logo.png",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Ryanair.svg",
       "codeshare_code": "RYR/FR"
     },
     {
@@ -429,7 +446,7 @@
       "prefix": "UL",
       "hubs": ["VCBI"],
       "color": "#01742F",
-      "logo": "https://images.vasystem.org/QVaPkuwnm9LGiWw5nr0fSIGpcwk-RqSVFxnaEeSfbgY/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvYmEvYjcvYmFiNzdhOTdiZWNjY2M3MTM1YjU1ZmZhZDBlN2ExYTI1YzY4MTI4MQ==",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/SriLankan_Airlines_Logo.svg",
       "codeshare_code": "ALK/UL"
     },
     {
