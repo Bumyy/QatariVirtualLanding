@@ -46,7 +46,7 @@ const testimonials = [
   { quote: 'Joining Qatari Virtual has been nothing short of life-changing. From the moment I signed up, I felt welcomed into a community that quickly became like a second family.', author: 'Mohammed', callsign: 'QRV060' },
 ];
 
-const partners = airlinesData.airlines.filter(a => a.name !== 'Qatar Airways');
+const partners = airlinesData.airlines.filter(a => a.prefix !== 'QR');
 const owPrefixes = ['AA','AS','AY','BA','CX','IB','JL','MH','QF','AT','RJ','UL'];
 const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includes(p.prefix) }));
 ---
