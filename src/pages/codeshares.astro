@@ -2,8 +2,52 @@
 import Layout from '../layouts/Layout.astro';
 import airlinesData from '../assets/airlines.json';
 import { getRoutes } from '../data/route';
+import csvText from '../assets/airports.csv?raw';
 
-// We filter out Qatar Airways since this is specifically a codeshare partners page
+// Server-side helper to parse airports CSV
+function parseCSV(csvText) {
+  const airports = {};
+  const lines = csvText.split('\n');
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+
+    let parts = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let c of line) {
+      if (c === '"') {
+        inQuotes = !inQuotes;
+      } else if (c === ',' && !inQuotes) {
+        parts.push(current);
+        current = "";
+      } else {
+        current += c;
+      }
+    }
+    parts.push(current);
+
+    if (parts.length >= 8) {
+      const icao = parts[1]?.trim();
+      const name = parts[3]?.trim();
+      const lat = parseFloat(parts[4]);
+      const lng = parseFloat(parts[5]);
+      const continent = parts[7]?.trim() || 'NA';
+
+      if (icao && !isNaN(lat) && !isNaN(lng)) {
+        airports[icao] = { name, icao, lat, lng, continent };
+      }
+    }
+  }
+
+  return airports;
+}
+
+const airportsMap = parseCSV(csvText);
+
+// Filter out Qatar Airways carriers since this is specifically a codeshare partners page
 const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'QR');
 
 let allRoutes = [];
@@ -13,9 +57,22 @@ try {
   console.error('Failed to load routes for codeshares page:', error);
 }
 
-// Calculate stats for each codeshare partner
+const owPrefixes = ['AA','AS','AY','BA','CX','IB','JL','MH','QF','AT','RJ','UL'];
+
+// Process and map codeshare partners with stats, regions, and alliance flags
 const codesharesWithStats = codeshares.map(airline => {
   let short = 0, medium = 0, long = 0, ultra = 0, total = 0;
+
+  // Determine region from the first valid hub
+  let region = 'OTHER';
+  if (airline.hubs && airline.hubs.length > 0) {
+    for (const hub of airline.hubs) {
+      if (airportsMap[hub]) {
+        region = airportsMap[hub].continent;
+        break;
+      }
+    }
+  }
 
   allRoutes.forEach(route => {
     const fltnum = route.fltnum || '';
@@ -32,7 +89,14 @@ const codesharesWithStats = codeshares.map(airline => {
     }
   });
 
-  return { ...airline, stats: { short, medium, long, ultra, total } };
+  const isOneWorld = owPrefixes.includes(airline.prefix);
+
+  return { 
+    ...airline, 
+    region,
+    isOneWorld,
+    stats: { short, medium, long, ultra, total } 
+  };
 });
 ---
 
@@ -53,24 +117,67 @@ const codesharesWithStats = codeshares.map(airline => {
       </p>
     </div>
 
-    <div class="mb-8 flex justify-end">
-      <input
-        id="searchInput"
-        type="text"
-        placeholder="Search airlines or codes..."
-        class="border border-gray-300 px-4 py-2 rounded-md w-full sm:w-72 shadow-sm focus:outline-none focus:border-[#8B1538] focus:ring-1 focus:ring-[#8B1538] transition"
-      />
+    <!-- Filter Section (Region tabs & Search bar) -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <!-- Region Filter Tabs -->
+      <div class="flex flex-wrap gap-2">
+        <button class="region-tab active px-4 py-2 rounded-full text-xs font-bold border border-[#8B1538] bg-[#8B1538] text-white shadow-sm transition" data-region="ALL">
+          All Regions
+        </button>
+        <button class="region-tab px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-gray-600 hover:border-[#8B1538] hover:text-[#8B1538] hover:bg-[#fdf8f9] transition" data-region="AS">
+          Asia & Middle East
+        </button>
+        <button class="region-tab px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-gray-600 hover:border-[#8B1538] hover:text-[#8B1538] hover:bg-[#fdf8f9] transition" data-region="EU">
+          Europe
+        </button>
+        <button class="region-tab px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-gray-600 hover:border-[#8B1538] hover:text-[#8B1538] hover:bg-[#fdf8f9] transition" data-region="NA">
+          North America
+        </button>
+        <button class="region-tab px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-gray-600 hover:border-[#8B1538] hover:text-[#8B1538] hover:bg-[#fdf8f9] transition" data-region="SA">
+          South America
+        </button>
+        <button class="region-tab px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-gray-600 hover:border-[#8B1538] hover:text-[#8B1538] hover:bg-[#fdf8f9] transition" data-region="AF">
+          Africa
+        </button>
+        <button class="region-tab px-4 py-2 rounded-full text-xs font-bold border border-gray-200 bg-white text-gray-600 hover:border-[#8B1538] hover:text-[#8B1538] hover:bg-[#fdf8f9] transition" data-region="OC">
+          Oceania
+        </button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="flex-shrink-0">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search airlines or codes..."
+          class="border border-gray-300 px-4 py-2.5 rounded-full w-full sm:w-72 shadow-sm focus:outline-none focus:border-[#8B1538] focus:ring-1 focus:ring-[#8B1538] text-sm transition"
+        />
+      </div>
     </div>
 
+    <!-- Grid List -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {codesharesWithStats.map((airline) => (
-        <div class="airline-card bg-white rounded-lg border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200 cursor-pointer overflow-hidden flex flex-col" data-search={`${airline.name.toLowerCase()} ${airline.codeshare_code.toLowerCase()}`}>
-          <div class="h-[200px] flex items-center justify-center p-6 bg-white relative z-10">
+        <div 
+          class="airline-card bg-white rounded-xl border border-[#e5d9dd] shadow-sm hover:shadow-lg hover:border-[#8B1538] transition duration-200 cursor-pointer overflow-hidden flex flex-col relative" 
+          data-search={`${airline.name.toLowerCase()} ${airline.codeshare_code.toLowerCase()}`}
+          data-region={airline.region}
+          data-airline-id={airline.prefix}
+        >
+          {airline.isOneWorld && (
+            <div class="absolute top-3 right-3 z-20 bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full border shadow-sm tracking-wide uppercase flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+              oneworld
+            </div>
+          )}
+
+          <div class="h-[180px] flex items-center justify-center p-6 bg-white relative z-10">
             {airline.logo ? (
               <img
                 src={airline.logo}
                 alt={airline.name}
-                class="max-h-[100px] object-contain"
+                class="max-h-[85px] object-contain"
+                loading="lazy"
               />
             ) : (
               <p class="text-gray-400 text-sm font-medium tracking-wide uppercase">
@@ -80,11 +187,11 @@ const codesharesWithStats = codeshares.map(airline => {
           </div>
 
           <div class="border-t border-[#e5d9dd] bg-[#faf7f8] px-4 py-3 flex justify-between items-center z-10 relative">
-            <span class="text-[#8B1538] font-semibold text-sm">
+            <span class="text-[#8B1538] font-bold text-sm">
               {airline.name} ({airline.codeshare_code})
             </span>
-            <div class="flex items-center gap-3">
-              <a href={`/map?airline=${airline.prefix}`} class="text-sm text-gray-500 hover:text-[#8B1538] hover:underline flex items-center gap-1" title={`View ${airline.name} Route Map`}>
+            <div class="flex items-center gap-2">
+              <a href={`/map?airline=${airline.prefix}`} class="text-xs text-gray-500 hover:text-[#8B1538] hover:underline flex items-center gap-1 font-semibold" title={`View ${airline.name} Route Map`}>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
@@ -145,30 +252,72 @@ const codesharesWithStats = codeshares.map(airline => {
   </section>
 
   <script>
-    // Client-side script to handle the filtering
+    // Client-side Tab & Search Filtering
     const searchInput = document.getElementById('searchInput');
+    const tabs = document.querySelectorAll('.region-tab');
     const cards = document.querySelectorAll('.airline-card');
 
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        
-        cards.forEach((card) => {
-          const searchData = card.getAttribute('data-search') || '';
-          if (searchData.includes(query)) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
-        });
+    let currentRegion = 'ALL';
+    let searchQuery = '';
+
+    function filterAirlines() {
+      cards.forEach(card => {
+        const searchData = card.getAttribute('data-search') || '';
+        const regionData = card.getAttribute('data-region') || '';
+
+        const matchesSearch = searchData.includes(searchQuery);
+        const matchesRegion = currentRegion === 'ALL' || regionData === currentRegion;
+
+        if (matchesSearch && matchesRegion) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
       });
     }
 
-    // Handle Accordion Clicks
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        filterAirlines();
+      });
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Toggle tab styles
+        tabs.forEach(t => {
+          t.classList.remove('active', 'bg-[#8B1538]', 'text-white', 'border-[#8B1538]');
+          t.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+        });
+
+        tab.classList.add('active', 'bg-[#8B1538]', 'text-white', 'border-[#8B1538]');
+        tab.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+
+        currentRegion = tab.getAttribute('data-region') || 'ALL';
+        filterAirlines();
+      });
+    });
+
+    // Accordion Clicks
     cards.forEach(card => {
       card.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return; // Allow clicking the Map link without toggling accordion
-        card.classList.toggle('is-expanded');
+        if (e.target.closest('a')) return;
+
+        const isExpanding = !card.classList.contains('is-expanded');
+
+        // Collapse all cards except this one
+        cards.forEach(c => {
+          if (c !== card) c.classList.remove('is-expanded');
+        });
+
+        card.classList.toggle('is-expanded', isExpanding);
+
+        if (isExpanding) {
+          setTimeout(() => {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 200);
+        }
       });
     });
   </script>
@@ -178,7 +327,7 @@ const codesharesWithStats = codeshares.map(airline => {
       max-height: 0;
       opacity: 0;
       overflow: hidden;
-      transition: max-height 0.3s ease, opacity 0.2s ease;
+      transition: max-height 0.35s ease, opacity 0.25s ease;
     }
     .airline-card.is-expanded .expanded-content {
       max-height: 400px;

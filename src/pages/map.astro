@@ -18,8 +18,13 @@ try {
 <Layout>
   <section class="px-6 py-8 min-h-screen">
     <div class="mb-8">
-      <div class="flex justify-between items-start gap-4 mb-3">
-        <h1 class="text-5xl font-bold text-[#8B1538]">Interactive Route Map</h1>
+      <div class="flex justify-between items-center gap-4 mb-3 flex-wrap sm:flex-nowrap">
+        <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+          <h1 class="text-5xl font-bold text-[#8B1538]">Interactive Route Map</h1>
+          <div id="selectedAirlineLogoContainer" class="flex items-center justify-center bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm h-12 w-28 overflow-hidden opacity-0 scale-95 transition-all duration-300 transform" style="display: none;">
+            <img id="selectedAirlineLogo" src="" alt="" class="max-h-full max-w-full object-contain" />
+          </div>
+        </div>
         <p class="text-sm text-gray-500 pt-2 hidden sm:inline">
           <a href="/" class="text-[#8B1538] font-semibold hover:underline">Home</a> / Route Map
         </p>
@@ -539,9 +544,55 @@ seamLat += (hash - 5) * spread * 0.2;
         }
       }
 
+      const logoContainer = document.getElementById("selectedAirlineLogoContainer");
+      const logoImg = document.getElementById("selectedAirlineLogo");
+
+      function updateAirlineLogo(val) {
+        if (!logoContainer || !logoImg) return;
+
+        if (!val) {
+          logoContainer.classList.add("opacity-0", "scale-95");
+          setTimeout(() => {
+            logoContainer.style.display = "none";
+          }, 300);
+          return;
+        }
+
+        if (val === "ALL") {
+          logoImg.src = "/images/QRV-Logo2.png";
+          logoImg.alt = "Qatari Virtual";
+          logoContainer.style.display = "flex";
+          setTimeout(() => {
+            logoContainer.classList.remove("opacity-0", "scale-95");
+          }, 50);
+          return;
+        }
+
+        // Find the airline matching prefix/suffix
+        const airline = airlines.find(a => {
+          const matchId = a.suffix ? `${a.prefix}_${a.suffix}` : a.prefix;
+          return matchId === val;
+        });
+
+        if (airline && airline.logo) {
+          logoImg.src = airline.logo;
+          logoImg.alt = airline.name;
+          logoContainer.style.display = "flex";
+          setTimeout(() => {
+            logoContainer.classList.remove("opacity-0", "scale-95");
+          }, 50);
+        } else {
+          logoContainer.classList.add("opacity-0", "scale-95");
+          setTimeout(() => {
+            logoContainer.style.display = "none";
+          }, 300);
+        }
+      }
+
       airlineSelect.addEventListener("change", (e) => {
         currentColor = e.target.selectedOptions[0]?.dataset.color || "#ff0000";
         displayRoutesForAirline(e.target.value);
+        updateAirlineLogo(e.target.value);
         window.history.replaceState({}, '', window.location.pathname);
       });
 
@@ -585,8 +636,10 @@ seamLat += (hash - 5) * spread * 0.2;
         const matchAirline = airlines.find((a) => a.suffix && fltnumParam.includes(a.suffix) && fltnumParam.startsWith(a.prefix))
                           || airlines.find((a) => !a.suffix && fltnumParam.startsWith(a.prefix));
         if (matchAirline) {
-          airlineSelect.value = matchAirline.suffix ? `${matchAirline.prefix}_${matchAirline.suffix}` : matchAirline.prefix;
+          const val = matchAirline.suffix ? `${matchAirline.prefix}_${matchAirline.suffix}` : matchAirline.prefix;
+          airlineSelect.value = val;
           currentColor = matchAirline.color || "#ff0000";
+          updateAirlineLogo(val);
         }
         showLinesToggle.checked = true; // Automatically check the show lines toggle for a single route
         displayRoutesForAirline(fltnumParam, true);
@@ -599,6 +652,7 @@ seamLat += (hash - 5) * spread * 0.2;
         if (selectedOption) {
           currentColor = selectedOption.dataset.color || "#ff0000";
           displayRoutesForAirline(airlineParam);
+          updateAirlineLogo(airlineParam);
         }
       }
     </script>

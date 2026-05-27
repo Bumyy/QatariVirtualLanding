@@ -5,7 +5,7 @@
       "prefix": "QR",
       "hubs": ["OTHH"],
       "color": "#8B1538",
-      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Qatar_Airways_Logo.svg/1024px-Qatar_Airways_Logo.svg.png",
+      "logo": "/images/QRV-Logo2.png",
       "codeshare_code": "QTR/QR"
     },
     {
@@ -14,7 +14,7 @@
       "suffix": "Classic",
       "hubs": ["OTHH", "OTBD"],
       "color": "#5A1024",
-      "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Qatar_Airways_Logo.svg/1024px-Qatar_Airways_Logo.svg.png",
+      "logo": "/images/QRV-Logo2.png",
       "codeshare_code": "QTR/QR"
     },
     {
