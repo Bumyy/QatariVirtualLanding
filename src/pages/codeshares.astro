@@ -4,7 +4,7 @@ import airlinesData from '../assets/airlines.json';
 import { getRoutes } from '../data/route';
 import csvText from '../assets/airports.csv?raw';
 
-// Server-side helper to parse airports CSV
+// Server-side helper to parse airports CSV file 
 function parseCSV(csvText) {
   const airports = {};
   const lines = csvText.split('\n');
