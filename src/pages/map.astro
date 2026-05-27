@@ -102,16 +102,10 @@ try {
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      client:load
-    ></script>
-    <script
-      src="https://unpkg.com/leaflet-arc/bin/leaflet-arc.min.js"
-      client:load
-    ></script>
+    <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script is:inline src="https://unpkg.com/leaflet-arc/bin/leaflet-arc.min.js"></script>
 
-    <script client:load define:vars={{ allRoutes, csvText, airlines }}>
+    <script define:vars={{ allRoutes, csvText, airlines }}>
       const map = L.map("map", {
         worldCopyJump: false,
       }).setView([20, 10], 2);
