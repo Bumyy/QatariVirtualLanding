@@ -15,7 +15,7 @@ try {
 }
 ---
 
-<Layout>
+<Layout title="Interactive Route Map | Qatari Virtual" description="Explore the global route network of Qatari Virtual on our interactive map. Filter by airline, region, and airport to discover 5,000+ routes.">
   <section class="px-6 py-8 min-h-screen">
     <div class="mb-8">
       <div class="flex justify-between items-start gap-4 mb-3">
@@ -98,10 +98,8 @@ try {
 
     <div id="map"></div>
 
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link slot="head" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       client:load
@@ -117,9 +115,10 @@ try {
       }).setView([20, 10], 2);
 
       L.tileLayer(
-        "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         {
-          attribution: '&copy; OpenMapTiles &copy; OpenStreetMap contributors',
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: "abcd",
           noWrap: false,
         }
       ).addTo(map);

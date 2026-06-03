@@ -4,8 +4,12 @@ import MdiIcon from '@mdi/react';
 import { mdiArrowTopRightThick, mdiMenu, mdiClose } from '@mdi/js';
 import Footer from '../components/Footer.astro';
 
-const { title = 'Qatari Virtual Landing', description } = Astro.props;
+const { title = 'Qatari Virtual | Infinite Flight Virtual Airline', description, image = '/images/Logo2.png' } = Astro.props;
 const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
+const canonical = Astro.url;
+const ogImage = new URL(image, canonical).href;
+const siteName = 'Qatari Virtual';
+const siteUrl = 'https://qatari-virtual-landing.pages.dev';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +19,39 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     <link rel="icon" type="image/png" href="/images/Logo2.png" />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content={siteName} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+      {JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Qatari Virtual",
+        "url": siteUrl,
+        "logo": siteUrl + "/images/Logo2.png",
+        "description": "Qatari Virtual is a virtual airline in Infinite Flight, offering an immersive aviation experience with an award-winning community of pilots.",
+        "foundingDate": "May 2023",
+        "knowsAbout": ["Infinite Flight", "Virtual Airline", "Flight Simulation"],
+        "award": "Best Virtual Airline 2025"
+      })}
+    </script>
+
+    <slot name="head" />
 
     <style>
       /* Custom Scrollbar */
@@ -346,8 +383,22 @@ const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
           color: white;
         }
 
-        .header-shell.is-scrolled .dropdown-menu a {
-          color: #2f2f2f;
+        .header-shell.is-scrolled .main-nav .nav-cta {
+          background: white;
+          color: #6e0038;
+        }
+
+        .header-shell.is-scrolled .main-nav .nav-cta:hover {
+          background: #f8f1f3;
+        }
+
+        .header-shell.is-scrolled .main-nav .dropdown-menu a {
+          color: rgba(255,255,255,0.8);
+        }
+
+        .header-shell.is-scrolled .main-nav .dropdown-menu a:hover {
+          background: rgba(255,255,255,0.12);
+          color: white;
         }
 
         .main-nav.is-open {
