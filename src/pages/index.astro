@@ -9,10 +9,10 @@ import { mdiAccountPlus, mdiSchoolOutline, mdiAirplane, mdiTrophyOutline } from 
 const Icon = MdiIcon && 'default' in MdiIcon ? MdiIcon.default : MdiIcon;
 
 const slides = [
-  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/7/5/9/75988cc057301e7359b670f978f21e1db9a810e9.jpeg', position: 'center' },
-  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/2/5/f/25fb40344fa01bea40c2c549b6a512f173434c5a.jpeg', position: 'center' },
-  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/5/0/c/50ca75810f42fc8ae4ffd46caf5f68255e75de69.jpeg', position: 'center top' },
-  { url: 'https://global.discourse-cdn.com/infiniteflight/original/4X/e/3/c/e3ccffd6e4772e82b0a2dafd0b539ad0f0a5610d.jpeg', position: 'center' }
+  { url: '/images/hero/hero1.jpg', position: 'center' },
+  { url: '/images/hero/hero2.jpg', position: 'center' },
+  { url: '/images/hero/hero3.jpg', position: 'center top' },
+  { url: '/images/hero/hero4.jpg', position: 'center' }
 ];
 
 const rankSteps = [
@@ -22,23 +22,22 @@ const rankSteps = [
 ];
 
 const track1 = [
-  { name: 'A350', icao: 'A359', img: '/images/QA_A350.webp', scale: 0.92, offset: '-10px' },
-  { name: 'Challenger 350', icao: 'CL35', img: '/images/QAE_C350.webp', scale: 0.6, offset: '20px' },
-  { name: 'A330', icao: 'A333', img: '/images/QA_A330.webp', scale: 0.88, offset: '-25px' },
+  { name: 'A350', icao: 'A359', img: '/images/QA_A350.webp', alt: 'Qatari Virtual Airbus A350', scale: 0.92, offset: '-10px' },
+  { name: 'Challenger 350', icao: 'CL35', img: '/images/QAE_C350.webp', alt: 'Qatari Executive Challenger 350', scale: 0.6, offset: '20px' },
+  { name: 'A330', icao: 'A333', img: '/images/QA_A330.webp', alt: 'Qatari Virtual Airbus A330', scale: 0.88, offset: '-25px' },
 ];
 
 const track2 = [
-  { name: 'A321', icao: 'A21N', img: '/images/QA_A321.webp', scale: 0.84, offset: '15px' },
-  { name: 'B777-300ER', icao: 'B77W', img: '/images/QA_B77W.webp', scale: 0.98, offset: '-15px' },
-  { name: 'A320', icao: 'A320', img: '/images/QA_A320.webp', scale: 0.82, offset: '30px' },
+  { name: 'A321', icao: 'A21N', img: '/images/QA_A321.webp', alt: 'Qatari Virtual Airbus A321', scale: 0.84, offset: '15px' },
+  { name: 'B777-300ER', icao: 'B77W', img: '/images/QA_B77W.webp', alt: 'Qatari Virtual Boeing 777-300ER', scale: 0.98, offset: '-15px' },
+  { name: 'A320', icao: 'A320', img: '/images/QA_A320.webp', alt: 'Qatari Virtual Airbus A320', scale: 0.82, offset: '30px' },
 ];
 
 const track3 = [
-  { name: 'A380', icao: 'A388', img: '/images/QA_A380.webp', scale: 1.05, offset: '5px' },
-  { name: 'B787-8', icao: 'B788', img: '/images/QA_B788.webp', scale: 0.9, offset: '-30px' },
-  { name: 'B777-200LR', icao: 'B77L', img: '/images/QA_B77L.webp', scale: 0.94, offset: '25px' },
+  { name: 'A380', icao: 'A388', img: '/images/QA_A380.webp', alt: 'Qatari Virtual Airbus A380', scale: 1.05, offset: '5px' },
+  { name: 'B787-8', icao: 'B788', img: '/images/QA_B788.webp', alt: 'Qatari Virtual Boeing 787-8 Dreamliner', scale: 0.9, offset: '-30px' },
+  { name: 'B777-200LR', icao: 'B77L', img: '/images/QA_B77L.webp', alt: 'Qatari Virtual Boeing 777-200LR', scale: 0.94, offset: '25px' },
 ];
-
 
 const testimonials = [
   { quote: 'I believe that Qatar Airways Virtual Airline is one of the best, if not the best, virtual airlines out there in Infinite Flight. The immersive training, active community, and endless events make every flight meaningful.', author: 'Daniel', callsign: 'QRV012' },
@@ -51,7 +50,59 @@ const owPrefixes = ['AA','AS','AY','BA','CX','IB','JL','MH','QF','AT','RJ','UL']
 const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includes(p.prefix) }));
 ---
 
-<Layout>
+<Layout title="Qatari Virtual | Award-Winning Infinite Flight Virtual Airline" description="Join Qatari Virtual, an award-winning Infinite Flight virtual airline. Fly 5,000+ routes, climb 10 ranks, and be part of the IFC Best Virtual Airline 2025." image="/images/hero/hero1.jpg">
+<link slot="head" rel="preload" as="image" href="/images/hero/hero1.jpg" fetchpriority="high" />
+
+<!-- FAQPage Schema -->
+<script slot="head" type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are the minimum requirements to join?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You must be at least 13 years old, be Grade 3 or higher in Infinite Flight, have a Discord and IFC account, communicate in English, and not be blacklisted by IFVARB."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does the application process take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most applications are reviewed within 48 hours. You will be notified via private message on the Infinite Flight Community Forum once a decision is made."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a training phase after acceptance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. All new pilots (except IFATC members) must pass 1 written test and 2 practical flights before becoming official pilots."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need a specific aircraft or add-on to fly?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. All aircraft are available through standard Infinite Flight. As you rank up, more aircraft in our fleet become available — from the A320 to the A380 and executive jets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the Cargo Program?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our Cargo Program is a collaborative community mode where pilots work together to deliver cargo around the world. It has a separate training track and dedicated aircraft."
+      }
+    }
+  ]
+}
+</script>
+
 <section class="hero" id="hero-banner">
   {slides.map((slide, index) => (
     <div
@@ -72,6 +123,61 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
 <section class="px-6 py-6">
   <div class="max-w-6xl mx-auto">
     <Stats />
+  </div>
+</section>
+
+<!-- Fleet -->
+<section class="px-6 py-12 bg-[#fdf8f9]">
+  <div class="max-w-6xl mx-auto">
+    <div class="fleet-stack">
+      <div class="fleet-marquee" aria-hidden="true">
+        <!-- Track 1 -->
+        <div class="fleet-marquee-track track-1">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-1">
+              {track1.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt={ac.alt} loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <!-- Track 2 -->
+        <div class="fleet-marquee-track track-2">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-2">
+              {track2.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt={ac.alt} loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <!-- Track 3 -->
+        <div class="fleet-marquee-track track-3">
+          {[0, 1, 2, 3].map(() => (
+            <div class="fleet-marquee-inner inner-3">
+              {track3.map((ac) => (
+                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
+                  <div class="fleet-icao-ghost">{ac.icao}</div>
+                  <img src={ac.img} alt={ac.alt} loading="lazy" class="fleet-marquee-plane" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div class="fleet-stack-footer">
+      <p class="fleet-stack-intro">ICAO tags highlight standout aircraft in our fleet.</p>
+      <a href="/fleet" class="inline-block mt-3 text-[#8B1538] font-semibold text-sm hover:underline">
+        Explore the full fleet &rarr;
+      </a>
+    </div>
   </div>
 </section>
 
@@ -104,65 +210,6 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
     <a href="/ranks" class="inline-block mt-6 text-[#8B1538] font-semibold text-sm hover:underline">
       View full rank structure &rarr;
     </a>
-  </div>
-</section>
-
-<!-- Fleet -->
-<section class="px-6 py-12 bg-[#fdf8f9]">
-  <div class="max-w-6xl mx-auto">
-    <div class="text-center">
-      <h2 class="text-3xl font-bold text-[#8B1538] mb-2">Fleet Highlights</h2>
-      <p class="text-gray-500 mb-8 max-w-xl mx-auto">From narrow-body staples to flagship long-haul and executive jets.</p>
-    </div>
-    <div class="fleet-stack">
-      <div class="fleet-marquee" aria-hidden="true">
-        <!-- Track 1 -->
-        <div class="fleet-marquee-track track-1">
-          {[0, 1, 2, 3].map(() => (
-            <div class="fleet-marquee-inner inner-1">
-              {track1.map((ac) => (
-                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
-                  <div class="fleet-icao-ghost">{ac.icao}</div>
-                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <!-- Track 2 -->
-        <div class="fleet-marquee-track track-2">
-          {[0, 1, 2, 3].map(() => (
-            <div class="fleet-marquee-inner inner-2">
-              {track2.map((ac) => (
-                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
-                  <div class="fleet-icao-ghost">{ac.icao}</div>
-                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <!-- Track 3 -->
-        <div class="fleet-marquee-track track-3">
-          {[0, 1, 2, 3].map(() => (
-            <div class="fleet-marquee-inner inner-3">
-              {track3.map((ac) => (
-                <div class="fleet-marquee-item" style={`--plane-scale: ${ac.scale}; --plane-offset: ${ac.offset};`}>
-                  <div class="fleet-icao-ghost">{ac.icao}</div>
-                  <img src={ac.img} alt="" loading="lazy" class="fleet-marquee-plane" />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-    <div class="fleet-stack-footer">
-      <p class="fleet-stack-intro">ICAO tags highlight standout aircraft in our fleet.</p>
-      <a href="/fleet" class="inline-block mt-3 text-[#8B1538] font-semibold text-sm hover:underline">
-        Explore the full fleet &rarr;
-      </a>
-    </div>
   </div>
 </section>
 
