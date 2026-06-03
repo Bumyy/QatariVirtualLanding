@@ -8,7 +8,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   output: 'static',
-  site: 'https://qatari-virtual-landing.pages.dev',
+  site: 'https://qatarivirtual.xyz',
   integrations: [react(), sitemap()],
 
   vite: {
