@@ -62,7 +62,7 @@ const totalRoutes = routes.length;
       <input id="filter-dep" type="text" placeholder="Departure" class="filter-input w-[110px]" />
       <input id="filter-arr" type="text" placeholder="Arrival" class="filter-input w-[110px]" />
       <button id="filter-btn" class="bg-[#8B1538] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#6e0038] transition">Search</button>
-      <span class="text-sm text-gray-500 ml-auto hidden sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
+      <span class="text-sm text-gray-500 sm:ml-auto w-full sm:w-auto text-right mt-1 sm:mt-0 block sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
     </div>
 
     <!-- desktop table -->
@@ -156,12 +156,12 @@ const totalRoutes = routes.length;
           </div>
           <div class="flex flex-wrap items-center gap-1 ac-group mb-2" data-route-id={route.id}>
             {route.aircraft?.slice(0, 2).map((ac) => (
-              ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+              ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df]" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
             ))}
             {(route.aircraft?.length || 0) > 2 && (
               <>
                 {route.aircraft?.slice(2).map((ac) => (
-                  ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+                  ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df] hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
                 ))}
                 <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
               </>
@@ -193,10 +193,9 @@ const totalRoutes = routes.length;
     const qDep = (filterDep?.value || '').toLowerCase();
     const qArr = (filterArr?.value || '').toLowerCase();
 
-    const items = tableRows.length ? tableRows : cards;
     let visible = 0;
 
-    items.forEach(item => {
+    tableRows.forEach(item => {
       const airline = (item.dataset.airline || '');
       const fltnum = (item.dataset.fltnum || '').toLowerCase();
       const depVal = (item.dataset.dep || '').toLowerCase();
@@ -211,7 +210,23 @@ const totalRoutes = routes.length;
       if (ok) visible++;
     });
 
-    if (routeCount) routeCount.textContent = `${visible.toLocaleString()} of ${items.length.toLocaleString()} routes`;
+    cards.forEach(item => {
+      const airline = (item.dataset.airline || '');
+      const fltnum = (item.dataset.fltnum || '').toLowerCase();
+      const depVal = (item.dataset.dep || '').toLowerCase();
+      const arrVal = (item.dataset.arr || '').toLowerCase();
+
+      const ok = (!qAirline || airline === qAirline)
+        && (!qFlt || fltnum.includes(qFlt))
+        && (!qDep || depVal.includes(qDep))
+        && (!qArr || arrVal.includes(qArr));
+
+      (item as HTMLElement).style.display = ok ? '' : 'none';
+      if (ok && !tableRows.length) visible++;
+    });
+
+    const totalCount = tableRows.length || cards.length;
+    if (routeCount) routeCount.textContent = `${visible.toLocaleString()} of ${totalCount.toLocaleString()} routes`;
     if (noResults) noResults.style.display = visible === 0 ? '' : 'none';
 
     // sync URL
