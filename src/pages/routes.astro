@@ -62,7 +62,7 @@ const totalRoutes = routes.length;
       <input id="filter-dep" type="text" placeholder="Departure" class="filter-input w-[110px]" />
       <input id="filter-arr" type="text" placeholder="Arrival" class="filter-input w-[110px]" />
       <button id="filter-btn" class="bg-[#8B1538] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#6e0038] transition">Search</button>
-      <span class="text-sm text-gray-500 ml-auto hidden sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
+      <span class="text-sm text-gray-500 sm:ml-auto w-full sm:w-auto text-right mt-1 sm:mt-0 block sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
     </div>
 
     <!-- desktop table -->
@@ -79,47 +79,56 @@ const totalRoutes = routes.length;
             </tr>
           </thead>
           <tbody>
-            {routes.map((route, i) => (
-              <tr
-                class={`route-row border-t border-[#ead9df] hover:bg-[#fcfafb] transition ${i % 2 === 0 ? 'bg-white' : 'bg-[#fdfbfc]'}`}
-                data-fltnum={route.fltnum || ''}
-                data-dep={route.dep || ''}
-                data-arr={route.arr || ''}
-                data-airline={(() => {
-                  const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
-                             || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
-                  return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
-                })()}
-                data-duration={route.duration || 0}
-              >
-                <td class="py-2.5 px-4 font-medium text-gray-800">
-                  <div class="flex items-center gap-2">
-                    {route.fltnum || '\u2014'}
-                    <a href={`/map?fltnum=${route.fltnum}`} class="text-gray-400 hover:text-[#8B1538] transition" title="View specific route on map">
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                    </a>
-                  </div>
-                </td>
-                <td class="py-2.5 px-4 font-medium text-gray-700">{route.dep || '\u2014'}</td>
-                <td class="py-2.5 px-4 font-medium text-gray-700">{route.arr || '\u2014'}</td>
-                <td class="py-2.5 px-4">
-                  <div class="flex flex-wrap items-center gap-1 ac-group">
-                    {route.aircraft?.slice(0, 2).map((ac) => (
-                      ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df]" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
-                    ))}
-                    {(route.aircraft?.length || 0) > 2 && (
-                      <>
-                        {route.aircraft?.slice(2).map((ac) => (
-                          ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df] hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
-                        ))}
-                        <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
-                      </>
-                    )}
-                  </div>
-                </td>
-                <td class="py-2.5 px-4 text-gray-500">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</td>
-              </tr>
-            ))}
+            {routes.map((route, i) => {
+              const flightNumbers = (route.fltnum || '').split(',').map(f => f.trim()).filter(Boolean);
+              const primaryFltnum = flightNumbers[0] || '';
+              return (
+                <tr
+                  class={`route-row border-t border-[#ead9df] hover:bg-[#fcfafb] transition ${i % 2 === 0 ? 'bg-white' : 'bg-[#fdfbfc]'}`}
+                  data-fltnum={route.fltnum || ''}
+                  data-dep={route.dep || ''}
+                  data-arr={route.arr || ''}
+                  data-airline={(() => {
+                    const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
+                               || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
+                    return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
+                  })()}
+                  data-duration={route.duration || 0}
+                >
+                  <td class="py-2.5 px-4 font-medium text-gray-800">
+                    <div class="flex flex-wrap items-center gap-1 max-w-[220px]">
+                      {flightNumbers.slice(0, 2).map((num) => (
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-md text-[#8B1538] bg-[#f8f1f3] border border-[#ead9df]">{num}</span>
+                      ))}
+                      {flightNumbers.length > 2 && (
+                        <span class="text-[10px] text-gray-500 font-semibold bg-gray-100 px-1.5 py-0.5 rounded border" title={flightNumbers.slice(2).join(', ')}>+{flightNumbers.length - 2}</span>
+                      )}
+                      <a href={`/map?fltnum=${primaryFltnum}`} class="text-gray-400 hover:text-[#8B1538] transition ml-1" title={`View route on map (${primaryFltnum})`}>
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                      </a>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-4 font-medium text-gray-700">{route.dep || '\u2014'}</td>
+                  <td class="py-2.5 px-4 font-medium text-gray-700">{route.arr || '\u2014'}</td>
+                  <td class="py-2.5 px-4">
+                    <div class="flex flex-wrap items-center gap-1 ac-group">
+                      {route.aircraft?.slice(0, 2).map((ac) => (
+                        ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df]" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+                      ))}
+                      {(route.aircraft?.length || 0) > 2 && (
+                        <>
+                          {route.aircraft?.slice(2).map((ac) => (
+                            ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df] hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+                          ))}
+                          <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -127,48 +136,57 @@ const totalRoutes = routes.length;
 
     <!-- mobile cards -->
     <div class="sm:hidden space-y-3" id="mobile-list">
-      {routes.map((route) => (
-        <div
-          class="route-card bg-white rounded-2xl border border-[#ead9df] p-4 shadow-sm"
-          data-fltnum={route.fltnum || ''}
-          data-dep={route.dep || ''}
-          data-arr={route.arr || ''}
-          data-airline={(() => {
-            const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
-                       || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
-            return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
-          })()}
-          data-duration={route.duration || 0}
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-lg" style="color:#8B1538">{route.fltnum || '\u2014'}</span>
-              <a href={`/map?fltnum=${route.fltnum}`} class="text-gray-400 hover:text-[#8B1538] transition p-0.5" title="View specific route on map">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-              </a>
-            </div>
-            <span class="text-xs text-gray-400">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</span>
-          </div>
-          <div class="flex items-center gap-3 text-sm mb-2">
-            <span class="font-semibold text-gray-800">{route.dep || '\u2014'}</span>
-            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"/></svg>
-            <span class="font-semibold text-gray-800">{route.arr || '\u2014'}</span>
-          </div>
-          <div class="flex flex-wrap items-center gap-1 ac-group mb-2" data-route-id={route.id}>
-            {route.aircraft?.slice(0, 2).map((ac) => (
-              ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
-            ))}
-            {(route.aircraft?.length || 0) > 2 && (
-              <>
-                {route.aircraft?.slice(2).map((ac) => (
-                  ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+       {routes.map((route) => {
+        const flightNumbers = (route.fltnum || '').split(',').map(f => f.trim()).filter(Boolean);
+        const primaryFltnum = flightNumbers[0] || '';
+        return (
+          <div
+            class="route-card bg-white rounded-2xl border border-[#ead9df] p-4 shadow-sm"
+            data-fltnum={route.fltnum || ''}
+            data-dep={route.dep || ''}
+            data-arr={route.arr || ''}
+            data-airline={(() => {
+              const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
+                         || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
+              return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
+            })()}
+            data-duration={route.duration || 0}
+          >
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 flex-wrap max-w-[70%]">
+                {flightNumbers.slice(0, 2).map((num) => (
+                  <span class="text-sm font-bold px-2 py-0.5 rounded-md text-[#8B1538] bg-[#f8f1f3] border border-[#ead9df]">{num}</span>
                 ))}
-                <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
-              </>
-            )}
+                {flightNumbers.length > 2 && (
+                  <span class="text-[10px] text-gray-500 font-semibold bg-gray-100 px-1.5 py-0.5 rounded border" title={flightNumbers.slice(2).join(', ')}>+{flightNumbers.length - 2}</span>
+                )}
+                <a href={`/map?fltnum=${primaryFltnum}`} class="text-gray-400 hover:text-[#8B1538] transition p-0.5 ml-1" title={`View route on map (${primaryFltnum})`}>
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                </a>
+              </div>
+              <span class="text-xs text-gray-400">{route.duration ? `${Math.floor(route.duration / 3600)}h ${Math.floor((route.duration % 3600) / 60)}m` : '\u2014'}</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm mb-2">
+              <span class="font-semibold text-gray-800">{route.dep || '\u2014'}</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"/></svg>
+              <span class="font-semibold text-gray-800">{route.arr || '\u2014'}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1 ac-group mb-2" data-route-id={route.id}>
+              {route.aircraft?.slice(0, 2).map((ac) => (
+                ac && <span class="ac-tag text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df]" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+              ))}
+              {(route.aircraft?.length || 0) > 2 && (
+                <>
+                  {route.aircraft?.slice(2).map((ac) => (
+                    ac && <span class="ac-tag ac-extra text-xs font-medium px-2 py-0.5 rounded-full border border-[#ead9df] hidden" style="background:#f8f1f3;color:#8B1538">{ac.name} ({ac.liveryname})</span>
+                  ))}
+                  <button class="ac-expand text-xs font-semibold px-2 py-0.5 rounded-full border transition" style="color:#8B1538;border-color:#ead9df;background:white">+{route.aircraft.length - 2}</button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
 
     <div class="text-center text-sm text-gray-400 mt-3" id="no-results" style="display:none">No routes match your filters.</div>
@@ -193,10 +211,9 @@ const totalRoutes = routes.length;
     const qDep = (filterDep?.value || '').toLowerCase();
     const qArr = (filterArr?.value || '').toLowerCase();
 
-    const items = tableRows.length ? tableRows : cards;
     let visible = 0;
 
-    items.forEach(item => {
+    tableRows.forEach(item => {
       const airline = (item.dataset.airline || '');
       const fltnum = (item.dataset.fltnum || '').toLowerCase();
       const depVal = (item.dataset.dep || '').toLowerCase();
@@ -211,7 +228,23 @@ const totalRoutes = routes.length;
       if (ok) visible++;
     });
 
-    if (routeCount) routeCount.textContent = `${visible.toLocaleString()} of ${items.length.toLocaleString()} routes`;
+    cards.forEach(item => {
+      const airline = (item.dataset.airline || '');
+      const fltnum = (item.dataset.fltnum || '').toLowerCase();
+      const depVal = (item.dataset.dep || '').toLowerCase();
+      const arrVal = (item.dataset.arr || '').toLowerCase();
+
+      const ok = (!qAirline || airline === qAirline)
+        && (!qFlt || fltnum.includes(qFlt))
+        && (!qDep || depVal.includes(qDep))
+        && (!qArr || arrVal.includes(qArr));
+
+      (item as HTMLElement).style.display = ok ? '' : 'none';
+      if (ok && !tableRows.length) visible++;
+    });
+
+    const totalCount = tableRows.length || cards.length;
+    if (routeCount) routeCount.textContent = `${visible.toLocaleString()} of ${totalCount.toLocaleString()} routes`;
     if (noResults) noResults.style.display = visible === 0 ? '' : 'none';
 
     // sync URL
