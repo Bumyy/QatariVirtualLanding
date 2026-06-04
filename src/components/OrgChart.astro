@@ -17,7 +17,7 @@ const ceo = findRole('Chief Executive Officer');
 const chro = findRole('Chief Human Resources Officer');
 const cmo = findRole('Chief Marketing Officer');
 const coo = findRole('Chief Operating Officer');
-const trainingMgr = findRole('Training Manager');
+const trainingManagers = members.filter(m => m.role.toLowerCase() === 'training manager');
 const marketingMgr = findRole('Marketing Manager');
 
 const instructors = findGroup('Flight Instructor');
@@ -59,9 +59,13 @@ const socialCoords = findGroup('Social Media');
                 </div>
 
                 <!-- Manager (z-30: Medium priority) -->
-                <div class="flex justify-center mb-8 relative z-30">
-                    <OrgNode member={trainingMgr} type="manager" />
-                    <div class="absolute top-full h-8 w-0.5 bg-gray-200 -z-10"></div>
+                <div class="flex justify-center gap-6 mb-8 relative z-30 flex-wrap w-full">
+                    {trainingManagers.map(mgr => (
+                        <div class="relative">
+                            <OrgNode member={mgr} type="manager" />
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 h-8 w-0.5 bg-gray-200 -z-10"></div>
+                        </div>
+                    ))}
                 </div>
 
                 <!-- Staff (z-20: Lower priority) -->
