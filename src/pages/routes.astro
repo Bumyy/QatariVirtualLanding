@@ -34,6 +34,16 @@ try {
 
 const airlines = airlinesData.airlines;
 const totalRoutes = routes.length;
+
+// Extract unique aircraft and livery configurations from the routes
+const allAircraft = Array.from(
+  new Map(
+    routes
+      .flatMap(r => r.aircraft || [])
+      .filter(ac => ac && ac.name && ac.liveryname)
+      .map(ac => [`${ac.name} (${ac.liveryname})`, ac])
+  ).values()
+).sort((a, b) => a.name.localeCompare(b.name));
 ---
 
 <Layout title="Route Database | Qatari Virtual" description="Browse Qatari Virtual's complete route database with 5,000+ flights. Search and filter by flight number, departure, arrival, and aircraft type.">
@@ -54,14 +64,60 @@ const totalRoutes = routes.length;
 
     {error && (<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-3 mb-6 text-sm">{error}</div>)}
 
-    <div class="flex flex-wrap items-center gap-2.5 mb-5">
-      <select id="filter-airline" class="filter-input w-[180px]">
-        <option value="">All Airlines</option>
-        {airlines.map(a => <option value={a.suffix ? `${a.prefix}_${a.suffix}` : a.prefix}>{a.name}</option>)}
-      </select>
-      <input id="filter-dep" type="text" placeholder="Departure" class="filter-input w-[110px]" />
-      <input id="filter-arr" type="text" placeholder="Arrival" class="filter-input w-[110px]" />
-      <button id="filter-btn" class="bg-[#8B1538] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#6e0038] transition">Search</button>
+    <div class="flex flex-wrap items-center gap-2.5 mb-5 z-20">
+      <!-- Custom Searchable Dropdown for Airline -->
+      <div class="relative search-select w-full sm:w-[200px]" id="airline-select-wrapper">
+        <input 
+          id="filter-airline-display"
+          type="text" 
+          placeholder="All Airlines" 
+          class="filter-input w-full pr-8 cursor-pointer"
+          autocomplete="off"
+        />
+        <input id="filter-airline" type="hidden" value="" />
+        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+        <div class="search-select-dropdown absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#ead9df] rounded-xl shadow-lg z-50 hidden opacity-0 scale-95 transition-all duration-200 origin-top">
+          <div class="py-1">
+            <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer font-medium" data-value="">All Airlines</div>
+            {airlines.map(a => (
+              <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer" data-value={a.suffix ? `${a.prefix}_${a.suffix}` : a.prefix}>
+                {a.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Searchable Dropdown for Aircraft -->
+      <div class="relative search-select w-full sm:w-[230px]" id="aircraft-select-wrapper">
+        <input 
+          id="filter-aircraft-display"
+          type="text" 
+          placeholder="All Aircraft (Livery)" 
+          class="filter-input w-full pr-8 cursor-pointer"
+          autocomplete="off"
+        />
+        <input id="filter-aircraft" type="hidden" value="" />
+        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+        <div class="search-select-dropdown absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#ead9df] rounded-xl shadow-lg z-50 hidden opacity-0 scale-95 transition-all duration-200 origin-top">
+          <div class="py-1">
+            <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer font-medium" data-value="">All Aircraft</div>
+            {allAircraft.map(ac => (
+              <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer" data-value={`${ac.name} (${ac.liveryname})`}>
+                {ac.name} <span class="text-xs text-gray-400">({ac.liveryname})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <input id="filter-dep" type="text" placeholder="Departure" class="filter-input w-full sm:w-[110px]" />
+      <input id="filter-arr" type="text" placeholder="Arrival" class="filter-input w-full sm:w-[110px]" />
+      <button id="filter-btn" class="bg-[#8B1538] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#6e0038] transition w-full sm:w-auto">Search</button>
       <span class="text-sm text-gray-500 sm:ml-auto w-full sm:w-auto text-right mt-1 sm:mt-0 block sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
     </div>
 
@@ -93,6 +149,7 @@ const totalRoutes = routes.length;
                                || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
                     return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
                   })()}
+                  data-aircraft={route.aircraft?.map(ac => `${ac.name} (${ac.liveryname})`).join(', ') || ''}
                   data-duration={route.duration || 0}
                 >
                   <td class="py-2.5 px-4 font-medium text-gray-800">
@@ -150,6 +207,7 @@ const totalRoutes = routes.length;
                          || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
               return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
             })()}
+            data-aircraft={route.aircraft?.map(ac => `${ac.name} (${ac.liveryname})`).join(', ') || ''}
             data-duration={route.duration || 0}
           >
             <div class="flex items-center justify-between mb-2">
@@ -195,7 +253,10 @@ const totalRoutes = routes.length;
 </Layout>
 
 <script>
-  const filterAirline = document.getElementById('filter-airline') as HTMLSelectElement;
+  const filterAirline = document.getElementById('filter-airline') as HTMLInputElement;
+  const filterAirlineDisplay = document.getElementById('filter-airline-display') as HTMLInputElement;
+  const filterAircraft = document.getElementById('filter-aircraft') as HTMLInputElement;
+  const filterAircraftDisplay = document.getElementById('filter-aircraft-display') as HTMLInputElement;
   const filterFltnum = document.getElementById('filter-fltnum') as HTMLInputElement;
   const filterDep = document.getElementById('filter-dep') as HTMLInputElement;
   const filterArr = document.getElementById('filter-arr') as HTMLInputElement;
@@ -207,6 +268,7 @@ const totalRoutes = routes.length;
 
   function filterRows() {
     const qAirline = filterAirline?.value || '';
+    const qAircraft = filterAircraft?.value || '';
     const qFlt = (filterFltnum?.value || '').toLowerCase();
     const qDep = (filterDep?.value || '').toLowerCase();
     const qArr = (filterArr?.value || '').toLowerCase();
@@ -218,8 +280,10 @@ const totalRoutes = routes.length;
       const fltnum = (item.dataset.fltnum || '').toLowerCase();
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
+      const acVal = (item.dataset.aircraft || '').toLowerCase();
 
       const ok = (!qAirline || airline === qAirline)
+        && (!qAircraft || acVal.includes(qAircraft.toLowerCase()))
         && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
         && (!qArr || arrVal.includes(qArr));
@@ -233,8 +297,10 @@ const totalRoutes = routes.length;
       const fltnum = (item.dataset.fltnum || '').toLowerCase();
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
+      const acVal = (item.dataset.aircraft || '').toLowerCase();
 
       const ok = (!qAirline || airline === qAirline)
+        && (!qAircraft || acVal.includes(qAircraft.toLowerCase()))
         && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
         && (!qArr || arrVal.includes(qArr));
@@ -250,6 +316,7 @@ const totalRoutes = routes.length;
     // sync URL
     const params = new URLSearchParams();
     if (qAirline) params.set('airline', qAirline);
+    if (qAircraft) params.set('aircraft', qAircraft);
     if (qFlt) params.set('flt', qFlt);
     if (qDep) params.set('dep', qDep);
     if (qArr) params.set('arr', qArr);
@@ -257,9 +324,111 @@ const totalRoutes = routes.length;
     window.history.replaceState({}, '', newUrl);
   }
 
+  // Setup custom searchable dropdowns
+  function setupSearchSelect(wrapperId: string, hiddenInputId: string, displayInputId: string, placeholderText: string) {
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+
+    const displayInput = document.getElementById(displayInputId) as HTMLInputElement;
+    const hiddenInput = document.getElementById(hiddenInputId) as HTMLInputElement;
+    const dropdown = wrapper.querySelector('.search-select-dropdown') as HTMLElement;
+    const options = wrapper.querySelectorAll('.search-select-option');
+
+    function showDropdown() {
+      // Close other dropdowns first
+      document.querySelectorAll('.search-select-dropdown').forEach(d => {
+        if (d !== dropdown) {
+          d.classList.add('opacity-0', 'scale-95');
+          setTimeout(() => d.classList.add('hidden'), 200);
+        }
+      });
+
+      dropdown.classList.remove('hidden');
+      setTimeout(() => {
+        dropdown.classList.remove('opacity-0', 'scale-95');
+      }, 10);
+    }
+
+    function hideDropdown() {
+      dropdown.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => {
+        dropdown.classList.add('hidden');
+      }, 200);
+    }
+
+    displayInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showDropdown();
+    });
+
+    displayInput.addEventListener('focus', () => {
+      showDropdown();
+    });
+
+    displayInput.addEventListener('input', () => {
+      const q = displayInput.value.toLowerCase().trim();
+      options.forEach(opt => {
+        const text = opt.textContent?.toLowerCase() || '';
+        const val = (opt as HTMLElement).dataset.value || '';
+        const isMatch = text.includes(q) || val.toLowerCase().includes(q);
+        (opt as HTMLElement).style.display = isMatch ? '' : 'none';
+      });
+    });
+
+    options.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = (opt as HTMLElement).dataset.value || '';
+        const text = val ? opt.textContent?.trim() || '' : '';
+        
+        hiddenInput.value = val;
+        displayInput.value = text;
+        
+        options.forEach(o => (o as HTMLElement).style.display = '');
+        hideDropdown();
+        filterRows();
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target as Node)) {
+        hideDropdown();
+        
+        // Reset check
+        const currentVal = hiddenInput.value;
+        const matchingOpt = Array.from(options).find(o => (o as HTMLElement).dataset.value === currentVal);
+        if (matchingOpt && currentVal) {
+          displayInput.value = matchingOpt.textContent?.trim() || '';
+        } else {
+          displayInput.value = '';
+          hiddenInput.value = '';
+        }
+        options.forEach(o => (o as HTMLElement).style.display = '');
+      }
+    });
+  }
+
+  // Initialize SearchSelect dropdowns
+  setupSearchSelect('airline-select-wrapper', 'filter-airline', 'filter-airline-display', 'All Airlines');
+  setupSearchSelect('aircraft-select-wrapper', 'filter-aircraft', 'filter-aircraft-display', 'All Aircraft');
+
   // load filters from URL on page load
   const params = new URLSearchParams(window.location.search);
-  if (params.get('airline') && filterAirline) filterAirline.value = params.get('airline')!;
+  
+  if (params.get('airline') && filterAirline && filterAirlineDisplay) {
+    const val = params.get('airline')!;
+    filterAirline.value = val;
+    const opt = document.querySelector(`#airline-select-wrapper .search-select-option[data-value="${val}"]`);
+    if (opt) filterAirlineDisplay.value = opt.textContent?.trim() || '';
+  }
+
+  if (params.get('aircraft') && filterAircraft && filterAircraftDisplay) {
+    const val = params.get('aircraft')!;
+    filterAircraft.value = val;
+    const opt = document.querySelector(`#aircraft-select-wrapper .search-select-option[data-value="${val}"]`);
+    if (opt) filterAircraftDisplay.value = opt.textContent?.trim() || '';
+  }
+
   if (params.get('flt') && filterFltnum) filterFltnum.value = params.get('flt')!;
   if (params.get('dep') && filterDep) filterDep.value = params.get('dep')!;
   if (params.get('arr') && filterArr) filterArr.value = params.get('arr')!;
@@ -335,5 +504,18 @@ const totalRoutes = routes.length;
   }
   .ac-expand:hover {
     background: #f8f1f3 !important;
+  }
+  .search-select-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+  .search-select-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .search-select-dropdown::-webkit-scrollbar-thumb {
+    background: #ead9df;
+    border-radius: 4px;
+  }
+  .search-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #8B1538;
   }
 </style>
