@@ -528,6 +528,14 @@
       "color": "#008CD5",
       "logo": "https://images.vasystem.org/SFkZof9RsfpBZ0VNID4C3CknV5CMjXkzbX5fwQLuABo/rt:fill/g:sm/el:1/aHR0cHM6Ly9pbWFnZXMtc3RvcmFnZS52YXN5c3RlbS5vcmcvc2t5dGVhbXZpcnR1YWwvMTAvZjgvMTBmOGU0NjE4MDA3ZTQ2ZmE3MDdlNTFhZGU4N2Y1YWE3ZjViMWZjMy5wbmc",
       "codeshare_code": "CXA/MF"
+    },
+    {
+      "name": "AJet",
+      "prefix": "VF",
+      "hubs": ["LTFJ", "LTFE", "LTBR"],
+      "color": "#048CFC",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/AJet_logo.svg",
+      "codeshare_code": "TKJ/VF"
     }
   ]
 }
