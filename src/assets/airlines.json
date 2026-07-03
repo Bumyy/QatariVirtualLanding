@@ -536,6 +536,14 @@
       "color": "#048CFC",
       "logo": "https://en.wikipedia.org/wiki/Special:FilePath/AJet_logo.svg",
       "codeshare_code": "TKJ/VF"
+    },
+    {
+      "name": "China Eastern Airlines",
+      "prefix": "CES,CUA,CSH",
+      "hubs": ["ZSPD", "ZSWZ"],
+      "color": "#1B1D80",
+      "logo": "https://cdn.qatarivirtual.xyz/graphics%20and%20images/chinaeastern.png",
+      "codeshare_code": "CES/MU"
     }
   ]
 }

@@ -47,8 +47,10 @@ function parseCSV(csvText) {
 
 const airportsMap = parseCSV(csvText);
 
-// Filter out Qatar Airways carriers since this is specifically a codeshare partners page
-const codeshares = airlinesData.airlines.filter(airline => airline.prefix !== 'QR');
+// Filter out Qatar Airways carriers since this is specifically a codeshare partners page, sorted alphabetically
+const codeshares = airlinesData.airlines
+  .filter(airline => airline.prefix !== 'QR')
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 let allRoutes = [];
 try {
@@ -76,8 +78,8 @@ const codesharesWithStats = codeshares.map(airline => {
 
   allRoutes.forEach(route => {
     const fltnum = route.fltnum || '';
-    const match = airlinesData.airlines.find(a => a.suffix && fltnum.includes(a.suffix) && fltnum.startsWith(a.prefix))
-               || airlinesData.airlines.find(a => !a.suffix && fltnum.startsWith(a.prefix));
+    const match = airlinesData.airlines.find(a => a.suffix && fltnum.includes(a.suffix) && a.prefix.split(',').some(p => fltnum.startsWith(p)))
+               || airlinesData.airlines.find(a => !a.suffix && a.prefix.split(',').some(p => fltnum.startsWith(p)));
     
     if (match && match.name === airline.name) {
       total++;
