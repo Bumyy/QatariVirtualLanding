@@ -25,6 +25,7 @@ const recruiters = findGroup('Recruiter');
 const routeCoords = findGroup('Route Coordinator');
 const eventCoords = findGroup('Event Coordinator');
 const socialCoords = findGroup('Social Media');
+const pirepCoords = findGroup('Pirep Coordinator');
 ---
 
 <div class="w-full flex flex-col items-center pt-8 pb-20 px-4">
@@ -125,6 +126,20 @@ const socialCoords = findGroup('Social Media');
                                     <OrgNode member={m} type="staff" />
                                 </div>
                             )) : <div class="text-xs opacity-40 italic py-2">No route coords</div>}
+                        </div>
+                    </div>
+
+                    {/* Pirep Team */}
+                    <div class="w-full flex flex-col items-center relative">
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 h-8 w-0.5 bg-gray-200"></div>
+                        <div class="staff-category-label">Pirep Team</div>
+                        <div class="flex flex-col gap-4 items-center w-full">
+                            {pirepCoords.length > 0 ? pirepCoords.map((m, index) => (
+                                <div class="relative" style={`z-index: ${20 - index}`}>
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 h-4 w-0.5 bg-gray-200 -z-10"></div>
+                                    <OrgNode member={m} type="staff" />
+                                </div>
+                            )) : <div class="text-xs opacity-40 italic py-2">No Pirep coordinators</div>}
                         </div>
                     </div>
                 </div>

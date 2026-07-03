@@ -32,7 +32,7 @@ try {
   error = 'Route data unavailable right now.';
 }
 
-const airlines = airlinesData.airlines;
+const airlines = [...airlinesData.airlines].sort((a, b) => a.name.localeCompare(b.name));
 const totalRoutes = routes.length;
 
 // Extract unique aircraft and livery configurations from the routes
@@ -117,6 +117,13 @@ const allAircraft = Array.from(
 
       <input id="filter-dep" type="text" placeholder="Departure" class="filter-input w-full sm:w-[110px]" />
       <input id="filter-arr" type="text" placeholder="Arrival" class="filter-input w-full sm:w-[110px]" />
+      <div class="flex items-center gap-1.5 w-full sm:w-auto">
+        <select id="filter-duration-type" class="filter-input w-[95px] cursor-pointer bg-white">
+          <option value="under">Under</option>
+          <option value="over">Over</option>
+        </select>
+        <input id="filter-duration-hours" type="number" min="0" step="0.5" placeholder="Hours" class="filter-input w-[85px]" />
+      </div>
       <button id="filter-btn" class="bg-[#8B1538] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#6e0038] transition w-full sm:w-auto">Search</button>
       <span class="text-sm text-gray-500 sm:ml-auto w-full sm:w-auto text-right mt-1 sm:mt-0 block sm:inline" id="route-count">{totalRoutes.toLocaleString()} routes</span>
     </div>
@@ -145,8 +152,8 @@ const allAircraft = Array.from(
                   data-dep={route.dep || ''}
                   data-arr={route.arr || ''}
                   data-airline={(() => {
-                    const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
-                               || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
+                    const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && a.prefix.split(',').some(p => (route.fltnum || '').startsWith(p)))
+                               || airlines.find(a => !a.suffix && a.prefix.split(',').some(p => (route.fltnum || '').startsWith(p)));
                     return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
                   })()}
                   data-aircraft={route.aircraft?.map(ac => `${ac.name} (${ac.liveryname})`).join(', ') || ''}
@@ -203,8 +210,8 @@ const allAircraft = Array.from(
             data-dep={route.dep || ''}
             data-arr={route.arr || ''}
             data-airline={(() => {
-              const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && (route.fltnum || '').startsWith(a.prefix))
-                         || airlines.find(a => !a.suffix && (route.fltnum || '').startsWith(a.prefix));
+              const match = airlines.find(a => a.suffix && (route.fltnum || '').includes(a.suffix) && a.prefix.split(',').some(p => (route.fltnum || '').startsWith(p)))
+                         || airlines.find(a => !a.suffix && a.prefix.split(',').some(p => (route.fltnum || '').startsWith(p)));
               return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
             })()}
             data-aircraft={route.aircraft?.map(ac => `${ac.name} (${ac.liveryname})`).join(', ') || ''}
@@ -272,6 +279,9 @@ const allAircraft = Array.from(
     const qFlt = (filterFltnum?.value || '').toLowerCase();
     const qDep = (filterDep?.value || '').toLowerCase();
     const qArr = (filterArr?.value || '').toLowerCase();
+    const qDurationType = (document.getElementById('filter-duration-type') as HTMLSelectElement)?.value || 'under';
+    const qDurationHoursVal = (document.getElementById('filter-duration-hours') as HTMLInputElement)?.value || '';
+    const qDurationHours = parseFloat(qDurationHoursVal);
 
     let visible = 0;
 
@@ -281,12 +291,21 @@ const allAircraft = Array.from(
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
       const acVal = (item.dataset.aircraft || '').toLowerCase();
+      const durationVal = parseFloat((item as HTMLElement).dataset.duration || '0');
+      const hours = durationVal / 3600;
+
+      let durationOk = true;
+      if (!isNaN(qDurationHours)) {
+        if (qDurationType === 'under') durationOk = hours < qDurationHours;
+        else if (qDurationType === 'over') durationOk = hours > qDurationHours;
+      }
 
       const ok = (!qAirline || airline === qAirline)
         && (!qAircraft || acVal.includes(qAircraft.toLowerCase()))
         && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
-        && (!qArr || arrVal.includes(qArr));
+        && (!qArr || arrVal.includes(qArr))
+        && durationOk;
 
       (item as HTMLElement).style.display = ok ? '' : 'none';
       if (ok) visible++;
@@ -298,12 +317,21 @@ const allAircraft = Array.from(
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
       const acVal = (item.dataset.aircraft || '').toLowerCase();
+      const durationVal = parseFloat((item as HTMLElement).dataset.duration || '0');
+      const hours = durationVal / 3600;
+
+      let durationOk = true;
+      if (!isNaN(qDurationHours)) {
+        if (qDurationType === 'under') durationOk = hours < qDurationHours;
+        else if (qDurationType === 'over') durationOk = hours > qDurationHours;
+      }
 
       const ok = (!qAirline || airline === qAirline)
         && (!qAircraft || acVal.includes(qAircraft.toLowerCase()))
         && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
-        && (!qArr || arrVal.includes(qArr));
+        && (!qArr || arrVal.includes(qArr))
+        && durationOk;
 
       (item as HTMLElement).style.display = ok ? '' : 'none';
       if (ok && !tableRows.length) visible++;
@@ -320,6 +348,10 @@ const allAircraft = Array.from(
     if (qFlt) params.set('flt', qFlt);
     if (qDep) params.set('dep', qDep);
     if (qArr) params.set('arr', qArr);
+    if (!isNaN(qDurationHours)) {
+      params.set('dur_type', qDurationType);
+      params.set('dur_hours', qDurationHoursVal);
+    }
     const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
     window.history.replaceState({}, '', newUrl);
   }
@@ -429,6 +461,12 @@ const allAircraft = Array.from(
     if (opt) filterAircraftDisplay.value = opt.textContent?.trim() || '';
   }
 
+  const filterDurationType = document.getElementById('filter-duration-type') as HTMLSelectElement;
+  const filterDurationHours = document.getElementById('filter-duration-hours') as HTMLInputElement;
+
+  if (params.get('dur_type') && filterDurationType) filterDurationType.value = params.get('dur_type')!;
+  if (params.get('dur_hours') && filterDurationHours) filterDurationHours.value = params.get('dur_hours')!;
+
   if (params.get('flt') && filterFltnum) filterFltnum.value = params.get('flt')!;
   if (params.get('dep') && filterDep) filterDep.value = params.get('dep')!;
   if (params.get('arr') && filterArr) filterArr.value = params.get('arr')!;
@@ -436,6 +474,8 @@ const allAircraft = Array.from(
 
   const filterBtn = document.getElementById('filter-btn');
   filterBtn?.addEventListener('click', filterRows);
+  filterDurationType?.addEventListener('change', filterRows);
+  filterDurationHours?.addEventListener('input', filterRows);
 
   // Allow pressing "Enter" inside the text boxes to trigger the search
   const handleEnter = (e: KeyboardEvent) => { if (e.key === 'Enter') filterRows(); };
