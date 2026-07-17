@@ -10,7 +10,7 @@ interface Route {
   arr: string;
   duration: number;
   airline_id?: number;
-  aircraft?: { name: string; liveryname: string }[];
+  aircraft?: { name: string; liveryname: string; icao?: string }[];
 }
 
 let routes: Route[] = [];
@@ -35,15 +35,32 @@ try {
 const airlines = [...airlinesData.airlines].sort((a, b) => a.name.localeCompare(b.name));
 const totalRoutes = routes.length;
 
-// Extract unique aircraft and livery configurations from the routes
+// Extract unique aircraft types from the routes
 const allAircraft = Array.from(
   new Map(
     routes
       .flatMap(r => r.aircraft || [])
-      .filter(ac => ac && ac.name && ac.liveryname)
-      .map(ac => [`${ac.name} (${ac.liveryname})`, ac])
+      .filter(ac => ac && ac.name)
+      .map(ac => {
+        const key = ac.icao && ac.icao !== 'XXXX' ? ac.icao : ac.name;
+        return [key, ac];
+      })
   ).values()
-).sort((a, b) => a.name.localeCompare(b.name));
+).sort((a, b) => {
+  const aKey = a.icao && a.icao !== 'XXXX' ? a.icao : a.name;
+  const bKey = b.icao && b.icao !== 'XXXX' ? b.icao : b.name;
+  return aKey.localeCompare(bKey);
+});
+
+// Extract unique livery names from the routes
+const allLiveries = Array.from(
+  new Set(
+    routes
+      .flatMap(r => r.aircraft || [])
+      .map(ac => ac && ac.liveryname)
+      .filter(Boolean)
+  )
+).sort((a, b) => a.localeCompare(b));
 ---
 
 <Layout title="Route Database | Qatari Virtual" description="Browse Qatari Virtual's complete route database with 5,000+ flights. Search and filter by flight number, departure, arrival, and aircraft type.">
@@ -95,7 +112,7 @@ const allAircraft = Array.from(
         <input 
           id="filter-aircraft-display"
           type="text" 
-          placeholder="All Aircraft (Livery)" 
+          placeholder="All Aircraft" 
           class="filter-input w-full pr-8 cursor-pointer"
           autocomplete="off"
         />
@@ -106,9 +123,38 @@ const allAircraft = Array.from(
         <div class="search-select-dropdown absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#ead9df] rounded-xl shadow-lg z-50 hidden opacity-0 scale-95 transition-all duration-200 origin-top">
           <div class="py-1">
             <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer font-medium" data-value="">All Aircraft</div>
-            {allAircraft.map(ac => (
-              <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer" data-value={`${ac.name} (${ac.liveryname})`}>
-                {ac.name} <span class="text-xs text-gray-400">({ac.liveryname})</span>
+            {allAircraft.map(ac => {
+              const displayVal = ac.icao && ac.icao !== 'XXXX' ? `${ac.name} (${ac.icao})` : ac.name;
+              const dataVal = ac.icao && ac.icao !== 'XXXX' ? ac.icao : ac.name;
+              return (
+                <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer" data-value={dataVal}>
+                  {displayVal}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Searchable Dropdown for Livery -->
+      <div class="relative search-select w-full sm:w-[230px]" id="livery-select-wrapper">
+        <input 
+          id="filter-livery-display"
+          type="text" 
+          placeholder="All Liveries" 
+          class="filter-input w-full pr-8 cursor-pointer"
+          autocomplete="off"
+        />
+        <input id="filter-livery" type="hidden" value="" />
+        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+        <div class="search-select-dropdown absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#ead9df] rounded-xl shadow-lg z-50 hidden opacity-0 scale-95 transition-all duration-200 origin-top">
+          <div class="py-1">
+            <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer font-medium" data-value="">All Liveries</div>
+            {allLiveries.map(livery => (
+              <div class="search-select-option px-4 py-2 text-sm text-gray-700 hover:bg-[#f8f1f3] hover:text-[#8B1538] cursor-pointer" data-value={livery}>
+                {livery}
               </div>
             ))}
           </div>
@@ -156,7 +202,8 @@ const allAircraft = Array.from(
                                || airlines.find(a => !a.suffix && a.prefix.split(',').some(p => (route.fltnum || '').startsWith(p)));
                     return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
                   })()}
-                  data-aircraft={route.aircraft?.map(ac => `${ac.name} (${ac.liveryname})`).join(', ') || ''}
+                  data-aircraft={route.aircraft?.map(ac => `${ac.name} ${ac.icao || ''}`).join(', ') || ''}
+                  data-liveries={route.aircraft?.map(ac => ac.liveryname || '').join(', ') || ''}
                   data-duration={route.duration || 0}
                 >
                   <td class="py-2.5 px-4 font-medium text-gray-800">
@@ -214,7 +261,8 @@ const allAircraft = Array.from(
                          || airlines.find(a => !a.suffix && a.prefix.split(',').some(p => (route.fltnum || '').startsWith(p)));
               return match ? (match.suffix ? `${match.prefix}_${match.suffix}` : match.prefix) : '';
             })()}
-            data-aircraft={route.aircraft?.map(ac => `${ac.name} (${ac.liveryname})`).join(', ') || ''}
+            data-aircraft={route.aircraft?.map(ac => `${ac.name} ${ac.icao || ''}`).join(', ') || ''}
+            data-liveries={route.aircraft?.map(ac => ac.liveryname || '').join(', ') || ''}
             data-duration={route.duration || 0}
           >
             <div class="flex items-center justify-between mb-2">
@@ -264,6 +312,8 @@ const allAircraft = Array.from(
   const filterAirlineDisplay = document.getElementById('filter-airline-display') as HTMLInputElement;
   const filterAircraft = document.getElementById('filter-aircraft') as HTMLInputElement;
   const filterAircraftDisplay = document.getElementById('filter-aircraft-display') as HTMLInputElement;
+  const filterLivery = document.getElementById('filter-livery') as HTMLInputElement;
+  const filterLiveryDisplay = document.getElementById('filter-livery-display') as HTMLInputElement;
   const filterFltnum = document.getElementById('filter-fltnum') as HTMLInputElement;
   const filterDep = document.getElementById('filter-dep') as HTMLInputElement;
   const filterArr = document.getElementById('filter-arr') as HTMLInputElement;
@@ -276,6 +326,7 @@ const allAircraft = Array.from(
   function filterRows() {
     const qAirline = filterAirline?.value || '';
     const qAircraft = filterAircraft?.value || '';
+    const qLivery = filterLivery?.value || '';
     const qFlt = (filterFltnum?.value || '').toLowerCase();
     const qDep = (filterDep?.value || '').toLowerCase();
     const qArr = (filterArr?.value || '').toLowerCase();
@@ -291,6 +342,7 @@ const allAircraft = Array.from(
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
       const acVal = (item.dataset.aircraft || '').toLowerCase();
+      const liveryVal = (item.dataset.liveries || '').toLowerCase();
       const durationVal = parseFloat((item as HTMLElement).dataset.duration || '0');
       const hours = durationVal / 3600;
 
@@ -302,6 +354,7 @@ const allAircraft = Array.from(
 
       const ok = (!qAirline || airline === qAirline)
         && (!qAircraft || acVal.includes(qAircraft.toLowerCase()))
+        && (!qLivery || liveryVal.includes(qLivery.toLowerCase()))
         && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
         && (!qArr || arrVal.includes(qArr))
@@ -317,6 +370,7 @@ const allAircraft = Array.from(
       const depVal = (item.dataset.dep || '').toLowerCase();
       const arrVal = (item.dataset.arr || '').toLowerCase();
       const acVal = (item.dataset.aircraft || '').toLowerCase();
+      const liveryVal = (item.dataset.liveries || '').toLowerCase();
       const durationVal = parseFloat((item as HTMLElement).dataset.duration || '0');
       const hours = durationVal / 3600;
 
@@ -328,6 +382,7 @@ const allAircraft = Array.from(
 
       const ok = (!qAirline || airline === qAirline)
         && (!qAircraft || acVal.includes(qAircraft.toLowerCase()))
+        && (!qLivery || liveryVal.includes(qLivery.toLowerCase()))
         && (!qFlt || fltnum.includes(qFlt))
         && (!qDep || depVal.includes(qDep))
         && (!qArr || arrVal.includes(qArr))
@@ -345,6 +400,7 @@ const allAircraft = Array.from(
     const params = new URLSearchParams();
     if (qAirline) params.set('airline', qAirline);
     if (qAircraft) params.set('aircraft', qAircraft);
+    if (qLivery) params.set('livery', qLivery);
     if (qFlt) params.set('flt', qFlt);
     if (qDep) params.set('dep', qDep);
     if (qArr) params.set('arr', qArr);
@@ -443,6 +499,7 @@ const allAircraft = Array.from(
   // Initialize SearchSelect dropdowns
   setupSearchSelect('airline-select-wrapper', 'filter-airline', 'filter-airline-display', 'All Airlines');
   setupSearchSelect('aircraft-select-wrapper', 'filter-aircraft', 'filter-aircraft-display', 'All Aircraft');
+  setupSearchSelect('livery-select-wrapper', 'filter-livery', 'filter-livery-display', 'All Liveries');
 
   // load filters from URL on page load
   const params = new URLSearchParams(window.location.search);
@@ -459,6 +516,13 @@ const allAircraft = Array.from(
     filterAircraft.value = val;
     const opt = document.querySelector(`#aircraft-select-wrapper .search-select-option[data-value="${val}"]`);
     if (opt) filterAircraftDisplay.value = opt.textContent?.trim() || '';
+  }
+
+  if (params.get('livery') && filterLivery && filterLiveryDisplay) {
+    const val = params.get('livery')!;
+    filterLivery.value = val;
+    const opt = document.querySelector(`#livery-select-wrapper .search-select-option[data-value="${val}"]`);
+    if (opt) filterLiveryDisplay.value = opt.textContent?.trim() || '';
   }
 
   const filterDurationType = document.getElementById('filter-duration-type') as HTMLSelectElement;
