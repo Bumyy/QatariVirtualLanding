@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Stats from '../components/Stats.astro';
 import CTA from '../components/CTA.astro';
+import RecentPilots from '../components/RecentPilots.astro';
 import airlinesData from '../assets/airlines.json';
 import MdiIcon from '@mdi/react';
 import { mdiAccountPlus, mdiSchoolOutline, mdiAirplane, mdiTrophyOutline } from '@mdi/js';
@@ -187,6 +188,9 @@ const partnerWithFlag = partners.map(p => ({ ...p, isOneWorld: owPrefixes.includ
     description="Join an award-winning community of pilots flying 5,000+ routes worldwide."
   />
 </div>
+
+<!-- Recent Pilots -->
+<RecentPilots />
 
 <!-- Rank Progression -->
 <section class="px-6 py-12">
