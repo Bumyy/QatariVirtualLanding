@@ -348,7 +348,21 @@
     {
       "name": "Norwegian Air Shuttle",
       "prefix": "NOZ",
-      "hubs": ["ENGM", "EFHK", "ESSA", "EKCH", "ENBR", "LEAL", "LEMG", "LEBL", "EVRA", "ENZV", "ENVA", "GCLP", "LEPA"],
+      "hubs": [
+        "ENGM",
+        "EFHK",
+        "ESSA",
+        "EKCH",
+        "ENBR",
+        "LEAL",
+        "LEMG",
+        "LEBL",
+        "EVRA",
+        "ENZV",
+        "ENVA",
+        "GCLP",
+        "LEPA"
+      ],
       "color": "#E6222E",
       "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png",
       "codeshare_code": "NOZ/DY"
@@ -356,7 +370,21 @@
     {
       "name": "Norwegian Air Sweden",
       "prefix": "NSZ",
-      "hubs": ["ENGM", "EFHK", "ESSA", "EKCH", "ENBR", "LEAL", "LEMG", "LEBL", "EVRA", "ENZV", "ENVA", "GCLP", "LEPA"],
+      "hubs": [
+        "ENGM",
+        "EFHK",
+        "ESSA",
+        "EKCH",
+        "ENBR",
+        "LEAL",
+        "LEMG",
+        "LEBL",
+        "EVRA",
+        "ENZV",
+        "ENVA",
+        "GCLP",
+        "LEPA"
+      ],
       "color": "#E6222E",
       "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Norwegian_Logo_2024.svg/1280px-Norwegian_Logo_2024.svg.png",
       "codeshare_code": "NSZ/LE"
@@ -542,7 +570,7 @@
       "prefix": "CES,CUA,CSH",
       "hubs": ["ZSPD", "ZSWZ"],
       "color": "#1B1D80",
-      "logo": "https://cdn.qatarivirtual.xyz/graphics%20and%20images/chinaeastern.png",
+      "logo": "https://cdn.qatarivirtual.com/graphics%20and%20images/chinaeastern.png",
       "codeshare_code": "CES/MU"
     }
   ]

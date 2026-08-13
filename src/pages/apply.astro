@@ -261,7 +261,7 @@ import RecentPilots from '../components/RecentPilots.astro';
     showStatus('Looking up your Infinite Flight profile...', false);
 
     try {
-      const res = await fetch('https://crew.qatarivirtual.xyz/api.php/if-proxy', {
+      const res = await fetch('https://crew.qatarivirtual.com/api.php/if-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ endpoint: 'user_lookup', discourseName: username }),
@@ -376,7 +376,7 @@ import RecentPilots from '../components/RecentPilots.astro';
     submitBtn.textContent = 'Submitting...';
 
     try {
-      const res = await fetch('https://crew.qatarivirtual.xyz/api.php/apply', {
+      const res = await fetch('https://crew.qatarivirtual.com/api.php/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
